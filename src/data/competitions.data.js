@@ -61,7 +61,7 @@ export const UEFA_COMPETITIONS = [
 
     // ITÁLIA
     { id: 104, nome: "Liga Italiana", pais: "Itália", tipo: "Liga", modoRegistro: "liga", logo: "/logos/competitions/liga-italiana.png", promovidos: 0, rebaixados: 3, trofeu: 'trofeu-liga-italiana' },
-    { id: 105, nome: "Copa Italia", pais: "Itália", tipo: "Copa", modoRegistro: "mata_mata_simples", logo: "/logos/competitions/copa-italiana.png", promovidos: 0, rebaixados: 0, trofeu: 'trofeu-copa-italia' },
+    { id: 105, nome: "Copa Italia", pais: "Itália", tipo: "Copa", modoRegistro: "mata_mata_simples", logo: "/logos/competitions/copa-italia.png", promovidos: 0, rebaixados: 0, trofeu: 'trofeu-copa-italia' },
 
     // ESPANHA
     { id: 106, nome: "Liga Espanhola", pais: "Espanha", tipo: "Liga", modoRegistro: "liga", logo: "/logos/competitions/liga-espanhola.png", promovidos: 0, rebaixados: 3, trofeu: 'trofeu-liga-espanhola' },

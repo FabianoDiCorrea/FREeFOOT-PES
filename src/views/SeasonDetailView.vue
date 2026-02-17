@@ -52,11 +52,14 @@
                      @error="e => e.target.style.display='none'">
                 
                 <div class="position-relative d-flex align-items-center">
-                  <TeamShield :teamName="season.campeao" :size="100" borderless class="escudo-campeao" />
+                  <TeamShield :teamName="season.campeao" :size="100" borderless class="escudo-campeao" :season="season.ano" />
                 </div>
 
                 <div class="text-start info-campeao">
-                  <h5 class="fw-black text-uppercase mb-0 lh-1" style="font-size: 1.4rem;">{{ season.campeao }}</h5>
+                  <h5 class="fw-black text-uppercase mb-0 lh-1 d-flex align-items-center gap-2" style="font-size: 1.4rem;">
+                    {{ season.campeao }}
+                    <i v-if="careerStore.isUserTeam(season.campeao, season.ano)" class="bi bi-controller text-neon-green pulse-neon" style="font-size: 1.1rem;"></i>
+                  </h5>
                   <div class="text-secondary small fw-bold text-uppercase opacity-75 mt-1" style="font-size: 0.8rem;">CAMPEÃO — {{ season.ano }}</div>
                 </div>
               </div>
@@ -75,9 +78,12 @@
             <!-- VICE -->
             <div class="col-md-6 p-2 text-center bg-transparent shadow-inset-left">
               <div class="mb-1 d-inline-block pt-1">
-                <TeamShield :teamName="season.vice" :size="80" borderless />
+                <TeamShield :teamName="season.vice" :size="80" borderless :season="season.ano" />
               </div>
-              <h6 class="fw-bold text-uppercase text-secondary mb-0 small">{{ season.vice || 'SEM VICE' }}</h6>
+              <h6 class="fw-bold text-uppercase text-secondary mb-0 small d-flex align-items-center justify-content-center gap-2">
+                {{ season.vice || 'SEM VICE' }}
+                <i v-if="season.vice && careerStore.isUserTeam(season.vice, season.ano)" class="bi bi-controller text-neon-green pulse-neon" style="font-size: 1.1rem;"></i>
+              </h6>
               <div v-if="isInternational && season.vice && getClubInfo(season.vice)" class="d-flex justify-content-center align-items-center gap-2 opacity-50">
                 <template v-if="competitionInfo?.modoRegistro === 'mundial'">
                    <img :src="getClubInfo(season.vice).federacaoLogo" style="height: 12px; width: auto; object-fit: contain;" />
@@ -116,7 +122,7 @@
                     <div class="match-title x-small fw-black text-secondary mb-2 text-center">SEMIFINAL 1</div>
                     <div class="d-flex align-items-center justify-content-between gap-2">
                       <div class="d-flex flex-column align-items-center text-center" style="width: 120px;">
-                        <TeamShield :teamName="season.mundial.semi1.time1" :size="36" />
+                        <TeamShield :teamName="season.mundial.semi1.time1" :size="36" :season="season.ano" />
                         <input type="text" v-model="season.mundial.semi1.time1" class="form-control game-input-sm x-small text-center mt-1" placeholder="Time A">
                         <div v-if="getClubInfo(season.mundial.semi1.time1)" class="d-flex flex-column align-items-center gap-0 opacity-50 mt-1 lh-1">
                            <div class="d-flex align-items-center gap-1 mb-1">
@@ -135,7 +141,7 @@
                         <input type="number" v-model="season.mundial.semi1.placar2" class="form-control game-score-input fs-5">
                       </div>
                       <div class="d-flex flex-column align-items-center text-center" style="width: 120px;">
-                        <TeamShield :teamName="season.mundial.semi1.time2" :size="36" />
+                        <TeamShield :teamName="season.mundial.semi1.time2" :size="36" :season="season.ano" />
                         <input type="text" v-model="season.mundial.semi1.time2" class="form-control game-input-sm x-small text-center mt-1" placeholder="Time B">
                         <div v-if="getClubInfo(season.mundial.semi1.time2)" class="d-flex flex-column align-items-center gap-0 opacity-50 mt-1 lh-1">
                            <div class="d-flex align-items-center gap-1 mb-1">
@@ -155,7 +161,7 @@
                     <div class="match-title x-small fw-black text-secondary mb-2 text-center">SEMIFINAL 2</div>
                     <div class="d-flex align-items-center justify-content-between gap-2">
                       <div class="d-flex flex-column align-items-center text-center" style="width: 120px;">
-                        <TeamShield :teamName="season.mundial.semi2.time1" :size="36" />
+                        <TeamShield :teamName="season.mundial.semi2.time1" :size="36" :season="season.ano" />
                         <input type="text" v-model="season.mundial.semi2.time1" class="form-control game-input-sm x-small text-center mt-1" placeholder="Time A">
                         <div v-if="getClubInfo(season.mundial.semi2.time1)" class="d-flex flex-column align-items-center gap-0 opacity-50 mt-1 lh-1">
                            <div class="d-flex align-items-center gap-1 mb-1">
@@ -174,7 +180,7 @@
                         <input type="number" v-model="season.mundial.semi2.placar2" class="form-control game-score-input fs-5">
                       </div>
                       <div class="d-flex flex-column align-items-center text-center" style="width: 120px;">
-                        <TeamShield :teamName="season.mundial.semi2.time2" :size="36" />
+                        <TeamShield :teamName="season.mundial.semi2.time2" :size="36" :season="season.ano" />
                         <input type="text" v-model="season.mundial.semi2.time2" class="form-control game-input-sm x-small text-center mt-1" placeholder="Time B">
                         <div v-if="getClubInfo(season.mundial.semi2.time2)" class="d-flex flex-column align-items-center gap-0 opacity-50 mt-1 lh-1">
                            <div class="d-flex align-items-center gap-1 mb-1">
@@ -200,7 +206,7 @@
                       <div class="match-title small fw-black text-warning mb-3 text-center ls-2">🏆 GRANDE FINAL</div>
                       <div class="d-flex align-items-center justify-content-between gap-4">
                         <div class="d-flex flex-column align-items-center flex-grow-1">
-                          <TeamShield :teamName="season.mundial.final.time1" :size="80" borderless />
+                          <TeamShield :teamName="season.mundial.final.time1" :size="80" borderless :season="season.ano" />
                           <div class="fw-black text-uppercase mt-2 text-center" style="font-size: 1.1rem;">{{ season.mundial.final.time1 || 'FINALISTA 1' }}</div>
                           <div v-if="getClubInfo(season.mundial.final.time1)" class="d-flex flex-column justify-content-center align-items-center gap-1 opacity-50 mt-1">
                              <div class="d-flex align-items-center gap-2">
@@ -221,7 +227,7 @@
                         </div>
 
                         <div class="d-flex flex-column align-items-center flex-grow-1">
-                          <TeamShield :teamName="season.mundial.final.time2" :size="80" borderless />
+                          <TeamShield :teamName="season.mundial.final.time2" :size="80" borderless :season="season.ano" />
                           <div class="fw-black text-uppercase mt-2 text-center" style="font-size: 1.1rem;">{{ season.mundial.final.time2 || 'FINALISTA 2' }}</div>
                           <div v-if="getClubInfo(season.mundial.final.time2)" class="d-flex flex-column justify-content-center align-items-center gap-1 opacity-50 mt-1">
                              <div class="d-flex align-items-center gap-2">
@@ -242,7 +248,7 @@
                       <div class="match-title x-small fw-black text-secondary mb-2 text-center opacity-50">DISPUTA 3º LUGAR</div>
                       <div class="d-flex align-items-center justify-content-between gap-2">
                         <div class="d-flex align-items-center gap-2 flex-grow-1">
-                          <TeamShield :teamName="season.mundial.terceiro.time1" :size="20" borderless />
+                          <TeamShield :teamName="season.mundial.terceiro.time1" :size="20" borderless :season="season.ano" />
                           <span class="x-small fw-bold opacity-75 text-truncate" style="max-width: 100px;">{{ season.mundial.terceiro.time1 }}</span>
                         </div>
                         <div class="d-flex align-items-center gap-1">
@@ -252,7 +258,7 @@
                         </div>
                         <div class="d-flex align-items-center gap-2 justify-content-end flex-grow-1">
                           <span class="x-small fw-bold opacity-75 text-truncate" style="max-width: 100px;">{{ season.mundial.terceiro.time2 }}</span>
-                          <TeamShield :teamName="season.mundial.terceiro.time2" :size="20" borderless />
+                          <TeamShield :teamName="season.mundial.terceiro.time2" :size="20" borderless :season="season.ano" />
                         </div>
                       </div>
                     </div>
@@ -268,7 +274,7 @@
     <div class="d-flex flex-wrap gap-2 align-items-start">
       
       <!-- LADO ESQUERDO: TABELA (FIXED WIDTH TO ACTUAL SIZE) -->
-      <div v-if="(competitionInfo?.modoRegistro === 'liga' && season.tabela) || competitionInfo?.modoRegistro === 'participantes'" class="flex-shrink-0" style="width: 650px;">
+      <div v-if="(competitionInfo?.modoRegistro === 'liga' && season.tabela) || competitionInfo?.modoRegistro === 'participantes'" class="flex-shrink-0" style="width: fit-content; max-width: 600px;">
         
         <!-- Caso Liga -->
         <GamePanel v-if="competitionInfo?.modoRegistro === 'liga'" customClass="p-0 overflow-hidden">
@@ -281,6 +287,7 @@
             :promotedCount="competitionStats.promoted"
             :relegationCount="competitionStats.relegated"
             :playoffPromotedTeams="season.promovidosPlayoff || []"
+            :season="season.ano"
           />
         </GamePanel>
 
@@ -296,12 +303,10 @@
               <!-- CABEÇALHO -->
               <div class="cup-header-v2">
                 <div class="h-main">
-                  <div class="h-pos">#</div>
                   <div class="h-team">EQUIPE</div>
                 </div>
                 <div class="h-stats">
-                  <div class="h-slant">PAÍS</div>
-                  <div v-if="competitionInfo?.nome === 'Mundial de Clubes'" class="h-slant fed">FED.</div>
+                  <div class="h-slant country">PAÍS</div>
                   <div class="h-slant pos">POSIÇÃO</div>
                 </div>
               </div>
@@ -309,20 +314,20 @@
               <!-- LINHAS -->
               <div v-for="(p, idx) in season.participantes" :key="p.clubeId" 
                    class="cup-row-v2"
-                   :class="{ 
-                     'linha-campeao': p.colocacao === 'CAMPEÃO',
-                     'linha-vice': p.colocacao === 'VICE',
-                     'row-alt': idx % 2 !== 0 
-                   }">
+                   :class="[
+                     { 'row-alt': idx % 2 !== 0 },
+                     getPlacementColorClass(p.colocacao)
+                   ]">
                 
-                <!-- RANK SLANT -->
-                <div class="rank-slant-cup" :class="{ 'bg-champion-cup': p.colocacao === 'CAMPEÃO', 'bg-vice-cup': p.colocacao === 'VICE' }">
-                  <span>{{ idx + 1 }}</span>
-                </div>
 
                 <!-- INFO EQUIPE -->
                 <div class="team-info-cup">
-                  <TeamShield :teamName="p.nome" :size="24" />
+                  <!-- Ícone de Troféu/Medalha (condicional) -->
+                  <div class="trophy-icon-container">
+                    <span v-if="p.colocacao === 'CAMPEÃO'" class="trophy-icon gold">🏆</span>
+                    <span v-else-if="p.colocacao === 'VICE'" class="trophy-icon silver">🥈</span>
+                  </div>
+                  <TeamShield :teamName="p.nome" :size="24" :season="season.ano" />
                   <span class="team-name text-truncate">{{ p.nome }}</span>
                 </div>
 
@@ -336,21 +341,24 @@
                     
                     <div class="country-bg-glass"></div>
                     
-                    <div class="d-flex align-items-center w-100 slant-content gap-2" style="padding-left: 52px; padding-right: 5px;">
+                    <div class="d-flex align-items-center justify-content-center w-100 slant-content gap-2" style="padding-right: 5px;">
                       <NationalFlag v-if="p.pais" :countryName="p.pais" :size="20" class="position-relative z-3" />
                       <span class="text-uppercase fw-black text-truncate" style="font-size: 0.7rem; letter-spacing: 0.5px;">{{ p.pais || '-' }}</span>
                     </div>
                   </div>
-                  
-                  <div v-if="competitionInfo?.nome === 'Mundial de Clubes'" class="stat-slant-cup fed">
-                    <span class="slant-content text-uppercase">{{ p.federacao || '-' }}</span>
-                  </div>
 
-                  <div class="stat-slant-cup select-col">
+                  <div class="stat-slant-cup select-col" :class="getPlacementColorClass(p.colocacao)">
                     <div class="slant-content">
-                      <select v-model="p.colocacao" class="form-select cup-input-select fw-black">
-                         <option :value="null">SELECIONAR</option>
-                         <option v-for="opt in PLACEMENTS_OPTIONS" :key="opt" :value="opt">{{ opt }}</option>
+                      <select v-model="p.colocacao" 
+                              class="form-select cup-input-select fw-black"
+                              :class="getPlacementColorClass(p.colocacao)">
+                         <option :value="null" class="bg-dark text-white">SELECIONAR</option>
+                         <option v-for="opt in PLACEMENTS_OPTIONS" 
+                                 :key="opt" 
+                                 :value="opt"
+                                 :class="getPlacementColorClass(opt) + '-option'">
+                           {{ opt }}
+                         </option>
                       </select>
                     </div>
                   </div>
@@ -414,7 +422,7 @@
                   <div class="v-divider-h"></div>
                   <div class="d-flex align-items-center gap-2 px-3">
                     <div class="club-shield-h-wrap">
-                      <TeamShield :teamName="sc.clube" :size="48" borderless />
+                      <TeamShield :teamName="sc.clube" :size="48" borderless :season="season.ano" />
                     </div>
                     <div class="d-flex flex-column">
                       <span class="club-name-h">{{ sc.clube }}</span>
@@ -461,6 +469,7 @@
 import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { seasonStore } from '../services/season.store'
+import { careerStore } from '../services/career.store'
 import { seasonService } from '../services/season.service'
 import { CLUBS_DATA } from '../data/clubs.data'
 import { FEDERATIONS_DATA } from '../services/federations.data'
@@ -672,6 +681,19 @@ const loadSeasonData = async () => {
   }
 }
 
+const getPlacementColorClass = (colocacao) => {
+  if (!colocacao) return '';
+  const c = colocacao.toUpperCase().trim();
+  if (c.includes('CAMPEÃO')) return 'pos-gold';
+  if (c.includes('VICE')) return 'pos-silver';
+  if (c.includes('TERCEIRO') || c.includes('SEMIFINAL')) return 'pos-bronze';
+  if (c.includes('QUARTAS')) return 'pos-green';
+  if (c.includes('OITAVAS')) return 'pos-cyan';
+  if (c.includes('GRUPOS')) return 'pos-blue-dark';
+  if (c.includes('PRÉ')) return 'pos-red';
+  return '';
+}
+
 const getFedColorClass = (fedName) => {
   if (!fedName) return '';
   const n = fedName.toUpperCase();
@@ -684,9 +706,34 @@ const getFedColorClass = (fedName) => {
   return '';
 }
 
-onMounted(() => {
-  loadSeasonData();
+onMounted(async () => {
+  await seasonStore.loadAll()
+  await careerStore.loadAll()
+  loadSeasonData()
+  
+  // Força re-render dos selects após carregamento para aplicar CSS corretamente
+  setTimeout(() => {
+    if (season.value?.participantes) {
+      season.value.participantes = [...season.value.participantes]
+    }
+  }, 100)
 })
+
+// Watcher para forçar re-aplicação de classes CSS quando dados mudam
+watch(() => season.value?.participantes, (newVal) => {
+  if (newVal && newVal.length > 0) {
+    // Força re-render para aplicar classes CSS corretamente
+    setTimeout(() => {
+      const selects = document.querySelectorAll('.cup-input-select')
+      selects.forEach(select => {
+        // Força o navegador a re-renderizar o select
+        select.style.display = 'none'
+        select.offsetHeight // trigger reflow
+        select.style.display = ''
+      })
+    }, 50)
+  }
+}, { deep: true, immediate: true })
 
 watch(() => route.params.id, () => {
   loadSeasonData();
@@ -1122,7 +1169,7 @@ const saveMundial = async () => {
 
 .h-main {
   display: flex;
-  width: 250px;
+  width: 210px;
   font-weight: 900;
   font-size: 0.6rem;
   color: rgba(255, 255, 255, 0.4);
@@ -1130,7 +1177,7 @@ const saveMundial = async () => {
 }
 
 .h-pos { width: 40px; text-align: center; }
-.h-team { padding-left: 10px; }
+.h-team { padding-left: 15px; display: flex; align-items: center; justify-content: flex-start; }
 
 .h-stats {
   display: flex;
@@ -1151,8 +1198,9 @@ const saveMundial = async () => {
   padding: 0 10px;
 }
 
+.h-slant.country { width: 160px; }
 .h-slant.fed { width: 80px; }
-.h-slant.pos { flex-grow: 1; }
+.h-slant.pos { width: 140px; }
 
 .cup-row-v2 {
   display: flex;
@@ -1164,49 +1212,109 @@ const saveMundial = async () => {
 }
 
 .cup-row-v2:hover {
-  background: rgba(30, 50, 90, 0.9) !important;
-  transform: scale(1.01);
+  transform: scale(1.015);
   z-index: 5;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* HOVER NEON DINÂMICO POR POSIÇÃO */
+.cup-row-v2.pos-gold:hover {
+  background: linear-gradient(90deg, rgba(255, 215, 0, 0.25), rgba(255, 215, 0, 0.1)) !important;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.6), inset 0 0 15px rgba(255, 215, 0, 0.2);
+  border-left: 4px solid #ffd700;
+}
+
+.cup-row-v2.pos-silver:hover {
+  background: linear-gradient(90deg, rgba(192, 192, 192, 0.25), rgba(192, 192, 192, 0.1)) !important;
+  box-shadow: 0 0 20px rgba(192, 192, 192, 0.6), inset 0 0 15px rgba(192, 192, 192, 0.2);
+  border-left: 4px solid #c0c0c0;
+}
+
+.cup-row-v2.pos-bronze:hover {
+  background: linear-gradient(90deg, rgba(255, 140, 0, 0.25), rgba(255, 140, 0, 0.1)) !important;
+  box-shadow: 0 0 20px rgba(255, 140, 0, 0.6), inset 0 0 15px rgba(255, 140, 0, 0.2);
+  border-left: 4px solid #ff8c00;
+}
+
+.cup-row-v2.pos-green:hover {
+  background: linear-gradient(90deg, rgba(46, 204, 113, 0.25), rgba(46, 204, 113, 0.1)) !important;
+  box-shadow: 0 0 20px rgba(46, 204, 113, 0.6), inset 0 0 15px rgba(46, 204, 113, 0.2);
+  border-left: 4px solid #2ecc71;
+}
+
+.cup-row-v2.pos-cyan:hover {
+  background: linear-gradient(90deg, rgba(0, 242, 255, 0.25), rgba(0, 242, 255, 0.1)) !important;
+  box-shadow: 0 0 20px rgba(0, 242, 255, 0.6), inset 0 0 15px rgba(0, 242, 255, 0.2);
+  border-left: 4px solid #00f2ff;
+}
+
+.cup-row-v2.pos-blue-dark:hover {
+  background: linear-gradient(90deg, rgba(0, 86, 179, 0.25), rgba(0, 86, 179, 0.1)) !important;
+  box-shadow: 0 0 20px rgba(0, 86, 179, 0.6), inset 0 0 15px rgba(0, 86, 179, 0.2);
+  border-left: 4px solid #0056b3;
+}
+
+.cup-row-v2.pos-red:hover {
+  background: linear-gradient(90deg, rgba(231, 76, 60, 0.25), rgba(231, 76, 60, 0.1)) !important;
+  box-shadow: 0 0 20px rgba(231, 76, 60, 0.6), inset 0 0 15px rgba(231, 76, 60, 0.2);
+  border-left: 4px solid #e74c3c;
 }
 
 .row-alt { background: rgba(10, 18, 30, 0.5); }
 
-.rank-slant-cup {
-  width: 40px;
-  background: rgba(0, 0, 0, 0.4);
-  transform: skewX(-20deg);
-  margin-left: -8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 900;
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.7);
-  z-index: 2;
-}
-
-.rank-slant-cup span { transform: skewX(20deg); }
 
 .team-info-cup {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 8px;
-  padding-left: 15px;
+  padding-left: 8px; /* Reduzido para dar espaço ao ícone */
   width: 210px;
   z-index: 1;
+  background: rgba(30, 40, 55, 0.98); 
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Container do ícone de troféu/medalha */
+.trophy-icon-container {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.trophy-icon {
+  font-size: 18px;
+  animation: trophy-pulse 2s ease-in-out infinite;
+}
+
+.trophy-icon.gold {
+  filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.8));
+}
+
+.trophy-icon.silver {
+  filter: drop-shadow(0 0 4px rgba(192, 192, 192, 0.8));
+}
+
+@keyframes trophy-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
 }
 
 .team-name {
   font-weight: 800;
   font-size: 0.75rem;
   text-transform: uppercase;
+  color: #fff !important; /* Garantindo nome branco independente da posição */
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
 }
 
 .stats-group-cup {
   display: flex;
   gap: 2px;
-  flex-grow: 1;
-  margin-right: -10px;
+  width: fit-content; /* Remove excesso lateral */
 }
 
 .stat-slant-cup {
@@ -1222,6 +1330,8 @@ const saveMundial = async () => {
   transform: skewX(20deg);
   display: flex;
   align-items: center;
+  justify-content: center; /* Centralizado conforme solicitado */
+  width: 100%;
   font-weight: 800;
   font-size: 0.65rem;
   z-index: 2;
@@ -1241,7 +1351,7 @@ const saveMundial = async () => {
 }
 
 .stat-slant-cup.country { 
-  width: 160px; 
+  width: 160px;
   border-left: 2px solid rgba(255, 255, 255, 0.05);
   position: relative;
   overflow: hidden; /* Garante que o blur não vaze */
@@ -1291,7 +1401,7 @@ const saveMundial = async () => {
   background: linear-gradient(90deg, rgba(0, 255, 255, 0.15), transparent) !important;
 }
 
-.stat-slant-cup.select-col { flex-grow: 1; background: rgba(0, 0, 0, 0.4); }
+.stat-slant-cup.select-col { width: 140px; background: rgba(0, 0, 0, 0.4); }
 
 /* SPECIAL ROW ACCENTS */
 .linha-campeao {
@@ -1316,14 +1426,40 @@ const saveMundial = async () => {
 .cup-input-select {
   background: transparent !important;
   border: none !important;
-  color: #00ff88;
+  color: #000 !important;
   font-size: 0.65rem;
   padding: 0 10px;
-  height: 32px;
+  height: 28px;
   width: 130px;
   cursor: pointer;
   appearance: none;
   text-align: center;
+  font-weight: 900 !important;
+}
+
+/* Overlay de texto sobre o select */
+.select-text-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 950;
+  pointer-events: none;
+  z-index: 1;
+  text-transform: uppercase;
+}
+
+.select-text-overlay.pos-gold {
+  color: #000 !important;
+}
+
+.select-text-overlay.pos-silver {
+  color: #000 !important;
 }
 
 .cup-input-select:focus {
@@ -1335,6 +1471,17 @@ const saveMundial = async () => {
   background: #111;
   color: white;
   font-weight: bold;
+}
+
+/* GARANTIR COR DO TEXTO EM TODAS AS SITUAÇÕES */
+select.cup-input-select.pos-gold,
+select.cup-input-select.pos-gold option:checked {
+  color: #000 !important;
+}
+
+select.cup-input-select.pos-silver,
+select.cup-input-select.pos-silver option:checked {
+  color: #000 !important;
 }
 
 /* Mundial Bracket Styles */
@@ -1381,5 +1528,87 @@ const saveMundial = async () => {
 
 .final-card {
   background: linear-gradient(135deg, rgba(255, 215, 0, 0.05) 0%, rgba(0, 0, 0, 0.4) 100%);
+}
+
+.text-neon-green {
+  color: #39ff14;
+  text-shadow: 0 0 8px rgba(57, 255, 20, 0.8);
+}
+
+.pulse-neon {
+  animation: pulse-neon-anim 2s infinite;
+  display: inline-block;
+}
+
+@keyframes pulse-neon-anim {
+  0% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+  100% { opacity: 0.7; transform: scale(1); }
+}
+/* FUNDO DAS LINHAS (SUAVE) */
+.cup-row-v2.pos-gold { background: rgba(255, 215, 0, 0.15) !important; }
+.cup-row-v2.pos-silver { background: rgba(192, 192, 192, 0.15) !important; }
+.cup-row-v2.pos-bronze { background: rgba(255, 140, 0, 0.15) !important; }
+.cup-row-v2.pos-green { background: rgba(46, 204, 113, 0.15) !important; }
+.cup-row-v2.pos-cyan { background: rgba(0, 242, 255, 0.15) !important; }
+.cup-row-v2.pos-blue-dark { background: rgba(0, 86, 179, 0.15) !important; }
+.cup-row-v2.pos-red { background: rgba(231, 76, 60, 0.15) !important; }
+
+/* BADGES DAS POSIÇÕES (VIBRANTES/SÓLIDAS) - COR DE FUNDO E TEXTO */
+select.form-select.cup-input-select.pos-gold { 
+  background-color: #ffd700 !important; 
+  color: #000 !important; 
+  font-weight: 800 !important; /* Reduzido de 950 */
+  font-size: 0.9rem !important; /* Aumentado de 0.65rem */
+  opacity: 1 !important; 
+  -webkit-text-fill-color: #000000 !important;
+  text-shadow: 0 0 1px #cfcccc !important;
+  filter: contrast(2);
+}
+
+select.form-select.cup-input-select.pos-silver { 
+  background-color: #c0c0c0 !important; 
+  color: #000 !important; 
+  font-weight: 800 !important; /* Reduzido de 950 */
+  font-size: 0.9rem !important; /* Aumentado de 0.65rem */
+  opacity: 1 !important;
+  -webkit-text-fill-color: #000 !important;
+  text-shadow: 0 0 1px cfcccc !important;
+  filter: contrast(2);
+}
+
+select.form-select.cup-input-select.pos-bronze { 
+  background-color: #ff8c00 !important; 
+  color: #ffffff !important; 
+  font-weight: 950 !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+select.form-select.cup-input-select.pos-green { 
+  background-color: #28a745 !important; 
+  color: #ffffff !important; 
+  font-weight: 950 !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+select.form-select.cup-input-select.pos-cyan { 
+  background-color: #0b8eca !important; 
+  color: #fffafa !important; 
+  font-weight: 950 !important;
+  -webkit-text-fill-color: #fffafa !important;
+}
+
+select.form-select.cup-input-select.pos-blue-dark { 
+  background-color: #0e00d8 !important; 
+  color: #ffffff !important; 
+  font-weight: 950 !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+select.form-select.cup-input-select.pos-red { 
+  background-color: #dc3545 !important; 
+  color: #ffffff !important; 
+  font-weight: 950 !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
 </style>

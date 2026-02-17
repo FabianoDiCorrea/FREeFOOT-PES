@@ -3,8 +3,11 @@
     <!-- TOOLBAR SUPERIOR -->
     <div class="d-flex justify-content-between align-items-center mb-3 px-3 py-2 bg-glass border-bottom border-white border-opacity-10 shadow-lg">
       <div class="d-flex align-items-center gap-4">
-        <button @click="$router.push(`/pais/${countryId}/historico`)" class="btn btn-sm btn-action hover-glow px-3">
-          <i class="bi bi-arrow-left me-2"></i>PAINEL ANTERIOR
+        <button @click="$router.push(`/pais/${countryId}/historico`)" class="btn btn-sm btn-action hover-glow px-3 me-2">
+          <i class="bi bi-table me-2"></i>HISTÓRICO
+        </button>
+        <button @click="$router.push('/universo?pais=' + countryName)" class="btn btn-sm btn-outline-info hover-glow px-3">
+          <i class="bi bi-trophy me-2"></i>COMPETIÇÕES
         </button>
         <div class="d-flex align-items-center gap-2">
           <NationalFlag v-if="countryName" :countryName="countryName" :size="32" />
@@ -78,7 +81,11 @@
           <!-- LINHA 3: SUB-DIVISÕES (A, B, C, D...) -->
           <tr>
             <template v-for="season in sortedSeasons" :key="'sd'+season">
-              <th v-for="slot in countrySlots" :key="season+slot.key" class="slot-header border-all text-center px-0" :class="{ 'last-of-season': isLastSlot(slot) }">
+              <th v-for="slot in countrySlots" :key="season+slot.key" class="slot-header border-all text-center px-0" 
+                  :class="[
+                    { 'last-of-season': isLastSlot(slot) },
+                    { 'intl-column-bg intl-slot-width': slot.type === 'intl' }
+                  ]">
                 {{ slot.label }}
               </th>
             </template>
@@ -90,19 +97,25 @@
             <!-- COLUNA FIXA: CLUBE -->
             <td class="sticky-club club-info-cell border-all px-2">
               <div class="d-flex align-items-center gap-2">
-                <TeamShield :teamName="club" :size="20" />
-                <span class="club-name-text">{{ club }}</span>
+                <TeamShield :teamName="clubNames[club] || club" :size="20" />
+                <span class="club-name-text d-flex align-items-center gap-1">
+                  {{ clubNames[club] || club }}
+                </span>
               </div>
             </td>
 
             <!-- CÉLULAS DE DADOS -->
             <template v-for="season in sortedSeasons" :key="club+season">
-              <td v-for="slot in countrySlots" 
-                  :key="club+season+slot.key" 
-                  class="matrix-xl-cell border-all text-center"
-                  :class="[getCellBackground(club, season, slot), { 'last-of-season': isLastSlot(slot) }]">
-                 <span class="cell-rank-text">{{ getRank(club, season, slot) }}</span>
-              </td>
+                <td v-for="slot in countrySlots" 
+                    :key="club+season+slot.key" 
+                    class="matrix-xl-cell border-all text-center"
+                    :class="[
+                      getCellBackground(club, season, slot), 
+                      { 'last-of-season': isLastSlot(slot) },
+                      { 'intl-column-bg intl-slot-width': slot.type === 'intl' }
+                    ]">
+                   <span class="cell-rank-text">{{ getRank(club, season, slot) }}</span>
+                </td>
             </template>
           </tr>
         </tbody>
@@ -137,9 +150,10 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { seasonStore } from '../services/season.store'
+import { careerStore } from '../services/career.store'
 import { CLUBS_DATA } from '../data/clubs.data'
 import { ALL_COMPETITIONS_DATA } from '../services/competitions.data'
 import { INTERNATIONAL_DATA } from '../data/internationalCompetitions'
@@ -160,11 +174,18 @@ const sortSlot = ref('league_A')
 
 // CONFIGURAÇÃO DE SLOTS (COLUNAS)
 const countrySlots = ref([])
-const intlSlots = [
-  { id: 'liberta', key: 'intl_Libertadores', name: 'Libertadores', shortName: 'LIBERTADORES', logo: '/logos/competitions/libertadores.png' },
-  { id: 'sula', key: 'intl_Sul-Americana', name: 'Sul-Americana', shortName: 'SUDAMERICANA', logo: '/logos/competitions/sulamericana.png' },
-  { id: 'mundial', key: 'intl_Mundial de Clubes', name: 'Mundial de Clubes', shortName: 'MUNDIAL', logo: '/logos/competitions/mundial-de-clubes.png' }
-]
+const intlSlots = ref([])
+
+const getFederationByCountry = (cName) => {
+  const norm = (s) => s?.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim() || ""
+  const target = norm(cName)
+  for (const continent of ALL_COMPETITIONS_DATA) {
+    if (continent.paises.some(p => norm(p.nome) === target)) {
+      return continent.continente
+    }
+  }
+  return null
+}
 
 const mainLeagueLogo = computed(() => {
   const countryIdVal = countryId.value?.toLowerCase()
@@ -185,11 +206,33 @@ const setupSlots = () => {
   const countryIdVal = countryId.value?.toLowerCase()
   let leaguesFound = []
   
-  // Buscar ligas deste país no sistema
+  // 1. Identificar Continente e definir Slots Internacionais
+  const continentName = getFederationByCountry(countryName.value)
+  
+  const intlMap = {
+    'América do Sul': [
+      { id: 'liberta', key: 'intl_Libertadores', name: 'Libertadores', shortName: 'LIBERTADORES', logo: '/logos/competitions/libertadores.png' },
+      { id: 'sula', key: 'intl_Sul-Americana', name: 'Sul-Americana', shortName: 'SUDAMERICANA', logo: '/logos/competitions/sulamericana.png' },
+      { id: 'mundial', key: 'intl_Mundial de Clubes', name: 'Mundial de Clubes', shortName: 'MUNDIAL', logo: '/logos/competitions/mundial-de-clubes.png' }
+    ],
+    'Europa': [
+      { id: 'champions', key: 'intl_Champions League', name: 'Champions League', shortName: 'CHAMPIONS', logo: '/logos/competitions/champions-league.png' },
+      { id: 'mundial', key: 'intl_Mundial de Clubes', name: 'Mundial de Clubes', shortName: 'MUNDIAL', logo: '/logos/competitions/mundial-de-clubes.png' }
+    ],
+    'América do Norte': [
+      { id: 'concacaf', key: 'intl_CONCACAF Champions', name: 'CONCACAF Champions', shortName: 'CONCACAF', logo: '/logos/competitions/concacaf-champions.png' },
+      { id: 'mundial', key: 'intl_Mundial de Clubes', name: 'Mundial de Clubes', shortName: 'MUNDIAL', logo: '/logos/competitions/mundial-de-clubes.png' }
+    ]
+  }
+
+  intlSlots.value = intlMap[continentName] || [
+    { id: 'mundial', key: 'intl_Mundial de Clubes', name: 'Mundial de Clubes', shortName: 'MUNDIAL', logo: '/logos/competitions/mundial-de-clubes.png' }
+  ]
+
+  // 2. Buscar ligas deste país no sistema
   for (const continent of ALL_COMPETITIONS_DATA) {
      const p = continent.paises.find(p => p.nome.toLowerCase() === countryIdVal)
      if (p) {
-       // Filtra apenas as Ligas (A, B, C, D...)
        leaguesFound = p.competicoes.filter(c => c.tipo === 'Liga')
        break
      }
@@ -208,7 +251,7 @@ const setupSlots = () => {
     })
   })
 
-  intlSlots.forEach(i => {
+  intlSlots.value.forEach(i => {
     slots.push({ key: i.key, label: 'Pos', type: 'intl', id: i.id })
   })
   countrySlots.value = slots
@@ -218,10 +261,11 @@ const setupSlots = () => {
 const processedMatrix = computed(() => {
   const data = {}
   const seasonsSet = new Set()
-  const clubsSet = new Set()
+  const clubsSet = new Set() // Chaves Normalizadas
+  const clubNameMap = {} // Mapa: Normalizado -> Raw (Mantém o primeiro nome "bonito" encontrado)
   
-  // Normalização profunda para evitar erros de case/acentos
-  const normalize = (s) => s?.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim() || ""
+  // Normalização profunda para evitar erros de case/acentos/espaços extras
+  const normalize = (s) => s?.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, ' ').trim() || ""
   const countryIdVal = normalize(countryId.value)
 
   if (!seasonStore.list || seasonStore.list.length === 0) {
@@ -242,7 +286,8 @@ const processedMatrix = computed(() => {
     if (!season.tabela || !season.competitionName) return
     
     const table = parseTable(season.tabela)
-    const year = season.ano
+    const yearRaw = season.ano
+    const year = yearRaw?.toString().replace(/\s+/g, '') || ''
     const compName = normalize(season.competitionName)
 
     table.forEach((row, index) => {
@@ -258,30 +303,56 @@ const processedMatrix = computed(() => {
           }
       }
 
-      // Verificação flexível
+      // Verificação flexível (Apenas clubes do país atual)
       if (!countryClubsNamesNormalized.includes(clubNameNorm)) return
 
       // Determinar Slot
       let slotKey = null
       
-      // Ligas
-      if (compName.includes('serie a') || compName.includes('primeira') || compName.includes('liga profissional') || compName.includes('liga inglesa')) slotKey = 'league_A'
-      else if (compName.includes('serie b') || compName.includes('segunda') || compName.includes('nacional') || compName.includes('liga inglesa serie b')) slotKey = 'league_B'
-      else if (compName.includes('serie c') || compName.includes('terceira')) slotKey = 'league_C'
-      else if (compName.includes('serie d')) slotKey = 'league_D'
-      
-      // Internacionais
-      intlSlots.forEach(intl => {
-        const intlNorm = normalize(intl.name)
-        const terms = intlNorm.split(' ')
-        if (terms.some(t => t.length > 4 && compName.includes(t))) {
-             slotKey = intl.key
+      // 1. Ligas (Matching por Metadata das Competicações do País + Aliases Argentina)
+      countrySlots.value.filter(s => s.type === 'league').forEach(slot => {
+        const slotNameNorm = normalize(slot.meta.nome)
+        
+        // Match exato ou o nome da temporada contém o nome da liga configurada
+        if (compName === slotNameNorm || compName.includes(slotNameNorm)) {
+          slotKey = slot.key
+        }
+        
+        // Aliases específicos para Argentina
+        if (!slotKey && countryIdVal === 'argentina') {
+           if (slot.label === 'A' && (compName.includes('lpf') || compName.includes('primera'))) slotKey = slot.key
+           if (slot.label === 'B' && (compName.includes('nacional'))) slotKey = slot.key
         }
       })
 
+      // 2. Fallbacks de termos comuns para ligas
+      if (!slotKey) {
+        if (compName.includes('serie a') || compName.includes('primeira') || compName.includes('liga profissional') || compName.includes('liga inglesa')) slotKey = 'league_A'
+        else if (compName.includes('serie b') || compName.includes('segunda') || compName.includes('nacional') || compName.includes('liga inglesa serie b')) slotKey = 'league_B'
+        else if (compName.includes('serie c') || compName.includes('terceira')) slotKey = 'league_C'
+        else if (compName.includes('serie d')) slotKey = 'league_D'
+      }
+      
+      // 3. Internacionais (Matching Dinâmico por Continente)
+      if (!slotKey) {
+        intlSlots.value.forEach(intl => {
+          const intlNorm = normalize(intl.name)
+          const terms = intlNorm.split(' ')
+          // Verificação mais precisa para evitar falsos positivos
+          if (terms.some(t => t.length > 4 && compName.includes(t)) || compName.includes(intlNorm)) {
+               slotKey = intl.key
+          }
+        })
+      }
+
       if (slotKey) {
-        if (!data[clubNameRaw]) data[clubNameRaw] = {}
-        if (!data[clubNameRaw][year]) data[clubNameRaw][year] = {}
+        if (!data[clubNameNorm]) {
+           data[clubNameNorm] = {}
+           // Preservar o nome "Raw" para exibição (priorizando o que está no CLUBS_DATA se possível)
+           const originalClub = CLUBS_DATA.find(c => normalize(c.nome) === clubNameNorm)
+           clubNameMap[clubNameNorm] = originalClub ? originalClub.nome : clubNameRaw
+        }
+        if (!data[clubNameNorm][year]) data[clubNameNorm][year] = {}
         
         // Determinar se é ACESSO (Direto ou Playoff)
         let isAccess = false
@@ -294,11 +365,6 @@ const processedMatrix = computed(() => {
            const directCount = Math.max(0, meta.promovidos - playoffCount)
            
            isAccess = (rank <= directCount) || normPlayoffs.includes(clubNameNorm)
-           
-           if (compName.includes('nacional') && (rank <= 5)) {
-              console.log(`DEBUG MATRIX [${clubNameRaw}]: Rank=${rank}, Direct=${directCount}, PlayoffCount=${playoffCount}, IsPlayoff=${normPlayoffs.includes(clubNameNorm)}, FinalAccess=${isAccess}`)
-              console.log('NormPlayoffs:', normPlayoffs)
-           }
         }
 
         // Determinar se é REBAIXAMENTO
@@ -307,18 +373,16 @@ const processedMatrix = computed(() => {
            isRelegation = (rank > (table.length - meta.rebaixados))
         }
 
-        if (!data[clubNameRaw][year][slotKey] || rank < data[clubNameRaw][year][slotKey].rank) {
-          data[clubNameRaw][year][slotKey] = { 
+        if (!data[clubNameNorm][year][slotKey] || rank < data[clubNameNorm][year][slotKey].rank) {
+          data[clubNameNorm][year][slotKey] = { 
             rank, 
             compName: season.competitionName,
             isAccess,
-            isRelegation,
-            debug_DirectCount: typeof directCount !== 'undefined' ? directCount : 'N/A',
-            debug_PlayoffLen: typeof playoffCount !== 'undefined' ? playoffCount : 'N/A'
+            isRelegation
           }
         }
         
-        clubsSet.add(clubNameRaw)
+        clubsSet.add(clubNameNorm)
         seasonsSet.add(year)
       }
     })
@@ -347,17 +411,17 @@ const processedMatrix = computed(() => {
     return a.localeCompare(b)
   })
 
-  return { data, seasons: sortedSeasonsList, clubs: sortedClubsList }
+  return { data, seasons: sortedSeasonsList, clubs: sortedClubsList, names: clubNameMap }
 })
 
 // Atalhos reativos
 const sortedSeasons = computed(() => processedMatrix.value.seasons)
 const sortedClubs = computed(() => processedMatrix.value.clubs)
 const matrixData = computed(() => processedMatrix.value.data)
+const clubNames = computed(() => processedMatrix.value.names || {})
 
 const forceReload = () => seasonStore.loadAll()
 
-// HELPERS (Robustos)
 // HELPERS (Robustos)
 const parseTable = (str) => {
     if (!str) return [];
@@ -418,23 +482,23 @@ const getCellExpertStyle = (club, season, slot) => {
     // CAMPEÃO (1º Lugar)
     if (rank === 1) {
       if (isSerieA) classes.push('expert-gold-bg', 'neon-border-gold')
+      else if (result.isAccess) classes.push('expert-champion-access-bg', 'neon-border-gold')
       else classes.push('expert-green-bg', 'neon-border-gold')
     } 
-    // ACESSO OU REBAIXAMENTO (DINÂMICO)
+    // VICE / ACESSO OU REBAIXAMENTO (DINÂMICO)
     else {
-      if (result.isAccess) {
-         if (rank === 2) classes.push('expert-green-bg', 'neon-border-silver')
-         else classes.push('expert-green-bg')
-      } else if (result.isRelegation) {
-         // Verifica se existe uma próxima liga no countrySlots para mostrar rebaixamento
-         const currentIdx = countrySlots.value.findIndex(s => s.key === slot.key)
-         const hasLeagueBelow = countrySlots.value[currentIdx + 1]?.type === 'league'
-         if (hasLeagueBelow) classes.push('expert-red-bg')
-         else classes.push('expert-neutral-bg')
-      } else {
-         if (club.includes('RIVADAVIA')) {
-             console.log('STYLE DEBUG: RIVADAVIA isAccess=FALSE. Applying neutral.')
-         }
+      if (rank === 2) {
+        if (result.isAccess && !isSerieA) classes.push('expert-vice-access-bg', 'neon-border-silver')
+        else classes.push('expert-silver-bg', 'neon-border-silver')
+      } else if (result.isAccess) {
+         classes.push('expert-green-bg')
+      } 
+      
+      if (result.isRelegation) {
+         classes.push('expert-red-bg')
+      }
+
+      if (classes.length === 0) {
          classes.push('expert-neutral-bg')
       }
     }
@@ -443,8 +507,12 @@ const getCellExpertStyle = (club, season, slot) => {
   if (slot.type === 'intl') {
     if (rank === 1) classes.push('expert-gold-bg', 'neon-border-gold')
     else if (rank === 2) classes.push('expert-silver-bg', 'neon-border-silver')
-    else if (rank <= 8) classes.push('expert-green-bg')
-    else classes.push('expert-blue-intl-bg')
+    else if (rank === 4) classes.push('expert-bronze-intl-grad')
+    else if (rank === 8) classes.push('expert-green-intl-grad')
+    else if (rank === 16) classes.push('expert-cyan-intl-grad')
+    else if (rank === 32) classes.push('expert-blue-intl-grad')
+    else if (rank === 64) classes.push('expert-red-intl-grad')
+    else classes.push('expert-neutral-bg')
   }
 
   return classes.join(' ')
@@ -455,14 +523,40 @@ const getRank = (club, season, slot) => {
   if (!result) return ''
   
   const rank = result.rank
+  
+  // Caso Especial: Campeão de Série Inferior (Acesso) -> Já tem troféu no híbrido
+  if (slot.type === 'league' && rank === 1 && result.isAccess && slot.label !== 'A') {
+    return '🏆 1º'
+  }
+
+  // Campeão de Série A ou qualquer outro título nacional que não seja acesso híbrido
+  if (slot.type === 'league' && rank === 1) {
+    return '🏆 1º'
+  }
+
+  // Caso Especial: Vice com Acesso
+  if (slot.type === 'league' && rank === 2 && result.isAccess && slot.label !== 'A') {
+    return '🥈 2º'
+  }
+
+  // Vice Geral
+  if (slot.type === 'league' && rank === 2) {
+    return '🥈 2º'
+  }
+
+  // Rebaixamento (Seta para baixo)
+  if (slot.type === 'league' && result.isRelegation) {
+    return '↓ ' + rank + 'º'
+  }
+
   if (slot.type === 'intl') {
-    if (rank === 1) return '🏆 CAMP'
+    if (rank === 1) return '🏆 CAMPEÃO'
     if (rank === 2) return '🥈 VICE'
-    if (rank === 4) return '🥉 SEMI'
-    if (rank === 8) return 'QRT'
-    if (rank === 16) return 'OIT'
-    if (rank === 32) return 'GRP'
-    if (rank === 64) return 'PRÉ'
+    if (rank === 4) return 'SEMIFINAL'
+    if (rank === 8) return 'QUARTAS'
+    if (rank === 16) return 'OITAVAS'
+    if (rank === 32) return 'GRUPOS'
+    if (rank === 64) return 'PRÉ-LIBERTA'
     return rank + 'º'
   }
   return rank + 'º'
@@ -477,9 +571,15 @@ const isLastSlot = (slot) => {
   return slot.key === countrySlots.value[countrySlots.value.length - 1].key
 }
 
-onMounted(async () => {
+// Watcher para recarregar slots se o país mudar (Mover para o fim para evitar ReferenceError)
+watch(() => route.params.id, () => {
   setupSlots()
-  await seasonStore.loadAll()
+}, { immediate: true })
+
+onMounted(async () => {
+    await seasonStore.loadAll()
+    await careerStore.loadAll()
+    setupSlots()
 })
 </script>
 
@@ -664,6 +764,18 @@ thead th {
   font-weight: 950 !important;
 }
 
+.expert-champion-access-bg {
+  background: linear-gradient(135deg, #28a745 0%, #ffd700 100%) !important;
+  color: #000 !important;
+  font-weight: 950 !important;
+}
+
+.expert-vice-access-bg {
+  background: linear-gradient(135deg, #28a745 0%, #c0c0c0 100%) !important;
+  color: #000 !important;
+  font-weight: 900 !important;
+}
+
 .expert-silver-bg { 
   background: linear-gradient(135deg, #a0a0a0 0%, #707070 100%) !important; 
   color: #ffffff !important; 
@@ -671,26 +783,64 @@ thead th {
 }
 
 .expert-green-bg { 
-  background: #28a74555 !important; 
-  color: #55ef44 !important; 
+  background: #28a745 !important; 
+  color: #fff !important; 
   border: 1px solid rgba(40, 167, 69, 0.3) !important;
 }
 
 .expert-red-bg { 
-  background: #dc354544 !important; 
-  color: #ff5555 !important; 
-  border: 1px solid rgba(220, 53, 69, 0.3) !important;
+  background: #dc3545 !important; 
+  color: #fff !important; 
+  font-weight: 800 !important;
 }
 
-.expert-blue-intl-bg { 
-  background: #0096ff22 !important; 
-  color: #44d2ff !important; 
-  border: 1px solid rgba(0, 150, 255, 0.3) !important;
+.expert-bronze-bg { 
+  background: #ff8c00 !important; 
+  color: #fff !important; 
+  font-weight: 900 !important;
 }
 
-.expert-neutral-bg {
-  background: rgba(255,255,255,0.03);
-  color: #666;
+/* GRADIENTES PARA INTERNACIONAIS (DIFERENCIAÇÃO) - FONTE PRETA */
+.expert-bronze-intl-grad { 
+  background: linear-gradient(135deg, #ff8c00 0%, #cc7000 100%) !important; 
+  color: #000 !important; 
+  font-weight: 950 !important;
+}
+
+.expert-green-intl-grad { 
+  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%) !important; /* Emerald */
+  color: #000 !important; 
+  font-weight: 950 !important;
+}
+
+.expert-cyan-intl-grad { 
+  background: linear-gradient(135deg, #00f2ff 0%, #00a8b3 100%) !important; 
+  color: #000 !important; 
+  font-weight: 950 !important;
+}
+
+.expert-blue-intl-grad { 
+  background: linear-gradient(135deg, #0056b3 0%, #003366 100%) !important; 
+  color: #000 !important; 
+  font-weight: 900 !important;
+}
+
+.expert-red-intl-grad { 
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%) !important; /* Carmesim */
+  color: #000 !important; 
+  font-weight: 950 !important;
+}
+
+.expert-cyan-bg { 
+  background: #00f2ff !important; 
+  color: #000 !important; 
+  font-weight: 950 !important;
+}
+
+.expert-blue-bg { 
+  background: #0056b3 !important; 
+  color: #fff !important; 
+  font-weight: 700 !important;
 }
 
 /* Bordas Neon */
@@ -737,6 +887,23 @@ thead th {
 .btn-action:hover {
   background: #00f2ff;
   color: #000;
+}
+
+/* FUNDO PARA DIFERENCIAR INTERNACIONAIS (PEDIDO USUÁRIO) */
+.intl-column-bg {
+  background-color: rgba(0, 150, 255, 0.05); /* Sem !important para não sobrepor cores de posição */
+}
+
+/* LARGURA EXPANDIDA PARA INTERNACIONAIS (PEDIDO USUÁRIO) */
+.intl-slot-width {
+  min-width: 110px !important;
+  width: 110px !important;
+  font-size: 0.7rem !important;
+  letter-spacing: 0px !important;
+}
+
+.intl-slot-width .cell-rank-text {
+  font-weight: 950 !important;
 }
 
 /* Custom Scrollbar */

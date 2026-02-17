@@ -7,7 +7,7 @@
         
         <nav class="top-nav d-flex align-items-center h-100">
           <router-link to="/" class="nav-item" active-class="active">HOME</router-link>
-          <router-link :to="{ path: '/universo', query: { reset: 'true' } }" class="nav-item" active-class="active">UNIVERSO DO FUTEBOL</router-link>
+          <router-link to="/universo" class="nav-item" active-class="active">UNIVERSO DO FUTEBOL</router-link>
           <router-link to="/carreira" class="nav-item" active-class="active">MINHA CARREIRA</router-link>
           <router-link to="/premios" class="nav-item" active-class="active">PRÊMIOS</router-link>
           <router-link to="/rankings" class="nav-item" active-class="active">RANKINGS</router-link>
@@ -22,11 +22,7 @@
     </header>
 
     <main class="main-content">
-      <router-view v-slot="{ Component }">
-        <transition name="fade-slide" mode="out-in">
-          <component :is="Component" />
-        </transition>
-      </router-view>
+      <router-view />
     </main>
   </div>
 </template>

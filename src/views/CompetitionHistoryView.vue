@@ -99,7 +99,7 @@
         <div class="row align-items-center">
           <!-- ANO -->
           <div class="col-1">
-            <span class="fw-black fs-5">{{ s.ano }}</span>
+            <span class="fw-black fs-5">{{ s.ano?.replace('/', ' / ') }}</span>
           </div>
 
           <!-- CAMPEÃO -->
@@ -110,10 +110,11 @@
                    class="trofeu-hist" 
                    alt="Troféu"
                    @error="e => e.target.style.display='none'">
-              <TeamShield :teamName="s.campeao" :size="20" borderless />
+              <TeamShield :teamName="s.campeao" :size="24" borderless :season="s.ano" />
               <div class="d-flex flex-column lh-1">
-                <span class="fw-bold text-uppercase name-champion">
+                <span class="fw-bold text-uppercase name-champion d-flex align-items-center">
                     {{ s.campeao }}
+                    <i v-if="careerStore.isUserTeam(s.campeao, s.ano)" class="bi bi-controller text-neon-green pulse-neon ms-1" style="font-size: 1.1rem;"></i>
                     <span v-if="maiorCampeao && s.campeao === maiorCampeao.nome" class="ms-1" title="Rei de Copas">👑</span>
                 </span>
                 <div v-if="isInternational && getClubInfo(s.campeao)" class="d-flex align-items-center gap-1 opacity-50 mt-1">
@@ -132,10 +133,11 @@
           <!-- VICE -->
           <div class="col-2">
             <div class="d-flex align-items-center gap-2 opacity-75" v-if="s.vice">
-              <TeamShield :teamName="s.vice" :size="20" borderless />
+              <TeamShield :teamName="s.vice" :size="20" borderless :season="s.ano" />
               <div class="d-flex flex-column lh-1" style="min-width: 0;">
-                <span class="text-secondary small fw-bold text-uppercase text-truncate">
+                <span class="text-secondary small fw-bold text-uppercase text-truncate d-flex align-items-center gap-1">
                   {{ s.vice }}
+                  <i v-if="s.vice && careerStore.isUserTeam(s.vice, s.ano)" class="bi bi-controller text-neon-green pulse-neon" style="font-size: 1.1rem;"></i>
                 </span>
                 <div v-if="isInternational && getClubInfo(s.vice)" class="d-flex align-items-center gap-1 opacity-50 mt-1">
                   <template v-if="competition.modoRegistro === 'mundial'">
@@ -160,8 +162,11 @@
                 </div>
                 <div class="extra-names-wrap">
                   <div v-for="(t, tidx) in s.promovidosList" :key="tidx" class="extra-team-item">
-                    <TeamShield :teamName="t" :size="16" borderless />
-                    <span class="name text-truncate">{{ t }}</span>
+                    <TeamShield :teamName="t" :size="16" borderless :season="s.ano" />
+                    <span class="name text-truncate d-flex align-items-center gap-1">
+                      {{ t }}
+                      <i v-if="careerStore.isUserTeam(t, s.ano)" class="bi bi-controller text-neon-green pulse-neon" style="font-size: 0.9rem;"></i>
+                    </span>
                     <span v-if="tidx < s.promovidosList.length - 1" class="sep">•</span>
                   </div>
                 </div>
@@ -170,12 +175,15 @@
               <!-- REBAIXADOS -->
               <div v-if="competition.tipo === 'Liga' && s.rebaixadosList && s.rebaixadosList.length" class="extra-group relegation">
                 <div class="d-flex align-items-center gap-2 mb-1">
-                  <span class="icon-label">⬇ REBAIXADOS</span>
+                  <span class="icon-label">↓ REBAIXADOS</span>
                 </div>
                 <div class="extra-names-wrap">
                   <div v-for="(t, tidx) in s.rebaixadosList" :key="tidx" class="extra-team-item">
-                    <TeamShield :teamName="t" :size="16" borderless />
-                    <span class="name text-truncate">{{ t }}</span>
+                    <TeamShield :teamName="t" :size="16" borderless :season="s.ano" />
+                    <span class="name text-truncate d-flex align-items-center gap-1">
+                      {{ t }}
+                      <i v-if="careerStore.isUserTeam(t, s.ano)" class="bi bi-controller text-neon-green pulse-neon" style="font-size: 0.9rem;"></i>
+                    </span>
                     <span v-if="tidx < s.rebaixadosList.length - 1" class="sep">•</span>
                   </div>
                 </div>
@@ -212,13 +220,15 @@ import { CLUBS_DATA } from '../data/clubs.data'
 import { FEDERATIONS_DATA } from '../services/federations.data'
 import { getTrofeuPath } from '../services/utils'
 import NationalFlag from '../components/NationalFlag.vue'
+import { careerStore } from '../services/career.store'
 
 const route = useRoute()
 const competition = ref(null)
 const history = ref([])
 
-onMounted(() => {
+onMounted(async () => {
   loadData()
+  await careerStore.loadAll()
 })
 
 // FIX: Reatividade para carregar dados assim que o store atualizar (ex: ao voltar da tela de edição)
@@ -640,5 +650,21 @@ onMounted(loadData)
 }
 .animated-fade-in {
     animation: fadeIn 0.4s ease-out;
+}
+
+.text-neon-green {
+  color: #39ff14;
+  text-shadow: 0 0 10px rgba(57, 255, 20, 0.8), 0 0 18px rgba(57, 255, 20, 0.4);
+}
+
+.pulse-neon {
+  animation: pulse-neon-anim 2s infinite;
+  display: inline-block;
+}
+
+@keyframes pulse-neon-anim {
+  0% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+  100% { opacity: 0.7; transform: scale(1); }
 }
 </style>

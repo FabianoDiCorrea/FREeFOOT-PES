@@ -16,6 +16,8 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { dataSearchService } from '../services/dataSearch.service'
+import { FEDERATIONS_DATA } from '../services/federations.data'
+import { imageCacheService } from '../services/imageCache.service'
 
 const props = defineProps({
   countryName: String,
@@ -32,13 +34,28 @@ const cachedUrl = ref(null)
 const flagUrl = computed(() => {
   if (cachedUrl.value) return cachedUrl.value
   if (props.forceUrl) return props.forceUrl
+  // Normalização para casos específicos
   if (!props.countryName || hasError.value) return null
-  const data = dataSearchService.findNationalTeam(props.countryName) || dataSearchService.findClub(props.countryName)
+  const name = props.countryName.trim()
+  
+  // 1. Suporte especial para logos de federação (CONMEBOL, UEFA, etc.)
+  // Tenta pelo nome da chave (ex: "América do Sul") ou pelo nome da federação (ex: "CONMEBOL")
+  let fed = FEDERATIONS_DATA[name]
+  if (!fed) {
+      fed = Object.values(FEDERATIONS_DATA).find(f => f.nome === name)
+  }
+  if (fed) return fed.logo
+
+  // 2. Tentar encontrar seleção/clube (Bandeira)
+  // Se for "Estados Unidos", o sistema pode estar usando "USA" ou outro nome internamente
+  const searchName = name === 'Estados Unidos' ? 'USA' : name
+  const data = dataSearchService.findNationalTeam(searchName) || dataSearchService.findClub(searchName)
+  
+  // Fallback para bandeira
   return data?.bandeira_url || null
 })
 
 // Sistema de Cache
-import { imageCacheService } from '../services/imageCache.service'
 
 watch(() => flagUrl.value, async (newUrl) => {
   if (newUrl && !newUrl.startsWith('data:')) {

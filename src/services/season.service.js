@@ -16,14 +16,21 @@ export const seasonService = {
 
     async getByCompetitionFlexible(targetCompetition, targetCountry = null) {
         const seasons = await this.getAll();
-        const normalize = (s) => s?.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim() || ""
+        const normalize = (s) => {
+            if (!s) return "";
+            try {
+                return s.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+            } catch (e) {
+                return "";
+            }
+        }
 
         const cName = normalize(targetCompetition);
         const cCountry = targetCountry ? normalize(targetCountry) : null;
 
         return seasons.filter(s => {
             const sName = normalize(s.competitionName);
-            let sCountry = s.pais ? normalize(s.pais) : null; // Use let for sCountry as it might be inferred
+            let sCountry = s.pais ? normalize(s.pais) : null;
 
             // 0. Inferência de País (Smart Fix para dados legados sem país)
             if (!sCountry) {
@@ -33,7 +40,9 @@ export const seasonService = {
             }
 
             // 1. Validação de País (Agora mais robusta com a inferência)
-            if (cCountry && sCountry && sCountry !== cCountry) {
+            const isInternational = cCountry && ['AMERICA DO SUL', 'EUROPA', 'CONMEBOL', 'UEFA', 'MUNDO', 'INTERNACIONAL'].includes(cCountry.toUpperCase());
+
+            if (cCountry && sCountry && sCountry !== cCountry && !isInternational) {
                 return false;
             }
 
@@ -45,8 +54,8 @@ export const seasonService = {
                 if (sName.includes('brasileirao') || sName.includes('serie a') || sName.includes('serie b') || sName.includes('copa do brasil')) return false;
             }
 
-            // Se não tem país na temporada, checar o campeão como fallback
-            if (cCountry && !sCountry && s.campeao) {
+            // Se não tem país na temporada, checar o campeão como fallback (APENAS PARA LIGAS LOCAIS)
+            if (cCountry && !sCountry && s.campeao && !isInternational) {
                 const champ = CLUBS_DATA.find(c => normalize(c.nome) === normalize(s.campeao));
                 if (champ && normalize(champ.pais) !== cCountry) return false;
             }

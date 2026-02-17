@@ -5,7 +5,7 @@
       <div class="country-bg-flag" v-if="countryFlagUrl" :style="{ backgroundImage: `url(${countryFlagUrl})` }"></div>
       
       <div class="d-flex align-items-center gap-3 position-relative" style="z-index: 2;">
-        <button @click="$router.push('/universo')" class="btn btn-outline-light btn-sm border-opacity-25 bg-black bg-opacity-20 hover-glow">
+        <button @click="$router.push('/universo?pais=' + countryName)" class="btn btn-outline-light btn-sm border-opacity-25 bg-black bg-opacity-20 hover-glow">
           <i class="bi bi-arrow-left me-2"></i>VOLTAR
         </button>
         <h2 class="m-0 text-uppercase fw-black d-flex align-items-center gap-3 header-title-main" v-if="countryName">
@@ -24,9 +24,9 @@
             <option v-for="comp in nationalCompetitions" :key="comp.nome" :value="'nat_' + comp.nome">
               {{ comp.nome }}
             </option>
-            <option value="libertadores">Libertadores</option>
-            <option value="sudamericana">Sul-Americana</option>
-            <option value="mundial">Mundial</option>
+            <option v-for="slot in intlSlots" :key="slot.id" :value="slot.id">
+              {{ slot.name }}
+            </option>
             <option value="relegations">Rebaixamentos</option>
           </select>
         </div>
@@ -59,36 +59,26 @@
                 </th>
               </template>
               <!-- Internacionais -->
-              <th :class="{ 'border-start border-black border-opacity-10': !['Brasil', 'Argentina', 'Inglaterra'].includes(countryName) }" class="py-1 border-none align-middle">
-                <div class="logo-comp-container">
-                  <img src="/logos/competitions/libertadores.png" class="logo-comp-img mini" />
-                </div>
-              </th>
-              <th class="py-1 border-none align-middle">
-                <div class="logo-comp-container">
-                  <img src="/logos/competitions/libertadores.png" class="logo-comp-img" />
-                </div>
-              </th>
-              <th class="py-1 border-none align-middle">
-                <div class="logo-comp-container">
-                  <img src="/logos/competitions/sulamericana.png" class="logo-comp-img mini" />
-                </div>
-              </th>
-              <th class="py-1 border-none align-middle">
-                <div class="logo-comp-container">
-                  <img src="/logos/competitions/sulamericana.png" class="logo-comp-img" />
-                </div>
-              </th>
-              <th class="py-1 border-none align-middle px-1">
-                <div class="logo-comp-container">
-                  <img src="/logos/competitions/mundial-de-clubes.png" class="logo-comp-img" />
-                </div>
-              </th>
+              <!-- Internacionais Dinâmicos -->
+              <template v-for="(intl, idx) in intlSlots" :key="'logo_intl_' + intl.id">
+                <!-- Coluna de Participação (Logo Menor) -->
+                <th :class="{ 'border-start border-black border-opacity-10': idx === 0 && !['Brasil', 'Argentina', 'Inglaterra'].includes(countryName) }" class="py-1 border-none align-middle">
+                  <div class="logo-comp-container">
+                    <img :src="intl.logo" class="logo-comp-img mini" />
+                  </div>
+                </th>
+                <!-- Coluna de Título (Logo Normal) -->
+                <th class="py-1 border-none align-middle">
+                  <div class="logo-comp-container">
+                    <img :src="intl.logo" class="logo-comp-img" />
+                  </div>
+                </th>
+              </template>
               <!-- REMOVIDO: th condicional com ícone bi-caret-down-fill que causava duplicação visual -->
             </tr>
             <tr class="text-secondary opacity-70 x-small text-uppercase text-center fw-black border-bottom border-secondary border-opacity-10">
               <th class="text-start ps-1 align-middle bg-black bg-opacity-30" style="width: 120px; min-width: 120px;">CLUBE</th>
-              <th class="text-warning-neon align-middle px-1 py-1 header-cell-neon col-total-titulos" style="width: 55px;">TOTAL<br>TÍTULOS</th>
+              <th class="text-warning-neon align-middle px-1 py-1 header-cell-neon col-total-titulos" style="width: 55px;">🏆 TOTAL<br>TÍTULOS</th>
               <th v-for="comp in nationalCompetitions" :key="comp.nome" style="width: 75px;" class="align-middle px-1 py-1 header-cell-neon border-start border-white border-opacity-5">
                 <div v-html="formatHeader(comp.nome)" class="lh-1"></div>
               </th>
@@ -100,11 +90,14 @@
                 <th v-if="hasSerieD" class="text-danger-neon align-middle px-1 py-1 header-cell-neon col-relegation" style="width: 60px;">QUEDA<br>DIV. 3</th>
                 <th v-if="hasSerieD" class="text-success-neon align-middle px-1 py-1 header-cell-neon col-access" style="width: 60px;">SUBIDA<br>DIV. 3</th>
               </template>
-              <th class="text-info-neon align-middle px-1 py-1 header-cell-neon border-start border-white border-opacity-10" style="width: 65px;">LIBERTA<br>CLASS.</th>
-              <th class="text-warning-neon align-middle px-1 py-1 header-cell-neon" style="width: 65px;">LIBERTA<br>TÍTULO</th>
-              <th class="text-info-neon align-middle px-1 py-1 header-cell-neon" style="width: 65px;">SUL-AM.<br>CLASS.</th>
-              <th class="text-warning-neon align-middle px-1 py-1 header-cell-neon" style="width: 65px;">SUL-AM.<br>TÍTULO</th>
-              <th class="text-warning-neon align-middle px-1 py-1 header-cell-neon" style="width: 60px;">MUNDIAL<br>TÍTULO</th>
+              <template v-for="intl in intlSlots" :key="'label_intl_' + intl.id">
+                <th class="text-info-neon align-middle px-1 py-1 header-cell-neon border-start border-white border-opacity-10" style="width: 65px;">
+                  {{ intl.shortName }}<br>CLASS.
+                </th>
+                <th class="text-warning-neon align-middle px-1 py-1 header-cell-neon" style="width: 65px;">
+                  {{ intl.shortName }}<br>TÍTULO
+                </th>
+              </template>
               <!-- REMOVIDO: th genérico de REBAIXAMENTOS que causava duplicação na Argentina -->
             </tr>
           </thead>
@@ -113,7 +106,9 @@
               <td class="ps-1 fw-black text-uppercase border-none">
                 <div class="d-flex align-items-center gap-1">
                   <TeamShield :teamName="club.nome" :size="20" />
-                  <span class="name-cell-full">{{ club.nome }}</span>
+                  <span class="name-cell-full d-flex align-items-center gap-1">
+                    {{ club.nome }}
+                  </span>
                 </div>
               </td>
 
@@ -140,21 +135,15 @@
               </template>
 
               <!-- CÉLULAS INTERNACIONAIS -->
-              <td class="text-center px-1 fw-black text-info-neon" :data-value="club.stats.part_libertadores">
-                <span class="stat-badge">{{ club.stats.part_libertadores || '' }}</span>
-              </td>
-              <td class="text-center px-1 fw-black text-neon-gold" :data-value="club.stats.libertadores">
-                <span class="stat-badge">{{ club.stats.libertadores || '' }}</span>
-              </td>
-              <td class="text-center px-1 fw-black text-info-neon" :data-value="club.stats.part_sudamericana">
-                <span class="stat-badge">{{ club.stats.part_sudamericana || '' }}</span>
-              </td>
-              <td class="text-center px-1 fw-black text-neon-gold" :data-value="club.stats.sudamericana">
-                <span class="stat-badge">{{ club.stats.sudamericana || '' }}</span>
-              </td>
-              <td class="text-center px-1 fw-black text-neon-gold" :data-value="club.stats.mundial">
-                <span class="stat-badge">{{ club.stats.mundial || '' }}</span>
-              </td>
+              <!-- CÉLULAS INTERNACIONAIS DINÂMICAS -->
+              <template v-for="intl in intlSlots" :key="'stat_intl_' + intl.id + club.nome">
+                <td class="text-center px-1 fw-black text-info-neon" :data-value="club.stats['part_' + intl.id]">
+                  <span class="stat-badge">{{ club.stats['part_' + intl.id] || '' }}</span>
+                </td>
+                <td class="text-center px-1 fw-black text-neon-gold" :data-value="club.stats[intl.id]">
+                  <span class="stat-badge">{{ club.stats[intl.id] || '' }}</span>
+                </td>
+              </template>
 
               <!-- REMOVIDO: td genérico de REBAIXAMENTOS -->
             </tr>
@@ -181,22 +170,22 @@ import { INTERNATIONAL_DATA } from '../data/internationalCompetitions'
 import GamePanel from '../components/GamePanel.vue'
 import TeamShield from '../components/TeamShield.vue'
 import NationalFlag from '../components/NationalFlag.vue'
+import { careerStore } from '../services/career.store'
 import LogoFREeFOOT from '../components/LogoFREeFOOT.vue'
 
 const route = useRoute()
 const countryName = ref('')
 const countryClubs = ref([])
+const intlSlots = ref([])
+const nationalCompetitions = ref([])
+const sortBy = ref('total')
 
-const hasSerieC = computed(() => nationalCompetitions.value.length >= 3)
-const hasSerieD = computed(() => nationalCompetitions.value.length >= 4)
-const movementColspan = computed(() => {
-  let count = 2
-  if (hasSerieC.value) count += 2
-  if (hasSerieD.value) count += 2
-  return count
-})
+// Helpers
+const normalizeName = (name) => {
+    if (!name) return '';
+    return name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+}
 
-// Helper para pegar o nome da liga/competição e saber se é internacional ou qual divisão
 const getCompetitionInfo = (compName) => {
   if (!compName || !ALL_COMPETITIONS_DATA) return { type: 'unknown' };
   const cName = compName.toLowerCase().trim();
@@ -224,9 +213,27 @@ const getCompetitionInfo = (compName) => {
   return found || { type: 'unknown' };
 }
 
-const nationalCompetitions = ref([])
-const sortBy = ref('total')
+const getFederationByCountry = (cName) => {
+  const norm = (s) => s?.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim() || ""
+  const target = norm(cName)
+  for (const continent of ALL_COMPETITIONS_DATA) {
+    if (continent.paises.some(p => norm(p.nome) === target)) {
+      return continent.continente
+    }
+  }
+  return null
+}
 
+const formatHeader = (name) => {
+  if (!name) return '';
+  return String(name).replace('Brasileirão ', 'Brasileirão<br>')
+                    .replace('Série ', 'Série ')
+                    .replace('Copa do Brasil', 'Copa do<br>Brasil')
+                    .replace('Supercopa do Brasil', 'Supercopa<br>Brasil')
+                    .replace('Copa do ', 'Copa do<br>');
+}
+
+// Computeds
 const countryFlagUrl = computed(() => {
   if (!countryName.value) return null;
   const allContinents = [SOUTH_AMERICA_DATA, EUROPE_DATA, CONCACAF_DATA];
@@ -239,20 +246,17 @@ const countryFlagUrl = computed(() => {
   return null;
 })
 
-const formatHeader = (name) => {
-  if (!name) return '';
-  return String(name).replace('Brasileirão ', 'Brasileirão<br>')
-                    .replace('Série ', 'Série ')
-                    .replace('Copa do Brasil', 'Copa do<br>Brasil')
-                    .replace('Supercopa do Brasil', 'Supercopa<br>Brasil')
-                    .replace('Copa do ', 'Copa do<br>');
-}
+const hasSerieC = computed(() => nationalCompetitions.value.length >= 3)
+const hasSerieD = computed(() => nationalCompetitions.value.length >= 4)
+const movementColspan = computed(() => {
+  let count = 2
+  if (hasSerieC.value) count += 2
+  if (hasSerieD.value) count += 2
+  return count
+})
 
-// Helper para normalizar nomes de clubes (remover acentos e espaços extras)
-const normalizeName = (name) => {
-    if (!name) return '';
-    return name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
-}
+
+
 
 const loadData = async () => {
     const routeId = route.params.id;
@@ -261,6 +265,7 @@ const loadData = async () => {
 
     // 0. Carregar TODAS as temporadas do banco (evita dados parciais na store)
     await seasonStore.loadAll();
+    await careerStore.loadAll();
 
     // 1. Carregar Competições do País
     const allContinents = [SOUTH_AMERICA_DATA, EUROPE_DATA, CONCACAF_DATA];
@@ -276,15 +281,32 @@ const loadData = async () => {
         }
     }
 
+    // --- DEFINIR SLOTS INTERNACIONAIS POR CONTINENTE ---
+    const continentName = getFederationByCountry(foundCountry?.nome || pNome);
+    const intlMap = {
+      'América do Sul': [
+        { id: 'liberta', key: 'intl_Libertadores', name: 'Libertadores', shortName: 'LIBERTA', logo: '/logos/competitions/libertadores.png' },
+        { id: 'sula', key: 'intl_Sul-Americana', name: 'Sul-Americana', shortName: 'SUL-AM.', logo: '/logos/competitions/sulamericana.png' },
+        { id: 'mundial', key: 'intl_Mundial de Clubes', name: 'Mundial de Clubes', shortName: 'MUNDIAL', logo: '/logos/competitions/mundial-de-clubes.png' }
+      ],
+      'Europa': [
+        { id: 'champions', key: 'intl_Champions League', name: 'Champions League', shortName: 'CHAMPIONS', logo: '/logos/competitions/champions-league.png' },
+        { id: 'mundial', key: 'intl_Mundial de Clubes', name: 'Mundial de Clubes', shortName: 'MUNDIAL', logo: '/logos/competitions/mundial-de-clubes.png' }
+      ],
+      'América do Norte': [
+        { id: 'concacaf', key: 'intl_CONCACAF Champions', name: 'CONCACAF Champions', shortName: 'CONCACAF', logo: '/logos/competitions/concacaf-champions.png' },
+        { id: 'mundial', key: 'intl_Mundial de Clubes', name: 'Mundial de Clubes', shortName: 'MUNDIAL', logo: '/logos/competitions/mundial-de-clubes.png' }
+      ]
+    }
+    intlSlots.value = intlMap[continentName] || [
+      { id: 'mundial', key: 'intl_Mundial de Clubes', name: 'Mundial de Clubes', shortName: 'MUNDIAL', logo: '/logos/competitions/mundial-de-clubes.png' }
+    ];
+
     if (foundCountry) {
-        // Garantir filtro limpo por tipo Liga, mas incluindo Copas chave para o Brasil
+        // Incluir TODAS as competições nacionais (Ligas, Copas e Supercopas) para todos os países
         nationalCompetitions.value = (foundCountry.competicoes || []).filter(c => {
-            if (c.tipo === 'Liga') return true;
-            if (normalizeName(foundCountry.nome) === 'brasil') {
-                const n = normalizeName(c.nome);
-                if (n === 'copa do brasil' || n === 'supercopa do brasil') return true;
-            }
-            return false;
+            const type = c.tipo?.toLowerCase();
+            return type === 'liga' || type === 'copa' || type === 'supercopa';
         });
     }
 
@@ -302,7 +324,6 @@ const loadData = async () => {
             mundial: 0,
             part_mundial: 0,
             relegations: 0,
-            // Específicos Brasil
             relegation_A_B: 0,
             access_B_A: 0,
             relegation_B_C: 0,
@@ -310,6 +331,12 @@ const loadData = async () => {
             relegation_C_D: 0,
             access_D_C: 0
         };
+        
+        // Inicializar stats internacionais baseados nos slots
+        intlSlots.value.forEach(slot => {
+            statsMap[c.nome][slot.id] = 0;
+            statsMap[c.nome]['part_' + slot.id] = 0;
+        });
         nationalCompetitions.value.forEach(nc => {
             statsMap[c.nome].national[nc.nome] = 0;
         });
@@ -338,34 +365,28 @@ const loadData = async () => {
             statsMap[campeaoNorm].national[isNational.nome]++;
         }
 
-        // --- INTERNACIONAIS (Títulos e Participações) ---
+        // --- INTERNACIONAIS (Títulos e Participações Dinâmicas) ---
         if (compInfo && compInfo.type === 'international') {
             const cLow = normalizeName(compName);
-            const isLib = cLow.includes('libertadores');
-            const isSula = cLow.includes('sul-americana') || cLow.includes('sudamericana');
-            const isMundial = cLow.includes('mundial') || cLow.includes('intercontinental');
-
-            // Títulos
-            if (campeaoNorm) {
-                if (isLib) statsMap[campeaoNorm].libertadores++;
-                else if (isSula) statsMap[campeaoNorm].sudamericana++;
-                else if (isMundial) statsMap[campeaoNorm].mundial++;
-            }
-
-            // Participações (Contar todos os times com colocação salva/na tabela)
-            // O usuário mencionou: "se o mesmo clube jogar Libert e Sula na mesma temporada, deve somar nas duas"
-            // Como cada competição é uma entrada separada no seasonStore, isso acontece naturalmente.
-            if (season.tabela) {
-                const teamsInSeason = parseTable(season.tabela).map(t => t.time);
-                teamsInSeason.forEach(teamName => {
-                    const tNorm = getStatsKey(teamName);
-                    if (tNorm) {
-                        if (isLib) statsMap[tNorm].part_libertadores++;
-                        else if (isSula) statsMap[tNorm].part_sudamericana++;
-                        else if (isMundial) statsMap[tNorm].part_mundial++;
+            
+            intlSlots.value.forEach(slot => {
+                const isMatch = normalizeName(slot.name).split(' ').some(t => t.length > 4 && cLow.includes(t)) || cLow.includes(normalizeName(slot.name));
+                
+                if (isMatch) {
+                    // Títulos
+                    if (campeaoNorm) {
+                        statsMap[campeaoNorm][slot.id]++;
                     }
-                });
-            }
+                    // Participações
+                    if (season.tabela) {
+                        const teamsInSeason = parseTable(season.tabela).map(t => t.time);
+                        teamsInSeason.forEach(teamName => {
+                            const tNorm = getStatsKey(teamName);
+                            if (tNorm) statsMap[tNorm]['part_' + slot.id]++;
+                        });
+                    }
+                }
+            });
         }
 
         // --- ACESSOS E REBAIXAMENTOS (BR, AR, EN) ---
@@ -472,7 +493,7 @@ const getPromotedTeams = (season, tableData, compInfo) => {
 
 const calculateTotalTitles = (club) => {
     const nat = Object.values(club.stats.national).reduce((acc, v) => acc + v, 0);
-    const int = (club.stats.libertadores || 0) + (club.stats.sudamericana || 0) + (club.stats.mundial || 0);
+    const int = intlSlots.value.reduce((acc, slot) => acc + (club.stats[slot.id] || 0), 0);
     return nat + int;
 }
 
@@ -774,6 +795,22 @@ onMounted(() => {
 /* REMOVIDO: .mini-logo */
 /* REMOVIDO: .int-title */
 /* REMOVIDO: .int-vals */
+
+@keyframes pulse-neon-anim {
+  0% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+  100% { opacity: 0.7; transform: scale(1); }
+}
+
+.text-neon-green {
+  color: #39ff14;
+  text-shadow: 0 0 8px rgba(57, 255, 20, 0.8);
+}
+
+.pulse-neon {
+  animation: pulse-neon-anim 2s infinite;
+  display: inline-block;
+}
 
 @keyframes fadeInRight {
   from { opacity: 0; transform: translateX(20px); }

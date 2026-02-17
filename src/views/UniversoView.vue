@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="view-container">
     <div class="d-flex justify-content-between align-items-center mb-4 px-2">
       <div class="d-flex align-items-center gap-3">
@@ -29,13 +29,22 @@
       <!-- NÍVEL 4: DETALHES E TEMPORADAS (30/70 Layout) -->
       <div v-if="selectedCompetition" class="col-12 px-2">
         <div class="row g-4 m-0">
-          <!-- Sidebar: Info da Competição (30%) -->
+          <!-- Sidebar: Info da Competio (30%) -->
           <div class="col-xl-3">
             <GamePanel :customClass="getFederationColorClass(selectedCompetition.continente || (selectedContinent ? getFederation(selectedContinent.continente).nome : ''))">
               <div class="text-center p-3">
-                <div class="comp-sidebar-logo-highlight mb-4">
-                  <img v-if="selectedCompetition.logo" :src="getCachedLogo(selectedCompetition.logo)" @error="(e) => e.target.style.display='none'" class="comp-sidebar-logo">
-                  <i class="bi bi-trophy fs-1 text-dark opacity-50" v-if="!selectedCompetition.logo"></i>
+                <div class="d-flex align-items-center justify-content-center gap-3 mb-4">
+                  <div class="comp-sidebar-logo-highlight">
+                    <img v-if="selectedCompetition.logo" :src="getCachedLogo(selectedCompetition.logo)" @error="(e) => e.target.style.display='none'" class="comp-sidebar-logo">
+                    <i class="bi bi-trophy fs-1 text-dark opacity-50" v-if="!selectedCompetition.logo"></i>
+                  </div>
+                  
+                  <div v-if="selectedCompetition.trofeu" class="comp-sidebar-logo-highlight">
+                    <img :src="getTrofeuPath(selectedCompetition.trofeu)" 
+                         class="comp-sidebar-logo"
+                         alt="Troféu"
+                         @error="e => e.target.parentElement.style.display='none'">
+                  </div>
                 </div>
                 <h4 class="fw-bold text-uppercase">{{ selectedCompetition.nome }}</h4>
                 <div v-if="selectedCountry" class="d-flex justify-content-center align-items-center gap-2 mb-3">
@@ -84,12 +93,13 @@
                       <td class="fw-bold fs-5 text-nowrap">{{ s.ano }}</td>
                       <td class="text-nowrap">
                         <div class="d-flex align-items-center gap-2">
-                          <TeamShield :teamName="s.campeao" :size="36" />
+                          <TeamShield :teamName="s.campeao" :size="36" :season="s.ano" />
                           <div class="d-flex flex-column">
                             <div class="d-flex align-items-center gap-1 no-wrap">
                               <span class="fw-bold text-uppercase name-cell">{{ s.campeao }}</span>
+                              <i v-if="careerStore.isUserTeam(s.campeao, s.ano)" class="bi bi-controller ms-1 text-neon-green pulse-neon"></i>
                               
-                              <!-- Identificação de País e Federação (Mundial - Mesma Linha) -->
+                              <!-- identificação de País e federação (Mundial - Mesma Linha) -->
                               <template v-if="(selectedCompetition?.modoRegistro === 'mundial' || selectedCompetition?.nome === 'Mundial de Clubes') && getClubInfo(s.campeao)">
                                 <div class="d-flex align-items-center gap-1 ms-2 opacity-50 border-start border-secondary border-opacity-25 ps-2">
                                   <NationalFlag :countryName="getClubInfo(s.campeao).pais" :forceUrl="getClubInfo(s.campeao).bandeira" :size="14" />
@@ -101,7 +111,7 @@
                                 </div>
                               </template>
 
-                              <!-- Identificação de País (Comum - Mesma Linha) -->
+                              <!-- identificação de País (Comum - Mesma Linha) -->
                               <div v-else-if="selectedCompetition?.tipo === 'internacional' && getClubInfo(s.campeao)" class="d-flex align-items-center gap-1 ms-1 opacity-50">
                                 <NationalFlag :countryName="getClubInfo(s.campeao).pais" :forceUrl="getClubInfo(s.campeao).bandeira" :size="16" />
                                 <span class="x-small fw-bold text-uppercase">{{ getClubInfo(s.campeao).pais }}</span>
@@ -124,12 +134,13 @@
                       </td>
                       <td class="text-nowrap">
                         <div class="d-flex align-items-center gap-2 opacity-100">
-                          <TeamShield :teamName="s.vice" :size="28" />
+                          <TeamShield :teamName="s.vice" :size="28" :season="s.ano" />
                           <div class="d-flex flex-column">
                             <div class="d-flex align-items-center gap-1 no-wrap">
                               <span class="small text-uppercase name-cell-vice">{{ s.vice || '-' }}</span>
+                              <i v-if="s.vice && careerStore.isUserTeam(s.vice, s.ano)" class="bi bi-controller ms-1 text-neon-green pulse-neon"></i>
                               
-                              <!-- Identificação de País e Federação (Mundial - Mesma Linha - Vice) -->
+                              <!-- identificação de País e federação (Mundial - Mesma Linha - Vice) -->
                               <template v-if="(selectedCompetition?.modoRegistro === 'mundial' || selectedCompetition?.nome === 'Mundial de Clubes') && s.vice && getClubInfo(s.vice)">
                                 <div class="d-flex align-items-center gap-1 ms-2 opacity-50 border-start border-secondary border-opacity-25 ps-2">
                                   <NationalFlag :countryName="getClubInfo(s.vice).pais" :forceUrl="getClubInfo(s.vice).bandeira" :size="12" />
@@ -141,7 +152,7 @@
                                 </div>
                               </template>
 
-                              <!-- Identificação de País (Comum - Mesma Linha - Vice) -->
+                              <!-- identificação de País (Comum - Mesma Linha - Vice) -->
                               <div v-else-if="selectedCompetition?.tipo === 'internacional' && s.vice && getClubInfo(s.vice)" class="d-flex align-items-center gap-1 ms-1 opacity-50">
                                 <NationalFlag :countryName="getClubInfo(s.vice).pais" :forceUrl="getClubInfo(s.vice).bandeira" :size="14" />
                                 <span class="x-small fw-bold text-uppercase">{{ getClubInfo(s.vice).pais }}</span>
@@ -165,7 +176,7 @@
                       <td class="text-center">
                         <div class="d-flex justify-content-center gap-2">
                            <span v-if="(s.topScorers && s.topScorers.length > 0) || (s.artilheiro && s.artilheiro.nome)" class="text-warning fs-5" title="Tem Artilheiro">⚽</span>
-                           <span v-if="s.tabela" class="text-info fs-5" title="Tem Tabela">📊</span>
+                           <span v-if="s.tabela" class="text-info fs-5" title="Tem Tabela">📋</span>
                         </div>
                       </td>
                       <td class="text-center text-nowrap">
@@ -200,14 +211,19 @@
 
       <!-- NÍVEL 3: COMPETIÇÕES -->
       <div v-else-if="selectedCountry && !selectedCompetition" class="col-12 px-2">
-        <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary border-opacity-25">
-           <h4 class="text-white m-0 text-uppercase fw-black">
-             <i class="bi bi-trophy-fill me-2 text-warning"></i>Competições - {{ selectedCountry.nome }}
-           </h4>
-           <button class="btn btn-outline-info fw-bold text-uppercase small" @click="$router.push(`/pais/${selectedCountry.nome}/historico`)">
-             <i class="bi bi-table me-2"></i> VER HISTÓRICO GERAL
-           </button>
-        </div>
+         <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary border-opacity-25">
+            <h4 class="text-white m-0 text-uppercase fw-black">
+              <i class="bi bi-trophy-fill me-2 text-warning"></i>Competições - {{ selectedCountry.nome }}
+            </h4>
+            <div class="d-flex gap-2">
+              <button class="btn btn-outline-info fw-bold text-uppercase small" @click="$router.push(`/pais/${selectedCountry.nome}/historico`)">
+                <i class="bi bi-table me-2"></i> VER HISTÓRICO GERAL
+              </button>
+              <button class="btn btn-info fw-black text-uppercase small text-dark" style="background: #00f2ff;" @click="$router.push(`/pais/${selectedCountry.nome}/matriz`)">
+                <i class="bi bi-calendar3 me-2"></i> VER MATRIZ EXPERT
+              </button>
+            </div>
+         </div>
 
         <div class="game-grid-auto">
           <div v-for="comp in selectedCountry.competicoes" :key="comp.nome">
@@ -215,11 +231,22 @@
               :customClass="'comp-card-premium h-100 cursor-pointer ' + getFederationColorClass(comp.continente || (selectedContinent ? getFederation(selectedContinent.continente).nome : ''))"
               @click="selectCompetition(comp)"
             >
-              <div class="d-flex align-items-center gap-4">
-                <div class="comp-logo-container-highlight">
-                  <img v-if="comp.logo" :src="getCachedLogo(comp.logo)" @error="(e) => e.target.style.display='none'" class="comp-logo-premium">
-                  <i class="bi bi-trophy fs-4 text-dark opacity-50" v-if="!comp.logo"></i>
+              <div class="d-flex align-items-center gap-3">
+                <div class="comp-items-horizontal d-flex gap-2">
+                  <div class="comp-logo-container-highlight">
+                    <img v-if="comp.logo" :src="getCachedLogo(comp.logo)" @error="(e) => e.target.style.display='none'" class="comp-logo-premium">
+                    <i class="bi bi-trophy fs-4 text-dark opacity-50" v-if="!comp.logo"></i>
+                  </div>
+                  
+                  <!-- Troféu Real (Lado a Lado) -->
+                  <div v-if="comp.trofeu" class="comp-logo-container-highlight">
+                    <img :src="getTrofeuPath(comp.trofeu)" 
+                         class="comp-logo-premium"
+                         alt="Troféu"
+                         @error="e => e.target.parentElement.style.display='none'">
+                  </div>
                 </div>
+
                 <div class="flex-grow-1 min-w-0">
                   <h5 class="mb-2 fw-bold text-uppercase competition-title">{{ comp.nome }}</h5>
                   <span class="badge badge-game-type" :class="'badge-' + comp.tipo.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')">
@@ -232,7 +259,7 @@
         </div>
       </div>
 
-      <!-- NÍVEL 2: PAÍSES -->
+      <!-- NÍVEL 2: PASES -->
       <div v-else-if="selectedContinent && !selectedCountry" class="col-12 px-2">
         <div class="game-grid-auto">
           <div v-for="pais in selectedContinent.paises" :key="pais.nome">
@@ -267,10 +294,20 @@
                 :customClass="'comp-card-premium h-100 cursor-pointer ' + getFederationColorClass(comp.continente)"
                 @click="selectCompetition(comp)"
               >
-                <div class="d-flex align-items-center gap-4">
-                  <div class="comp-logo-container-highlight">
-                    <img v-if="comp.logo" :src="getCachedLogo(comp.logo)" @error="(e) => e.target.style.display='none'" class="comp-logo-premium">
-                    <i class="bi bi-trophy fs-4 text-dark opacity-50" v-if="!comp.logo"></i>
+                <div class="d-flex align-items-center gap-3">
+                  <div class="comp-items-horizontal d-flex gap-2">
+                    <div class="comp-logo-container-highlight">
+                      <img v-if="comp.logo" :src="getCachedLogo(comp.logo)" @error="(e) => e.target.style.display='none'" class="comp-logo-premium">
+                      <i class="bi bi-trophy fs-4 text-dark opacity-50" v-if="!comp.logo"></i>
+                    </div>
+                    
+                    <!-- Troféu Real (Lado a Lado) -->
+                    <div v-if="comp.trofeu" class="comp-logo-container-highlight">
+                      <img :src="getTrofeuPath(comp.trofeu)" 
+                           class="comp-logo-premium"
+                           alt="Troféu"
+                           @error="e => e.target.parentElement.style.display='none'">
+                    </div>
                   </div>
                   <div class="flex-grow-1 min-w-0">
                     <h5 class="mb-1 fw-bold text-uppercase competition-title">{{ comp.nome }}</h5>
@@ -312,7 +349,7 @@
       <GamePanel class="modal-content-panel scorer-mgmt-modal" :customClass="'neon-fifa'">
         <div class="d-flex justify-content-between align-items-center mb-4">
           <h3 class="m-0 text-warning">
-            <i class="bi bi-person-badge-fill me-2"></i>ARTILHEIROS – {{ selectedSeasonForScorer.ano }}
+            <i class="bi bi-person-badge-fill me-2"></i>ARTILHEIROS  {{ selectedSeasonForScorer.ano }}
           </h3>
           <button class="btn-close btn-close-white" @click="showScorerModal = false"></button>
         </div>
@@ -330,12 +367,12 @@
                 <!-- CHUTEIRA DOURADA (Imagem Artilheiro) -->
                 <div class="sc-item-pos">
                   <img v-if="index === 0" src="/logos/competitions/artilheiro.png" class="artilheiro-icon-lg highlight-glow">
-                  <span v-else class="opacity-25 fw-black">{{ index + 1 }}º</span>
+                  <span v-else class="opacity-25 fw-black">{{ index + 1 }}</span>
                 </div>
 
 
 
-                <!-- FOTO (ENTRE TROFÉU E NOME) -->
+                <!-- FOTO (ENTRE TROFU E NOME) -->
                 <div class="sc-item-photo-xl cursor-zoom-in" @click="openPhotoZoom(sc.fotoUrl)">
                    <img v-if="sc.fotoUrl" :src="getCachedLogo(sc.fotoUrl)" class="img-fluid rounded-2 shadow-lg">
                    <div v-else class="sc-photo-placeholder"><i class="bi bi-person"></i></div>
@@ -353,7 +390,7 @@
                   <span class="fs-6 fw-black text-uppercase truncate text-secondary ls-1">{{ sc.nacionalidade }}</span>
                 </div>
 
-                <!-- CLUBE + ESCUDO + BANDEIRA PAÍS -->
+                <!-- CLUBE + ESCUDO + BANDEIRA PAS -->
                 <div class="d-flex align-items-center gap-3 px-3 border-start border-secondary border-opacity-25 flex-grow-1">
                   <TeamShield :teamName="sc.clube" :size="64" />
                   <div class="d-flex flex-column">
@@ -381,7 +418,7 @@
             </div>
           </div>
 
-          <!-- Coluna 2: Formulário Add/Edit (Horizontal Form) -->
+          <!-- Coluna 2: Formulrio Add/Edit (Horizontal Form) -->
           <div class="col-md-12 pt-2">
             <h6 class="text-warning fw-bold mb-3 text-uppercase small d-flex align-items-center gap-2">
               <i class="bi bi-plus-circle-fill"></i>
@@ -400,7 +437,7 @@
                 <div class="col-md-2">
                   <label class="x-small text-uppercase opacity-50 fw-bold mb-1">Nacionalidade</label>
                   <div class="d-flex align-items-center gap-2">
-                    <input type="text" v-model="scorerForm.nacionalidade" class="form-control game-input py-2" placeholder="PAÍS">
+                    <input type="text" v-model="scorerForm.nacionalidade" class="form-control game-input py-2" placeholder="PAS">
                     <NationalFlag v-if="scorerForm.nacionalidade" :countryName="scorerForm.nacionalidade" :forceUrl="getNationalityFlag(scorerForm.nacionalidade)" :size="24" />
                   </div>
                 </div>
@@ -425,12 +462,12 @@
                        <img :src="getCachedLogo(playerPhotoPreview)" class="h-photo-preview">
                        <div class="change-photo-overlay-small" @click="$refs.scorerPhotoInput.click()"><i class="bi bi-camera"></i></div>
                     </template>
-                    <div v-else class="text-center py-1 opacity-50" @click="$refs.scorerPhotoInput.click()">
+                    <div v-else class="text-center py-1 opacity-50" @click="$refs.scorerPhotoInputModal.click()">
                       <i class="bi bi-image x-small"></i>
                       <div style="font-size: 0.5rem; line-height: 1;">FOTO CTRL+V</div>
                     </div>
                   </div>
-                  <input type="file" ref="scorerPhotoInput" class="d-none" @change="handleFileScorerPhoto" accept="image/*">
+                                    <input type="file" ref="scorerPhotoInputModal" class="d-none" @change="handleFileScorerPhoto" accept="image/*">
                 </div>
               </div>
               
@@ -452,7 +489,7 @@
         </div>
       </GamePanel>
     </div>
-    <!-- FORMULÁRIO FULL SCREEN UNIFICADO -->
+    <!-- FORMULRIO FULL SCREEN UNIFICADO -->
     <div v-if="viewMode === 'form'" class="form-full-screen-overlay animated-fade-in">
       <div class="form-full-screen-content custom-scrollbar">
         <div class="d-flex justify-content-between align-items-center mb-5">
@@ -464,7 +501,7 @@
         </div>
 
         <div class="row g-5">
-          <!-- SEÇÃO 1: DADOS BÁSICOS (CAMPEÃO / VICE) -->
+          <!-- SEÇÃO 1: DADOS BSICOS (CAMPEÃO / VICE) -->
           <div class="col-xl-7">
             <div class="form-section-premium mb-5">
               <h4 class="text-warning fw-black mb-3 text-uppercase"><i class="bi bi-trophy-fill me-2"></i>DADOS DA TEMPORADA</h4>
@@ -593,7 +630,7 @@
               
               <!-- SEÇÃO ESPECIAL: PROMOÇÃO PLAYOFF (ARGENTINA B) -->
               <div v-if="isArgentinaB" class="mt-4 p-3 bg-success bg-opacity-10 border border-success border-opacity-25 rounded-3">
-                <h6 class="text-success fw-black text-uppercase small mb-2"><i class="bi bi-arrow-up-circle-fill me-2"></i>Promoção via Playoff (3º ao 6º)</h6>
+                <h6 class="text-success fw-black text-uppercase small mb-2"><i class="bi bi-arrow-up-circle-fill me-2"></i>Promoção via Playoff (3 ao 6)</h6>
                 <p class="x-small opacity-75 mb-3">Selecione os 2 times que subiram via Playoff:</p>
                 
                 <div class="d-flex flex-wrap gap-2">
@@ -642,7 +679,7 @@
                   <div class="x-small mt-1 opacity-75">Foto do Jogador</div>
                 </div>
               </div>
-              <input type="file" ref="scorerPhotoInput" class="d-none" @change="handleFileScorerPhoto" accept="image/*">
+                                <input type="file" ref="scorerPhotoInput" class="d-none" @change="handleFileScorerPhoto" accept="image/*">
 
               <div class="mb-3">
                 <label class="form-label fw-bold text-secondary text-uppercase small">Nome do Jogador</label>
@@ -712,10 +749,12 @@ import { ALL_COMPETITIONS_DATA } from '../services/competitions.data'
 import { INTERNATIONAL_DATA } from '../data/internationalCompetitions'
 import { FEDERATIONS_DATA } from '../services/federations.data'
 import { seasonStore } from '../services/season.store'
-import { getSeasonFinalYear } from '../services/utils'
+import { getSeasonFinalYear, getTrofeuPath } from '../services/utils'
 import { CLUBS_DATA } from '../data/clubs.data'
 import { NATIONAL_TEAMS_DATA } from '../data/nationalTeams.data'
 import { db } from '../services/db'
+import { imageCacheService } from '../services/imageCache.service'
+import { careerStore } from '../services/career.store'
 
 const selectedContinent = ref(null)
 const selectedCountry = ref(null)
@@ -843,7 +882,7 @@ const removeParticipant = (index) => {
 
 const isArgentinaB = computed(() => {
   const name = selectedCompetition.value?.nome;
-  return name === 'Primera Nacional' || name === 'Liga Argentina Série B'; 
+  return (name === 'Primera Nacional' || name === 'Liga Argentina Série B'); 
 })
 
 const playoffCandidates = computed(() => {
@@ -852,7 +891,6 @@ const playoffCandidates = computed(() => {
   const teams = []
   
   lines.forEach((line, idx) => {
-    // Pegar do 3º ao 6º (idx 2 a 5)
     if (idx >= 2 && idx <= 5) {
       let cells = line.split('\t')
       if (cells.length === 1) cells = line.split(/\s{2,}/)
@@ -869,7 +907,6 @@ const playoffCandidates = computed(() => {
 const getRelegatedTeams = (season) => {
   if (!season.tabela) return []
 
-  // 1. Identificar Competição
   const allComps = [
     ...ALL_COMPETITIONS_DATA.flatMap(continent => [
       ...continent.paises.flatMap(p => p.competicoes),
@@ -880,27 +917,23 @@ const getRelegatedTeams = (season) => {
   
   let comp = allComps.find(c => c.nome.toLowerCase().trim() === season.competitionName.toLowerCase().trim())
 
-  // Fallback para nomes antigos/alternativos
   if (!comp) {
     if (season.competitionName === 'Liga Argentina Série B') {
        comp = allComps.find(c => c.nome === 'Primera Nacional') || { nome: 'Primera Nacional', rebaixados: 0 }
     } else if (season.competitionName === 'Liga Argentina') {
-       comp = allComps.find(c => c.nome === 'Liga Profissional') || { nome: 'Liga Profissional', rebaixados: 4 } // Fallback direto para 4
+       comp = allComps.find(c => c.nome === 'Liga Profissional') || { nome: 'Liga Profissional', rebaixados: 4 }
     }
   }
 
-  // 2. Definir Quantidade de Rebaixados
   let count = comp?.rebaixados || 0
   const name = comp ? comp.nome : season.competitionName
   if (name === 'Liga Profissional' || name === 'Primera División' || name === 'Liga Argentina') count = 4
 
   if (count === 0) return []
 
-  // 3. Parsear Tabela e Pegar os Últimos
   const lines = season.tabela.split('\n').filter(l => l.trim())
   const teams = []
   
-  // Extrair nomes dos times
   lines.forEach(line => {
       let cells = line.split('\t')
       if (cells.length === 1) cells = line.split(/\s{2,}/)
@@ -911,7 +944,6 @@ const getRelegatedTeams = (season) => {
       if (cells[0]) teams.push(cells[0].trim())
   })
 
-  // Retornar os últimos 'count'
   if (teams.length >= count) {
     return teams.slice(-count)
   }
@@ -919,15 +951,14 @@ const getRelegatedTeams = (season) => {
 }
 
 const getFederation = (continentName) => {
-  if (!continentName) return { nome: 'Federação', logo: '' };
+  if (!continentName) return { nome: 'federação', logo: '' };
   
   const normalize = (s) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
   const normalizedKey = normalize(continentName);
   
-  // Buscar a chave que mais se aproxima
   const key = Object.keys(FEDERATIONS_DATA).find(k => normalize(k) === normalizedKey);
   
-  return FEDERATIONS_DATA[key] || { nome: 'Federação', logo: '' };
+  return FEDERATIONS_DATA[key] || { nome: 'federação', logo: '' };
 }
 
 const getFederationLogo = (continente) => {
@@ -964,7 +995,6 @@ const getClubInfo = (clubName) => {
   const club = CLUBS_DATA.find(c => c.nome.toLowerCase().trim() === clubName.toLowerCase().trim());
   if (!club) return null;
   
-  // Mapear continente para federação
   const fed = getFederation(club.continente);
   
   return {
@@ -989,11 +1019,9 @@ const handlePasteScorerPhoto = async (event) => {
       const reader = new FileReader();
       reader.onload = async (e) => {
         const base64 = e.target.result;
-        // Atualizar refs globais usadas pelo form
         playerPhotoPreview.value = base64;
         scorerForm.value.fotoUrl = base64;
         
-        // Garantir sincronia se o objeto legado artilheiro ainda existir na nova temporada
         if (newSeason.value.artilheiro) {
           newSeason.value.artilheiro.fotoUrl = base64;
         }
@@ -1009,11 +1037,9 @@ const handleFileScorerPhoto = (event) => {
     const reader = new FileReader();
     reader.onload = async (e) => {
       const base64 = e.target.result;
-      // Atualizar refs globais usadas pelo form
       playerPhotoPreview.value = base64;
       scorerForm.value.fotoUrl = base64;
       
-      // Garantir sincronia se o objeto legado artilheiro ainda existir
       if (newSeason.value.artilheiro) {
         newSeason.value.artilheiro.fotoUrl = base64;
       }
@@ -1026,20 +1052,16 @@ const removeScorerPhoto = () => {
   playerPhotoPreview.value = null;
   scorerForm.value.fotoUrl = '';
   
-  // Caso 1: Editando no Modal de Artilheiros
   if (isEditingScorer.value && selectedSeasonForScorer.value && currentScorerIndex.value !== null) {
       if (selectedSeasonForScorer.value.topScorers[currentScorerIndex.value]) {
           selectedSeasonForScorer.value.topScorers[currentScorerIndex.value].fotoUrl = '';
       }
   }
 
-  // Caso 2: Criando/Editando Temporada no Form Completo
   if (newSeason.value.artilheiro) {
      newSeason.value.artilheiro.fotoUrl = '';
   }
-  // FIX: Também limpar do array topScorers se estiver populado (que é o padrão novo)
   if (newSeason.value.topScorers && newSeason.value.topScorers.length > 0) {
-     // Assume que o primeiro é o artilheiro sendo editado no form principal
      newSeason.value.topScorers[0].fotoUrl = ''; 
   }
 }
@@ -1069,7 +1091,6 @@ const selectCompetition = async (comp) => {
   selectedCompetition.value = comp
   await seasonStore.loadSeasons(comp.nome, comp.pais || selectedCountry.value?.nome)
   
-  // Cachear fotos dos artilheiros desta competição
   for (const s of seasonStore.list) {
     const scorers = s.topScorers || (s.artilheiro && s.artilheiro.nome ? [s.artilheiro] : [])
     for (const sc of scorers) {
@@ -1152,11 +1173,11 @@ const prepareEdit = async (season) => {
     promovidosPlayoff: season.promovidosPlayoff || []
   }))
   
-  // Carregar o primeiro artilheiro no formulário unificado (opcional no form)
+  // Carregar o primeiro artilheiro no formulrio unificado (opcional no form)
   if (newSeason.value.topScorers && newSeason.value.topScorers.length > 0) {
     scorerForm.value = JSON.parse(JSON.stringify(newSeason.value.topScorers[0]))
     
-    // Carregar foto do cache/banco para pré-visualização
+    // Carregar foto do cache/banco para pr-visualizao
     if (scorerForm.value.fotoUrl) {
       const b64 = await imageCacheService.getLogo(scorerForm.value.fotoUrl)
       if (b64) {
@@ -1200,8 +1221,6 @@ const openForm = () => {
     competitionName: selectedCompetition.value.nome,
     topScorers: [],
     participantes: [],
-    topScorers: [],
-    participantes: [],
     tabela: '',
     promovidosPlayoff: []
   }
@@ -1241,14 +1260,14 @@ const deleteScorer = (index) => {
 const saveScorer = async () => {
   if (!scorerForm.value.nome) return
 
-  // Criar uma cópia para evitar problemas de referência
+  // Criar uma cpia para evitar problemas de referncia
   const scorerToSave = { ...scorerForm.value }
 
   // Persistir foto se for base64
   if (scorerToSave.fotoUrl && scorerToSave.fotoUrl.startsWith('data:')) {
     const imageId = `artilheiro_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
     await db.saveImage(imageId, scorerToSave.fotoUrl);
-    // Alimentar cache para exibição imediata
+    // Alimentar cache para exibio imediata
     cachedLogos.value[imageId] = scorerToSave.fotoUrl;
     scorerToSave.fotoUrl = imageId;
   }
@@ -1268,14 +1287,14 @@ const saveScorer = async () => {
 const persistScorers = async () => {
   if (!selectedSeasonForScorer.value || !selectedSeasonForScorer.value.id) {
     console.error('Falha ao persistir: Temporada selecionada ou ID ausente', selectedSeasonForScorer.value);
-    alert('Erro: ID da temporada não encontrado. Tente reabrir o modal de artilheiros.');
+    alert('Erro: ID da temporada no encontrado. Tente reabrir o modal de artilheiros.');
     return;
   }
 
   console.log('Persisting scorers for season ID:', selectedSeasonForScorer.value.id);
   
   try {
-    // Limpeza profunda para garantir que nada estranho vá para o storage
+    // Limpeza profunda para garantir que nada estranho v para o storage
     const topScorersClean = JSON.parse(JSON.stringify(selectedSeasonForScorer.value.topScorers));
     
     await seasonStore.updateSeason(selectedSeasonForScorer.value.id, { 
@@ -1286,7 +1305,7 @@ const persistScorers = async () => {
     showScorerModal.value = false;
   } catch (error) {
     console.error('Erro ao salvar artilheiros:', error);
-    alert('Não foi possível salvar os artilheiros.\nMotivo: ' + (error.message || 'Erro de persistência no banco de dados.'));
+    alert('Não foi possvel salvar os artilheiros.\nMotivo: ' + (error.message || 'Erro de persistncia no banco de dados.'));
   }
 }
 
@@ -1301,7 +1320,7 @@ const confirmDelete = (season) => {
 const saveNewSeason = async (shouldClose = true) => {
   if (!selectedCompetition.value) return
   
-  // Garantir que os artilheiros sejam processados se preenchidos no form único
+  // Garantir que os artilheiros sejam processados se preenchidos no form nico
   if (scorerForm.value.nome) {
     // Se houver dados no form de artilheiro, vamos "salvar" ele no array topScorers antes de persistir a temporada
     const scorerToSave = JSON.parse(JSON.stringify(scorerForm.value));
@@ -1314,12 +1333,12 @@ const saveNewSeason = async (shouldClose = true) => {
       scorerToSave.fotoUrl = imageId;
     }
 
-    // Se já existia esse artilheiro (edição), poderíamos ter lógica aqui, 
-    // mas o requisito diz "adicionar uma temporada completa em UMA única tela".
-    // Então assumimos que se o form está preenchido, ele é o artilheiro principal.
+    // Se já existia esse artilheiro (edio), poderamos ter lgica aqui, 
+    // mas o requisito diz "adicionar uma temporada completa em UMA nica tela".
+    // Ento assumimos que se o form est preenchido, ele  o artilheiro principal.
     newSeason.value.topScorers = [scorerToSave];
   } else {
-    // Se o nome estiver vazio no form, entendemos que o usuário quer remover o artilheiro
+    // Se o nome estiver vazio no form, entendemos que o usurio quer remover o artilheiro
     newSeason.value.topScorers = [];
     newSeason.value.artilheiro = {};
   }
@@ -1351,7 +1370,6 @@ const saveNewSeason = async (shouldClose = true) => {
 }
 
 // Sistema de Cache de Imagens
-import { imageCacheService } from '../services/imageCache.service'
 const cachedLogos = ref({})
 
 const getCachedLogo = (url) => {
@@ -1369,7 +1387,7 @@ const cacheImages = async (data) => {
     }
   }
 
-  // Cachear logos de federações
+  // Cachear logos de federaes
   for (const fed of Object.values(FEDERATIONS_DATA)) {
     if (fed.logo && (fed.logo.startsWith('http') || fed.logo.startsWith('/'))) {
       const b64 = await imageCacheService.getOrCache(fed.logo)
@@ -1393,7 +1411,7 @@ const cacheImages = async (data) => {
   }
 }
 
-// Persistência de Navegação
+// Persistncia de navegação
 watch([selectedContinent, selectedCountry, selectedCompetition], () => {
   const state = {
     continent: selectedContinent.value,
@@ -1406,60 +1424,52 @@ watch([selectedContinent, selectedCountry, selectedCompetition], () => {
 const restoreNavigation = () => {
   // 1. Deep Link via Query Param (Checklist Access)
   if (route.query.compId) {
-      const compId = parseInt(route.query.compId)
-      const targetCountry = route.query.country
-      
-      console.log('Deep Link:', compId, targetCountry)
+    const compId = parseInt(route.query.compId)
+    
+    let foundComp = null
+    let foundCountry = null
+    let foundContinent = null
 
-      let foundComp = null
-      let foundCountry = null
-      let foundContinent = null
-
-      // Busca em competições continentais/nacionais
-      for (const region of ALL_COMPETITIONS_DATA) {
-          if (region.paises) {
-            for (const pais of region.paises) {
-                // Se veio país na query, filtro por pais primeiro para evitar colisão
-                if (targetCountry && pais.nome !== targetCountry) continue
-
-                const c = pais.competicoes.find(c => c.id === compId)
-                if (c) {
-                    foundComp = c
-                    foundCountry = pais
-                    foundContinent = region
-                    break
-                }
-            }
+    // Busca exaustiva em todos os dados
+    for (const cont of ALL_COMPETITIONS_DATA) {
+      if (cont.paises) {
+        for (const p of cont.paises) {
+          const c = p.competicoes.find(item => item.id === compId)
+          if (c) { 
+            foundComp = c
+            foundCountry = p
+            foundContinent = cont
+            break
           }
-          if (foundComp) break
-
-          if (region.continentais) {
-            const c = region.continentais.find(c => c.id === compId)
-            if (c) {
-                foundComp = c
-                foundContinent = region
-                break
-            }
-          }
+        }
       }
-
-      // Busca em Internacionais (se não achou acima)
-      if (!foundComp) {
-         foundComp = INTERNATIONAL_DATA.find(c => c.id === compId)
-         if (foundComp) {
-             // Tenta achar o continente "Mundo" ou similar se necessário, mas Universo lida com null
-         }
-      }
+      if (foundComp) break
       
-      if (foundComp) {
-           selectedContinent.value = foundContinent
-           selectedCountry.value = foundCountry
-           selectedCompetition.value = foundComp
-           
-           // Limpa a query para não ficar "preso" na URL
-           router.replace({ query: {} })
-           return
+      if (cont.continentais) {
+        const c = cont.continentais.find(item => item.id === compId)
+        if (c) {
+          foundComp = c
+          foundContinent = cont
+          break
+        }
       }
+    }
+
+    if (!foundComp) {
+      foundComp = INTERNATIONAL_DATA.find(c => c.id === compId)
+    }
+
+    if (foundComp) {
+      selectedContinent.value = foundContinent
+      selectedCountry.value = foundCountry
+      selectedCompetition.value = foundComp
+      
+      const targetCountry = foundComp.pais || foundCountry?.nome || foundContinent?.continente
+      seasonStore.loadSeasons(foundComp.nome, targetCountry)
+
+      router.replace({ query: {} })
+      return
+    }
   }
 
   if (route.query.reset === 'true') {
@@ -1468,33 +1478,35 @@ const restoreNavigation = () => {
     return
   }
   
-  // 2. LocalStorage Restore (Original Logic)
+  // 2. LocalStorage Restore
   const savedNav = localStorage.getItem('freefoot_universo_nav')
   if (savedNav) {
     try {
       const state = JSON.parse(savedNav)
+      if (!state || typeof state !== 'object') {
+        localStorage.removeItem('freefoot_universo_nav')
+        return
+      }
+
       if (state.continent) selectedContinent.value = state.continent
       if (state.country) selectedCountry.value = state.country
       
-      if (state.competition) {
-        // Buscar o objeto real da competição nos dados estáticos
-        let foundComp = null
-        if (state.country && state.country.competicoes) {
-          foundComp = state.country.competicoes.find(c => c.nome === state.competition.nome)
-        }
+      if (state.competition && state.competition.nome) {
+        const allComps = [
+          ...ALL_COMPETITIONS_DATA.flatMap(c => c.paises?.flatMap(p => p.competicoes) || []),
+          ...ALL_COMPETITIONS_DATA.flatMap(c => c.continentais || []),
+          ...INTERNATIONAL_DATA
+        ]
         
-        // Se não achou nas competições do país, tenta nas internacionais
-        if (!foundComp) {
-          foundComp = INTERNATIONAL_DATA.find(c => c.nome === state.competition.nome)
-        }
+        const foundComp = allComps.find(c => c.id === state.competition.id) || 
+                          allComps.find(c => c.nome === state.competition.nome)
 
         if (foundComp) {
-          // Define a competição síncrono para evitar flash
           selectedCompetition.value = foundComp
-          // Dispara o carregamento de temporadas
-          seasonStore.loadSeasons(foundComp.nome, foundComp.pais)
+          const targetCountry = foundComp.pais || selectedCountry.value?.nome || selectedContinent.value?.continente
+          seasonStore.loadSeasons(foundComp.nome, targetCountry)
           
-          if (foundComp.tipo === 'internacional') { // Restaurar lógica de visual internacional
+          if (foundComp.tipo === 'internacional') {
              const fedMap = {
                 'CONMEBOL': 'América do Sul',
                 'UEFA': 'Europa',
@@ -1517,24 +1529,48 @@ const restoreNavigation = () => {
   }
 }
 
-// Restaurar imediatamente
-restoreNavigation()
-
 onMounted(async () => {
-  // Carregar Cache de Imagens Geral em background
-  await cacheImages(ALL_COMPETITIONS_DATA)
-  
-  // Carregar fotos artilheiros se já tiver competição selecionada
-  if (seasonStore.list.length > 0) {
-      for (const s of seasonStore.list) {
-        const scorers = s.topScorers || (s.artilheiro && s.artilheiro.nome ? [s.artilheiro] : [])
-        for (const sc of scorers) {
-          if (sc.fotoUrl && !sc.fotoUrl.startsWith('http') && !sc.fotoUrl.startsWith('data:') && !cachedLogos.value[sc.fotoUrl]) {
-            const b64 = await imageCacheService.getLogo(sc.fotoUrl)
-            if (b64) cachedLogos.value[sc.fotoUrl] = b64
+  await seasonStore.loadAll()
+  await careerStore.loadAll()
+
+  // 1. Sincronizar com parâmetros da URL (Navegação facilitada solicitada pelo usuário)
+  if (route.query.pais) {
+    const pNome = route.query.pais;
+    for (const cont of ALL_COMPETITIONS_DATA) {
+      const p = cont.paises.find(p => p.nome === pNome);
+      if (p) {
+        selectedContinent.value = cont;
+        selectedCountry.value = p;
+        break;
+      }
+    }
+  }
+
+  // 2. Restaurar estado de navegação com segurança
+  try {
+    restoreNavigation()
+  } catch (e) {
+    console.error("Erro ao restaurar navegação:", e)
+  }
+
+  // 3. Carregar Cache de Imagens Geral em background
+  try {
+    await cacheImages(ALL_COMPETITIONS_DATA)
+    
+    // Carregar fotos artilheiros se já tiver competição selecionada
+    if (seasonStore.list.length > 0) {
+        for (const s of seasonStore.list) {
+          const scorers = s.topScorers || (s.artilheiro && s.artilheiro.nome ? [s.artilheiro] : [])
+          for (const sc of scorers) {
+            if (sc.fotoUrl && !sc.fotoUrl.startsWith('http') && !sc.fotoUrl.startsWith('data:') && !cachedLogos.value[sc.fotoUrl]) {
+              const b64 = await imageCacheService.getLogo(sc.fotoUrl)
+              if (b64) cachedLogos.value[sc.fotoUrl] = b64
+            }
           }
         }
-      }
+    }
+  } catch (e) {
+    console.error("Error in onMounted UniversoView images:", e)
   }
 })
 </script>
@@ -2023,7 +2059,7 @@ onMounted(async () => {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   padding: 1rem 1.5rem !important;
   margin-bottom: 0.75rem;
-  overflow: visible; /* Mudar para visible para não cortar efeitos de brilho se necessário, ou manter hidden se preferir */
+  overflow: visible; /* Mudar para visible para no cortar efeitos de brilho se necessrio, ou manter hidden se preferir */
 }
 
 .scorer-item-card-horizontal:hover {
@@ -2154,7 +2190,7 @@ onMounted(async () => {
 }
 
 .sc-item-pos, .scorer-pos {
-  width: 110px; /* Definido para evitar sobreposição do troféu de 100px */
+  width: 110px; /* Definido para evitar sobreposio do trofu de 100px */
   text-align: center;
   display: flex;
   align-items: center;
@@ -2264,7 +2300,7 @@ onMounted(async () => {
   text-overflow: ellipsis;
 }
 
-/* Estilos Formulário Full Screen */
+/* Estilos Formulrio Full Screen */
 .form-full-screen-overlay {
   position: fixed;
   inset: 0;
@@ -2474,4 +2510,53 @@ onMounted(async () => {
 .border-dashed {
   border-style: dashed !important;
 }
+
+.text-neon-green {
+  color: #39ff14;
+  text-shadow: 0 0 10px rgba(57, 255, 20, 0.8), 0 0 18px rgba(57, 255, 20, 0.4);
+  font-size: 1.1rem;
+}
+
+/* Troféus Overlays */
+/* Estilo para múltiplos itens na sidebar (Logo + Troféu) */
+.comp-sidebar-logo-highlight {
+  height: 100px;
+  width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, #f1f3f5 0%, #cfd8dc 100%);
+  padding: 12px;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  transition: transform 0.3s ease;
+}
+
+/* Layout Lado a Lado (Logo + Troféu) nos Cards */
+.comp-items-horizontal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Ajuste sutil para quando há dois itens lado a lado */
+.comp-items-horizontal .comp-logo-container-highlight {
+  width: 60px;
+  height: 60px;
+  padding: 6px;
+  border-radius: 10px;
+}
+
+.pulse-neon {
+  animation: pulse-neon-anim 2s infinite;
+  display: inline-block;
+}
+
+@keyframes pulse-neon-anim {
+  0% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+  100% { opacity: 0.7; transform: scale(1); }
+}
 </style>
+

@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import TeamShield from './TeamShield.vue'
+import { careerStore } from '../services/career.store'
 
 const props = defineProps({
   data: {
@@ -23,10 +24,12 @@ const props = defineProps({
   playoffPromotedTeams: {
     type: Array,
     default: () => []
-  }
+  },
+  season: String // Necessário para marcar o time do usuário
 })
 
 // Helper para garantir que pegamos a célula correta mesmo que falte dado
+// ... (omitted similar parts if using replace_file_content, but I need to be exact)
 const getCell = (row, index) => {
   return row[index] !== undefined ? row[index] : '-'
 }
@@ -137,8 +140,9 @@ const isAccessRow = (idx, teamName) => {
 
           <!-- Escudo e Nome -->
           <div class="team-info-v2">
-            <TeamShield :teamName="row[0]" :size="24" borderless />
+            <TeamShield :teamName="row[0]" :size="24" borderless :season="season" />
             <span class="team-name-v2 text-truncate">{{ row[0] }}</span>
+            <i v-if="careerStore.isUserTeam(row[0], season)" class="bi bi-controller ms-1 text-neon-green pulse-neon"></i>
           </div>
 
           <!-- Estatísticas (Juntas e Inclinadas) -->
@@ -169,6 +173,11 @@ const isAccessRow = (idx, teamName) => {
             
             <div class="stat-slant-v2 sg"><span>{{ getCell(row, 8) }}</span></div>
             <div class="stat-slant-v2 perc"><span>{{ getCell(row, 9) }}</span></div>
+            
+            <!-- Badge de Controle (Fim da Linha) -->
+            <div v-if="careerStore.isUserTeam(getCell(row, 1), season)" class="stat-slant-v2 tray-icon-user">
+                <i class="bi bi-controller text-neon-green"></i>
+            </div>
           </div>
 
         </div>
@@ -195,7 +204,7 @@ const isAccessRow = (idx, teamName) => {
 }
 
 .tv-league-table-v2 {
-  width: 650px;
+  width: 550px; /* Reduzido de 650px para caber na SeasonDetail */
   display: flex;
   flex-direction: column;
   gap: 1px;
@@ -210,7 +219,7 @@ const isAccessRow = (idx, teamName) => {
 
 .h-main-v2 {
   display: flex;
-  width: 280px;
+  width: 220px; /* Reduzido de 280px */
   font-weight: 900;
   font-size: 0.65rem;
   letter-spacing: 1.5px;
@@ -227,7 +236,7 @@ const isAccessRow = (idx, teamName) => {
 }
 
 .h-slant {
-  width: 36px;
+  width: 32px; /* Reduzido de 36px */
   height: 18px;
   background: rgba(255, 255, 255, 0.05);
   transform: skewX(-20deg);
@@ -239,9 +248,9 @@ const isAccessRow = (idx, teamName) => {
   color: rgba(255, 255, 255, 0.5);
 }
 
-.h-slant.pts { width: 45px; background: rgba(88, 204, 255, 0.1); }
-.h-slant.gp, .h-slant.gc, .h-slant.sg { width: 34px; }
-.h-slant.perc { width: 42px; }
+.h-slant.pts { width: 40px; background: rgba(88, 204, 255, 0.1); } /* Reduzido de 45 */
+.h-slant.gp, .h-slant.gc, .h-slant.sg { width: 30px; } /* Reduzido de 34 */
+.h-slant.perc { width: 36px; } /* Reduzido de 42 */
 
 /* ROW STYLE */
 .tv-row-v2 {
@@ -311,7 +320,7 @@ const isAccessRow = (idx, teamName) => {
   align-items: center;
   gap: 10px;
   padding-left: 15px;
-  width: 240px;
+  width: 180px; /* Reduzido para match com h-main (220 - 40) */
   z-index: 1;
 }
 
@@ -330,7 +339,7 @@ const isAccessRow = (idx, teamName) => {
 }
 
 .stat-slant-v2 {
-  width: 36px;
+  width: 32px; /* Compatível com h-slant */
   background: rgba(0, 0, 0, 0.2);
   transform: skewX(-20deg);
   display: flex;
@@ -347,7 +356,7 @@ const isAccessRow = (idx, teamName) => {
 
 /* PTS */
 .pts-v2 {
-  width: 45px;
+  width: 40px; /* Compatível com h-slant.pts */
   background: rgba(0, 0, 0, 0.4);
   color: #58ccff;
   font-size: 1.1rem;
@@ -363,8 +372,24 @@ const isAccessRow = (idx, teamName) => {
   color: #ff9999;
 }
 
-.stat-slant-v2.gp, .stat-slant-v2.gc, .stat-slant-v2.sg { width: 34px; font-size: 0.75rem; }
-.stat-slant-v2.perc { width: 42px; font-size: 0.75rem; opacity: 0.6; }
+.stat-slant-v2.gp, .stat-slant-v2.gc, .stat-slant-v2.sg { width: 30px; font-size: 0.75rem; }
+.stat-slant-v2.perc { width: 36px; font-size: 0.75rem; opacity: 0.6; }
+
+.text-neon-green {
+  color: #39ff14;
+  text-shadow: 0 0 10px rgba(57, 255, 20, 0.8), 0 0 18px rgba(57, 255, 20, 0.4);
+  font-size: 1.1rem;
+}
+
+.pulse-neon {
+  animation: pulse-neon-anim 2s infinite;
+}
+
+@keyframes pulse-neon-anim {
+  0% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+  100% { opacity: 0.7; transform: scale(1); }
+}
 
 /* ESPECIAL HIGHLIGHTS (Fundos originais para os ranks) */
 .bg-champion {
