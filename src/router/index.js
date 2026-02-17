@@ -7,7 +7,7 @@ const router = createRouter({
         { path: '/', name: 'home', component: HomeView },
         { path: '/universo', name: 'universo', component: () => import('../views/UniversoView.vue') },
         { path: '/carreira', name: 'carreira', component: () => import('../views/CarreiraView.vue') },
-        { path: '/premios', name: 'premios', component: () => import('../views/PremiosView.vue') },
+        { path: '/premio-individual', name: 'individual-awards', component: () => import('../views/IndividualAwardsHistory.vue') },
         { path: '/rankings', name: 'rankings', component: () => import('../views/RankingsView.vue') },
         { path: '/backup', name: 'backup', component: () => import('../views/BackupView.vue') },
         { path: '/season/:id', name: 'season-detail', component: () => import('../views/SeasonDetailView.vue') },

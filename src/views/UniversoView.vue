@@ -1108,6 +1108,7 @@ const resetNavigation = () => {
   selectedCompetition.value = null
   showNewSeasonForm.value = false
   isEditing.value = false
+  localStorage.removeItem('freefoot_universo_nav')
 }
 
 const backToCountries = () => {

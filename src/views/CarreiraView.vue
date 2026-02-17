@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="view-container">
     <div class="d-flex justify-content-between align-items-center mb-4 px-2">
       <div class="d-flex align-items-center gap-3">
@@ -9,7 +9,7 @@
       </div>
       <LogoFREeFOOT />
     </div>
-
+  </div>
     <!-- State: No History -->
     <div v-if="history.length === 0 && !showForm" class="text-center p-5">
       <GamePanel>
@@ -38,20 +38,28 @@
               <label class="form-label x-small fw-bold text-secondary">TEMPORADA</label>
               <input v-model="entryForm.temporada" type="text" class="form-control bg-dark text-white border-secondary" placeholder="Ex: 2025/2026">
             </div>
-            <div class="col-md-6">
-              <label class="form-label x-small fw-bold text-secondary">NOME DO TIME</label>
+            <div class="col-md-3">
+              <label class="form-label x-small fw-bold text-secondary">TIME</label>
               <div class="position-relative">
-                <input v-model="entryForm.timeNome" @input="showTeams = true" type="text" class="form-control bg-dark text-white border-secondary" placeholder="Digite o nome do time...">
+                <input v-model="entryForm.timeNome" @input="showTeams = true" type="text" class="form-control bg-dark text-white border-secondary" placeholder="Nome do time...">
                 <div v-if="showTeams && filteredClubs.length > 0" class="search-dropdown">
                   <div v-for="c in filteredClubs" :key="c.id" class="search-item d-flex align-items-center gap-2" @click="selectClub(c)">
-                    <img :src="c.escudo_url" width="20"> {{ c.nome }} ({{ c.pais }})
+                    <img :src="c.escudo_url" width="20"> {{ c.nome }}
                   </div>
                 </div>
               </div>
             </div>
-            <div class="col-md-3 d-flex align-items-end">
+            <div class="col-md-2">
+              <label class="form-label x-small fw-bold text-secondary">RANK INÍCIO</label>
+              <input v-model="entryForm.rankInicio" type="text" class="form-control bg-dark text-white border-secondary" placeholder="Ex: 15º">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label x-small fw-bold text-secondary">RANK FINAL</label>
+              <input v-model="entryForm.rankFinal" type="text" class="form-control bg-dark text-white border-secondary" placeholder="Ex: 5º">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
               <GameButton class="w-100" @click="saveEntry">
-                <i class="bi bi-save me-2"></i> SALVAR REGISTRO
+                <i class="bi bi-save me-2"></i> SALVAR
               </GameButton>
             </div>
           </div>
@@ -97,10 +105,13 @@
                         </div>
                     </div>
 
-                    <div class="text-end">
-                        <div class="header-main-h3 text-uppercase fw-black">
+                    <div class="text-end z-3">
+                        <div class="header-main-h3 text-uppercase fw-black mb-2">
                             {{ selectedEntry.temporada }}
                         </div>
+                        <button class="btn btn-sm btn-outline-warning text-uppercase fw-bold x-small" @click="editCurrentEntry">
+                            <i class="bi bi-pencil-fill me-1"></i> Editar Dados
+                        </button>
                     </div>
                 </div>
             </div>
@@ -186,16 +197,30 @@
                 <div class="p-3">
                    <div class="row g-2">
                        <div class="col-md-4">
-                           <div class="rank-card">
-                               <div class="rank-label">RANK DE CLUBES</div>
-                               <div class="rank-values d-flex align-items-center gap-2">
-                                   <span class="opacity-50">Início: {{ selectedEntry.rankInicio || '---' }}</span>
-                                   <i class="bi bi-arrow-right"></i>
-                                   <span class="fw-black text-warning">Final: {{ selectedEntry.rankFinal || '---' }}</span>
-                               </div>
-                           </div>
-                       </div>
-                       <div class="col-md-8">
+                            <div class="rank-card">
+                                <div class="rank-label">RANK DE CLUBES</div>
+                                <div class="rank-values d-flex align-items-center gap-2">
+                                    <!-- Inputs -->
+                                    <div class="d-flex align-items-center gap-1"><span class="opacity-50 x-mini fw-bold">INÍCIO:</span><input v-model="selectedEntry.rankInicio" class="rank-mini-input" style="font-size: 1.1rem; width: 40px;" placeholder="---"></div>
+                                    <i class="bi bi-arrow-right opacity-50"></i>
+                                    <div class="d-flex align-items-center gap-1">
+                                        <span class="fw-bold text-warning x-mini">FINAL:</span>
+                                        <input v-model="selectedEntry.rankFinal" class="rank-mini-input text-warning fw-black" style="font-size: 1.25rem; width: 45px;" :placeholder="autoRankFinal || '---'">
+                                    </div>
+
+                                    <!-- Indicador de Evolução -->
+                                    <div v-if="rankEvolution" class="ms-1 d-flex align-items-center gap-1" :class="'evolution-' + rankEvolution.type">
+                                        <div class="d-flex align-items-center" style="font-size: 1rem;">
+                                            <i v-if="rankEvolution.type === 'up'" class="bi bi-caret-up-fill"></i>
+                                            <i v-else-if="rankEvolution.type === 'down'" class="bi bi-caret-down-fill"></i>
+                                            <span v-else class="evolution-dash">—</span>
+                                            <span v-if="rankEvolution.type !== 'neutral'" class="fw-black ms-1">{{ rankEvolution.value }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
                            <div class="obs-card">
                                <div class="rank-label">OBSERVAÇÃO DO CONTRATO</div>
                                <input v-model="selectedEntry.observacao" class="obs-input w-100" placeholder="Digite detalhes do contrato ou metas...">
@@ -257,14 +282,14 @@
         <!-- LADO DIREITO: DASHBOARDS (30%) -->
         <div class="col-xl-4 px-2">
             <div class="d-flex flex-column gap-3 h-100">
-                <div class="gauge-card-custom theme-liga text-center p-3 flex-fill d-flex flex-column justify-content-center" v-if="currentSeasonData">
-                    <div class="text-uppercase fw-bold mb-2 x-small opacity-50">Aproveitamento Liga</div>
+                <div class="gauge-card-custom theme-liga text-center p-1 flex-fill d-flex flex-column justify-content-center" v-if="currentSeasonData">
+                    <div class="text-uppercase fw-bold mb-1 x-small opacity-40">Aproveitamento Liga</div>
                     <CareerGauge :value="calculateWinRate(currentSeasonData)" label="Liga" />
                     <div class="performance-status mt-2 text-uppercase fw-black">{{ getPerformanceStatus(calculateWinRate(currentSeasonData)) }}</div>
                 </div>
-                <div class="gauge-card-custom theme-total text-center p-3 flex-fill d-flex flex-column justify-content-center">
-                    <div class="text-uppercase fw-bold mb-2 x-small opacity-50">Aproveitamento Total</div>
-                    <CareerGauge :value="calculateWinRate(totalStats)" label="Total" />
+                <div class="gauge-card-custom theme-total text-center p-1 flex-fill d-flex flex-column justify-content-center">
+                    <div class="text-uppercase fw-bold mb-2 x-small opacity-40">Aproveitamento Temporada</div>
+                    <CareerGauge :value="calculateWinRate(totalStats)" label="Temporada" />
                     <div class="performance-status mt-2 text-uppercase fw-black">{{ getPerformanceStatus(calculateWinRate(totalStats)) }}</div>
                 </div>
             </div>
@@ -303,7 +328,7 @@
         </GamePanel>
     </div>
 
-  </div>
+
 </template>
 
 <script setup>
@@ -316,6 +341,7 @@ import NationalFlag from '../components/NationalFlag.vue'
 import CareerGauge from '../components/CareerGauge.vue'
 import { careerStore } from '../services/career.store'
 import { seasonStore } from '../services/season.store'
+import { rankingsStore } from '../services/rankings.store'
 import { CLUBS_DATA } from '../data/clubs.data'
 import { ALL_COMPETITIONS_DATA } from '../services/competitions.data'
 import { INTERNATIONAL_DATA } from '../data/internationalCompetitions'
@@ -340,11 +366,38 @@ const entryForm = ref({
     observacao: ''
 })
 
+const autoRankFinal = computed(() => {
+  if (!selectedEntry.value) return null
+  return rankingsStore.getTeamRank(selectedEntry.value.timeNome, selectedEntry.value.temporada)
+})
+
+const rankEvolution = computed(() => {
+    if (!selectedEntry.value) return null
+    
+    const start = parseInt(selectedEntry.value.rankInicio)
+    const end = parseInt(selectedEntry.value.rankFinal || autoRankFinal.value)
+    
+    if (isNaN(start) || isNaN(end)) return null
+    
+    const diff = start - end // Se inicio é 10 e final é 5, subiu 5 (positivo)
+    return {
+        value: Math.abs(diff),
+        type: diff > 0 ? 'up' : diff < 0 ? 'down' : 'neutral'
+    }
+})
+
 const newTrophy = ref({ nome: '' })
+
+watch(() => entryForm.value.temporada, (newVal) => {
+    if (newVal && entryForm.value.timeNome) {
+        tryLookupLeagueData(entryForm.value.timeNome, newVal)
+    }
+})
 
 onMounted(async () => {
     await careerStore.loadAll()
     await seasonStore.loadAll() // Carregar temporadas para buscar resultados automáticos
+    await rankingsStore.loadAll() // Carregar rankings para sincronização
     if (history.value.length > 0) {
         // Selecionar a última temporada (mais recente/atual)
         const lastIndex = history.value.length - 1
@@ -359,19 +412,29 @@ const filteredClubs = computed(() => {
     return CLUBS_DATA.filter(c => c.nome.toLowerCase().includes(q)).slice(0, 5)
 })
 
-const openForm = () => {
+const openForm = (entry = null) => {
     showForm.value = true
-    entryForm.value = {
-        temporada: '',
-        timeNome: '',
-        pais: '',
-        liga: { nome: '', posicao: 0, jogos: 0, vitorias: 0, empates: 0, derrotas: 0, golsPro: 0, golsContra: 0, pontos: 0, saldo: 0 },
-        copas: { jogos: 0, vitorias: 0, empates: 0, derrotas: 0, golsPro: 0, golsContra: 0, pontos: 0 },
-        titulos: [],
-        rankInicio: '',
-        rankFinal: '',
-        observacao: ''
+    if (entry && entry.id) {
+        // Modo Edição
+        entryForm.value = JSON.parse(JSON.stringify(entry))
+    } else {
+        // Modo Novo
+        entryForm.value = {
+            temporada: '',
+            timeNome: '',
+            pais: '',
+            liga: { nome: '', posicao: 0, jogos: 0, vitorias: 0, empates: 0, derrotas: 0, golsPro: 0, golsContra: 0, pontos: 0, saldo: 0 },
+            copas: { jogos: 0, vitorias: 0, empates: 0, derrotas: 0, golsPro: 0, golsContra: 0, pontos: 0 },
+            titulos: [],
+            rankInicio: '',
+            rankFinal: '',
+            observacao: ''
+        }
     }
+}
+
+const editCurrentEntry = () => {
+    openForm(selectedEntry.value)
 }
 
 const closeForm = () => {
@@ -384,32 +447,36 @@ const selectClub = (club) => {
     showTeams.value = false
     
     // Tentar buscar liga automática
-    tryLookupLeagueData(club.nome)
+    tryLookupLeagueData(club.nome, entryForm.value.temporada)
 }
 
-const tryLookupLeagueData = async (teamName) => {
+const tryLookupLeagueData = async (teamName, seasonYear) => {
+    if (!teamName || !seasonYear) return
+    
     // Carregar todas as temporadas se necessário
     if (seasonStore.list.length === 0) await seasonStore.loadAll()
     
+    // Resetar dados atuais
+    entryForm.value.liga = { nome: '', posicao: 0, jogos: 0, vitorias: 0, empates: 0, derrotas: 0, golsPro: 0, golsContra: 0, pontos: 0, saldo: 0 }
+    entryForm.value.copas = { jogos: 0, vitorias: 0, empates: 0, derrotas: 0, golsPro: 0, golsContra: 0, pontos: 0 }
+
     // Buscar temporadas onde esse time aparece na tabela
-    const foundSeason = seasonStore.list.find(s => {
-        if (!s.tabela) return false
-        return s.tabela.toLowerCase().includes(teamName.toLowerCase())
+    const matchingSeasons = seasonStore.list.filter(s => {
+        return (s.ano === seasonYear || s.ano.includes(seasonYear)) && 
+               s.tabela && s.tabela.toLowerCase().includes(teamName.toLowerCase())
     })
 
-    if (foundSeason) {
-        // Parsear a tabela simples para pegar a linha do time
-        const lines = foundSeason.tabela.split('\n')
+    if (matchingSeasons.length === 0) return
+
+    matchingSeasons.forEach(season => {
+        const lines = season.tabela.split('\n')
         const teamLine = lines.find(l => l.toLowerCase().includes(teamName.toLowerCase()))
         
         if (teamLine) {
             let cells = teamLine.split('\t')
             if (cells.length < 5) cells = teamLine.split(/\s{2,}/)
 
-            const pos = lines.indexOf(teamLine) + 1
-            entryForm.value.liga = {
-                nome: foundSeason.competitionName,
-                posicao: pos,
+            const stats = {
                 jogos: parseInt(cells[1]) || 0,
                 pontos: parseInt(cells[2]) || 0,
                 vitorias: parseInt(cells[3]) || 0,
@@ -420,15 +487,32 @@ const tryLookupLeagueData = async (teamName) => {
                 saldo: parseInt(cells[8]) || 0
             }
 
-            // Automação de Títulos (Se for campeão na liga)
-            if (pos === 1) {
-                const tituloExistente = entryForm.value.titulos.find(t => t.nome === foundSeason.competitionName)
-                if (!tituloExistente) {
-                    entryForm.value.titulos.push({ nome: foundSeason.competitionName })
+            const isLeague = season.competitionName.toLowerCase().match(/liga|serie|division|ligue|bundesliga|premiership|primera|eredivisie|primeira|campeonato/)
+            
+            if (isLeague || entryForm.value.liga.nome === '') {
+                if (entryForm.value.liga.nome === '') {
+                    entryForm.value.liga = { ...stats, nome: season.competitionName, posicao: lines.indexOf(teamLine) + 1 }
+                } else {
+                    entryForm.value.liga.jogos += stats.jogos
+                    entryForm.value.liga.vitorias += stats.vitorias
+                    entryForm.value.liga.empates += stats.empates
+                    entryForm.value.liga.derrotas += stats.derrotas
+                    entryForm.value.liga.golsPro += stats.golsPro
+                    entryForm.value.liga.golsContra += stats.golsContra
+                    entryForm.value.liga.pontos += stats.pontos
+                    entryForm.value.liga.saldo += stats.saldo
                 }
+            } else {
+                entryForm.value.copas.jogos += stats.jogos
+                entryForm.value.copas.vitorias += stats.vitorias
+                entryForm.value.copas.empates += stats.empates
+                entryForm.value.copas.derrotas += stats.derrotas
+                entryForm.value.copas.golsPro += stats.golsPro
+                entryForm.value.copas.golsContra += stats.golsContra
+                entryForm.value.copas.pontos += stats.pontos
             }
         }
-    }
+    })
 }
 
 /**
@@ -518,8 +602,9 @@ const calculateWinRate = (stats) => {
 }
 
 const getPerformanceStatus = (rate) => {
-    if (rate >= 85) return 'Excelente'
-    if (rate >= 70) return 'Bom'
+    if (rate >= 90) return 'Excelente'
+    if (rate >= 75) return 'Ótimo'
+    if (rate >= 55) return 'Bom'
     if (rate >= 30) return 'Regular'
     return 'Ruim'
 }
@@ -912,7 +997,41 @@ watch(selectedEntry, async (newVal) => {
     background: transparent;
     border: none;
     font-size: 0.75rem;
+    color: #eee;
 }
+
+.rank-mini-input {
+    background: transparent;
+    border: none;
+    font-size: 0.85rem;
+    color: #eee;
+    width: 50px;
+    padding: 0;
+    font-weight: 700;
+}
+
+.rank-mini-input:focus {
+    outline: none;
+    color: #fff;
+    text-shadow: 0 0 5px rgba(255,255,255,0.3);
+}
+
+.rank-mini-input.text-warning::placeholder {
+    color: #ffc107;
+    opacity: 0.9;
+}
+
+.x-mini {
+    font-size: 0.55rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+/* Evolução Styles */
+.evolution-up { color: #00ff88; text-shadow: 0 0 5px rgba(0, 255, 136, 0.4); }
+.evolution-down { color: #ff4444; text-shadow: 0 0 5px rgba(255, 68, 68, 0.4); }
+.evolution-neutral { color: #4488ff; opacity: 0.8; }
+.evolution-dash { font-weight: 900; margin-top: -2px; }
 
 /* Dashboards e Dashcards */
 .gauge-card-custom {
@@ -1497,3 +1616,5 @@ watch(selectedEntry, async (newVal) => {
     letter-spacing: 2px;
 }
 </style>
+
+

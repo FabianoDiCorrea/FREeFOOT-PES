@@ -7,9 +7,9 @@
         
         <nav class="top-nav d-flex align-items-center h-100">
           <router-link to="/" class="nav-item" active-class="active">HOME</router-link>
-          <router-link to="/universo" class="nav-item" active-class="active">UNIVERSO DO FUTEBOL</router-link>
+          <router-link to="/universo?reset=true" class="nav-item" active-class="active">UNIVERSO DO FUTEBOL</router-link>
           <router-link to="/carreira" class="nav-item" active-class="active">MINHA CARREIRA</router-link>
-          <router-link to="/premios" class="nav-item" active-class="active">PRÊMIOS</router-link>
+          <router-link to="/premio-individual" class="nav-item" active-class="active">PRÊMIO INDIVIDUAL</router-link>
           <router-link to="/rankings" class="nav-item" active-class="active">RANKINGS</router-link>
           <router-link to="/backup" class="nav-item" active-class="active">BACKUP</router-link>
         </nav>

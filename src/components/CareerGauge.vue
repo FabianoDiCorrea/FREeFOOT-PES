@@ -1,8 +1,8 @@
 <template>
-  <div class="gauge-wrapper">
+  <div class="gauge-wrapper" :class="{ 'is-excellent': value >= 90 }">
     <div class="gauge-container">
       <div class="gauge-body">
-        <!-- Scale Background (Fixed 4 Colors) -->
+        <!-- Scale Background (Fixed 5 Colors) -->
         <div class="gauge-scale-background"></div>
         
         <!-- Mask to create arc -->
@@ -35,17 +35,19 @@ const props = defineProps({
   }
 })
 
-// Cores fixas solicitadas
+// Cores 5 níveis (Novo Esquema Elite Blue)
 const colors = {
     ruim: '#dc3545',      // Vermelho (0-30%)
-    regular: '#ffc107',   // Amarelo (30-70%)
-    bom: '#90ee90',       // Verde Claro (70-85%)
-    excelente: '#28a745'  // Verde Escuro (85-100%)
+    regular: '#fd7e14',   // Laranja (30-55%)
+    bom: '#ffc107',       // Amarelo (55-75%)
+    otimo: '#28a745',     // Verde (75-90%)
+    excelente: '#00bfff'  // Azul Elite (90-100%)
 }
 
 const valueColor = computed(() => {
-    if (props.value >= 85) return colors.excelente
-    if (props.value >= 70) return colors.bom
+    if (props.value >= 90) return colors.excelente
+    if (props.value >= 75) return colors.otimo
+    if (props.value >= 55) return colors.bom
     if (props.value >= 30) return colors.regular
     return colors.ruim
 })
@@ -105,42 +107,32 @@ const needleStyles = computed(() => {
 }
 
 /* 
-  Conic Gradient para as 4 cores fixas:
-  Vermelho (30%): 0 -> 30% mapped to 0-180deg range? 
-  No CSS conic-gradient, o angulo começa em cima (0deg).
-  Queremos um arco de -90deg a +90deg (180 graus total).
-  
-  Mapeamento (180deg total):
-  - Vermelho: 30% do total = 54deg. Range: 270deg (start) até 324deg
-  - Amarelo: 40% do total = 72deg. Range: 324deg até 36deg (passando pelo 0)
-  - Verde Claro: 15% = 27deg. Range: 36deg até 63deg
-  - Verde Escuro: 15% = 27deg. Range: 63deg até 90deg
-  
-  Simpler approach: Use a wrapper rotated or calc offsets.
-  Let's use specific degress assuming standard clock:
-  Start at -90deg (270deg).
-  30% of 180 = 54deg. End Red = -36deg.
-  40% of 180 = 72deg. End Yellow = +36deg.
-  15% of 180 = 27deg. End LightGreen = +63deg.
-  15% of 180 = 27deg. End DarkGreen = +90deg.
+  Conic Gradient Elite Blue System:
+  Vermelho (0-30%): 54deg
+  Laranja (30-55%): +45deg = 99deg
+  Amarelo (55-75%): +36deg = 135deg
+  Verde (75-90%): +27deg = 162deg
+  Azul (90-100%): +18deg = 180deg
 */
 .gauge-scale-background {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    height: 200%; /* Dobro da altura para ser um circulo completo e cortar */
+    height: 200%;
     border-radius: 50%;
     background: conic-gradient(
         from 270deg,
         #dc3545 0deg,
-        #dc3545 54deg,   /* 30% */
-        #ffc107 54deg,
-        #ffc107 126deg,  /* 30% + 40% = 70% -> 126deg */
-        #90ee90 126deg,
-        #90ee90 153deg,  /* 70% + 15% = 85% -> 153deg */
-        #28a745 153deg,
-        #28a745 180deg   /* 85% + 15% = 100% -> 180deg */
+        #dc3545 54deg,    /* 30% */
+        #fd7e14 54deg,
+        #fd7e14 99deg,    /* 55% */
+        #ffc107 99deg,
+        #ffc107 135deg,   /* 75% */
+        #28a745 135deg,
+        #28a745 162deg,   /* 90% */
+        #00bfff 162deg,
+        #00bfff 180deg    /* 100% */
     );
 }
 
@@ -175,6 +167,7 @@ const needleStyles = computed(() => {
   font-size: 2rem;
   line-height: 1;
   text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  transition: all 0.3s ease;
 }
 
 .gauge-label {
@@ -209,5 +202,25 @@ const needleStyles = computed(() => {
     background: #fff;
     border-radius: 50%;
     box-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
+
+/* Efeito Neon Azul Elite para Excelente */
+.is-excellent .gauge-body {
+    box-shadow: inset 0 0 20px rgba(0, 191, 255, 0.3);
+    border-top: 2px solid rgba(0, 191, 255, 0.8);
+}
+
+.is-excellent .gauge-value {
+    text-shadow: 0 0 15px rgba(0, 191, 255, 0.6);
+    color: #00bfff !important; /* Azul Elite */
+}
+
+.is-excellent .gauge-needle {
+    background: #00bfff;
+    box-shadow: 0 0 10px rgba(0, 191, 255, 0.8);
+}
+
+.is-excellent .gauge-needle::after {
+    background: #00bfff;
 }
 </style>
