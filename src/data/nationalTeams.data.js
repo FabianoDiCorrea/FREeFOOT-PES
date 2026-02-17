@@ -1,308 +1,872 @@
 export const NATIONAL_TEAMS_DATA = [
   {
-    "id": 185,
-    "nome": "PARAGUAI",
+    "id": 1,
+    "nome": "EUROPA",
     "pais": "",
     "continente": "",
     "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/ohACZE.png",
-    "federacao_logo": "https://a.imagem.app/B76ggb.png"
+    "bandeira_url": "",
+    "logo_continente": "",
+    "federacao_logo": ""
   },
   {
-    "id": 198,
-    "nome": "BOLIVIA",
+    "id": 2,
+    "nome": "País de Gales",
     "pais": "",
-    "continente": "",
-    "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/ohA4Am.png",
-    "federacao_logo": "https://a.imagem.app/B76ggb.png"
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2GbdT.png",
+    "bandeira_url": "https://a.imagem.app/o2HrFa.png",
+    "logo_continente": "",
+    "federacao_logo": ""
   },
   {
-    "id": 217,
-    "nome": "VENEZUELA",
-    "pais": "",
-    "continente": "",
-    "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/ohAWS0.png",
-    "federacao_logo": "https://a.imagem.app/B76ggb.png"
-  },
-  {
-    "id": 228,
-    "nome": "PERU",
-    "pais": "",
-    "continente": "",
-    "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/ohb3ul.png",
-    "federacao_logo": "https://a.imagem.app/B76ggb.png"
-  },
-  {
-    "id": 247,
-    "nome": "EQUADOR",
-    "pais": "",
-    "continente": "",
-    "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/ohb6ca.png",
-    "federacao_logo": "https://a.imagem.app/B76ggb.png"
-  },
-  {
-    "id": 268,
-    "nome": "INGLATERRA",
-    "pais": "",
-    "continente": "",
-    "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/oSg5oV.png",
-    "federacao_logo": "https://a.imagem.app/B76yUr.png"
-  },
-  {
-    "id": 357,
-    "nome": "ESPANHA",
-    "pais": "",
-    "continente": "EUROPA",
-    "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/oSMw4Q.png",
-    "federacao_logo": "https://a.imagem.app/B76yUr.png"
-  },
-  {
-    "id": 400,
-    "nome": "FRANÇA",
-    "pais": "",
-    "continente": "EUROPA",
-    "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/oSVQga.png",
-    "federacao_logo": "https://a.imagem.app/B76yUr.png"
-  },
-  {
-    "id": 441,
-    "nome": "HOLANDA",
-    "pais": "",
-    "continente": "EUROPA",
-    "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/oSakQW.png",
-    "federacao_logo": "https://a.imagem.app/B76yUr.png"
-  },
-  {
-    "id": 461,
-    "nome": "PORTUGAL",
-    "pais": "",
-    "continente": "EUROPA",
-    "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/oSaELV.png",
-    "federacao_logo": "https://a.imagem.app/B76yUr.png"
-  },
-  {
-    "id": 480,
-    "nome": "ALEMANHA",
-    "pais": "",
-    "continente": "EUROPA",
-    "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/oSfHY8.png",
-    "federacao_logo": "https://a.imagem.app/B76yUr.png"
-  },
-  {
-    "id": 499,
-    "nome": "RUSSIA",
-    "pais": "",
-    "continente": "EUROPA",
-    "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/oSf4qN.png",
-    "federacao_logo": "https://a.imagem.app/B76yUr.png"
-  },
-  {
-    "id": 516,
-    "nome": "ESCOCIA",
-    "pais": "",
-    "continente": "EUROPA",
-    "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/oSyHEW.png",
-    "federacao_logo": "https://a.imagem.app/B76yUr.png"
-  },
-  {
-    "id": 529,
-    "nome": "TURQUIA",
-    "pais": "",
-    "continente": "EUROPA",
-    "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/oSydFQ.png",
-    "federacao_logo": "https://a.imagem.app/B76yUr.png"
-  },
-  {
-    "id": 551,
-    "nome": "BELGICA",
-    "pais": "",
-    "continente": "EUROPA",
-    "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/oSDrGP.png",
-    "federacao_logo": "https://a.imagem.app/B76yUr.png"
-  },
-  {
-    "id": 570,
-    "nome": "DINAMARCA",
-    "pais": "",
-    "continente": "EUROPA",
-    "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/ohBJoi.png",
-    "federacao_logo": "https://a.imagem.app/B76yUr.png"
-  },
-  {
-    "id": 584,
-    "nome": "SUIÇA",
-    "pais": "",
-    "continente": "EUROPA",
-    "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/oSOxa0.png",
-    "federacao_logo": "https://a.imagem.app/B76yUr.png"
-  },
-  {
-    "id": 595,
-    "nome": "Croacia",
-    "pais": "",
-    "continente": "",
-    "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/ohoEza.png",
-    "federacao_logo": "https://a.imagem.app/B76yUr.png"
-  },
-  {
-    "id": 597,
-    "nome": "Grécia",
-    "pais": "",
-    "continente": "",
-    "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/ohotfY.png",
-    "federacao_logo": "https://a.imagem.app/B76yUr.png"
-  },
-  {
-    "id": 602,
+    "id": 3,
     "nome": "Ucrânia",
     "pais": "",
-    "continente": "",
-    "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/ohoIl9.png",
-    "federacao_logo": "https://a.imagem.app/B76yUr.png"
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2G3b3.png",
+    "bandeira_url": "https://a.imagem.app/o2HwQ9.png",
+    "logo_continente": "",
+    "federacao_logo": ""
   },
   {
-    "id": 605,
-    "nome": "Rep. Checa",
+    "id": 4,
+    "nome": "Turquia",
     "pais": "",
-    "continente": "",
-    "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/ohoQMk.png",
-    "federacao_logo": "https://a.imagem.app/B76yUr.png"
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2GB1Z.png",
+    "bandeira_url": "https://a.imagem.app/o2HCpk.png",
+    "logo_continente": "",
+    "federacao_logo": ""
   },
   {
-    "id": 608,
-    "nome": "Romenia",
+    "id": 5,
+    "nome": "Suíça",
     "pais": "",
-    "continente": "",
-    "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/ohoZBV.png",
-    "federacao_logo": "https://a.imagem.app/B76yUr.png"
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2GGui.png",
+    "bandeira_url": "https://a.imagem.app/o2HtKV.png",
+    "logo_continente": "",
+    "federacao_logo": ""
   },
   {
-    "id": 610,
-    "nome": "Suecia",
+    "id": 6,
+    "nome": "Suécia",
     "pais": "",
-    "continente": "",
-    "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/ohodXJ.png",
-    "federacao_logo": "https://a.imagem.app/B76yUr.png"
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2GHN8.png",
+    "bandeira_url": "https://a.imagem.app/o2HuCJ.png",
+    "logo_continente": "",
+    "federacao_logo": ""
   },
   {
-    "id": 612,
+    "id": 7,
+    "nome": "Espanha",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2GhYE.png",
+    "bandeira_url": "https://a.imagem.app/o2HEfG.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 8,
+    "nome": "Eslovênia",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2Gkce.png",
+    "bandeira_url": "https://a.imagem.app/o2HQzm.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 9,
+    "nome": "Eslováquia",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2Gz4N.png",
+    "bandeira_url": "https://a.imagem.app/o2HRlX.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 10,
+    "nome": "Sérvia",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2G7SC.png",
+    "bandeira_url": "https://a.imagem.app/o2HZMb.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 11,
+    "nome": "Escócia",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2GYqY.png",
+    "bandeira_url": "https://a.imagem.app/o2HmBQ.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 12,
+    "nome": "Rússia",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2Gnda.png",
+    "bandeira_url": "https://a.imagem.app/o2HgX1.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 13,
+    "nome": "Romênia",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2GKb9.png",
+    "bandeira_url": "https://a.imagem.app/o2HvQW.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 14,
+    "nome": "Portugal",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2Ge6k.png",
+    "bandeira_url": "https://a.imagem.app/o2HMpt.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 15,
+    "nome": "Polônia",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2GsuV.png",
+    "bandeira_url": "https://a.imagem.app/o2H4e0.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 16,
+    "nome": "Noruega",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2G1NJ.png",
+    "bandeira_url": "https://a.imagem.app/o2HPCy.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 17,
+    "nome": "Irlanda do Norte",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2GinG.png",
+    "bandeira_url": "https://a.imagem.app/o2HUfr.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 18,
+    "nome": "Holanda",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2GFcm.png",
+    "bandeira_url": "https://a.imagem.app/o2Hf22.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 19,
+    "nome": "Itália",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2GXPX.png",
+    "bandeira_url": "https://a.imagem.app/o2HylP.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 20,
+    "nome": "Israel",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2GThb.png",
+    "bandeira_url": "https://a.imagem.app/o2HDMl.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 21,
+    "nome": "Irlanda",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2GqqQ.png",
+    "bandeira_url": "https://a.imagem.app/o2HOGS.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 22,
+    "nome": "Finlândia",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/BhGc92.png",
+    "bandeira_url": "https://a.imagem.app/BhGrVP.webp",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 23,
+    "nome": "Hungria",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2GlbW.png",
+    "bandeira_url": "https://a.imagem.app/o2HpRT.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 24,
+    "nome": "Grécia",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2G56t.png",
+    "bandeira_url": "https://a.imagem.app/o2SA83.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 25,
+    "nome": "Alemanha",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2G9E0.png",
+    "bandeira_url": "https://a.imagem.app/o2SbeZ.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 26,
+    "nome": "França",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2GcNy.png",
+    "bandeira_url": "https://a.imagem.app/o2SoLi.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 27,
+    "nome": "Inglaterra",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2Gwnr.png",
+    "bandeira_url": "https://a.imagem.app/o2S3y8.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 28,
+    "nome": "Dinamarca",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2GCr2.png",
+    "bandeira_url": "https://a.imagem.app/o2SG2E.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 29,
+    "nome": "República Tcheca",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2GLPP.png",
+    "bandeira_url": "https://a.imagem.app/o2SH5e.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 30,
+    "nome": "Croácia",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2Guhl.png",
+    "bandeira_url": "https://a.imagem.app/o2SSMN.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 31,
     "nome": "Bulgária",
     "pais": "",
-    "continente": "",
-    "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/ohomRG.png",
-    "federacao_logo": "https://a.imagem.app/B76yUr.png"
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2GEJS.png",
+    "bandeira_url": "https://a.imagem.app/o2SkGC.png",
+    "logo_continente": "",
+    "federacao_logo": ""
   },
   {
-    "id": 673,
-    "nome": "ARÁBIA",
+    "id": 32,
+    "nome": "Bósnia Herzegóvina",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2GImv.png",
+    "bandeira_url": "https://a.imagem.app/o2SzxY.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 33,
+    "nome": "Bélgica",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2GRoT.png",
+    "bandeira_url": "https://a.imagem.app/o2S2Ra.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 34,
+    "nome": "Áustria",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2GZi3.png",
+    "bandeira_url": "https://a.imagem.app/o2SY89.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 35,
+    "nome": "Albânia",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/o2GdEZ.png",
+    "bandeira_url": "https://a.imagem.app/o2Snsk.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 36,
+    "nome": "Geórgia",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76yUr.png",
+    "escudo_url": "https://a.imagem.app/BhGJst.png",
+    "bandeira_url": "https://a.imagem.app/BhGjt0.webp",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 37,
+    "nome": "AMÉRICA DO SUL",
     "pais": "",
     "continente": "",
     "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/oSpgr9.png",
-    "federacao_logo": "https://a.imagem.app/B76MoQ.png"
+    "bandeira_url": "",
+    "logo_continente": "",
+    "federacao_logo": ""
   },
   {
-    "id": 692,
-    "nome": "Austrália",
+    "id": 38,
+    "nome": "Peru",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76ggb.png",
+    "escudo_url": "https://a.imagem.app/o2Sfuk.png",
+    "bandeira_url": "https://a.imagem.app/o2SRDi.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 39,
+    "nome": "Paraguai",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76ggb.png",
+    "escudo_url": "https://a.imagem.app/o2SyDV.png",
+    "bandeira_url": "https://a.imagem.app/o2SQtZ.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 40,
+    "nome": "Venezuela",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76ggb.png",
+    "escudo_url": "https://a.imagem.app/o2SNYJ.png",
+    "bandeira_url": "https://a.imagem.app/o2SdY8.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 41,
+    "nome": "Equador",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76ggb.png",
+    "escudo_url": "https://a.imagem.app/o2SOcG.png",
+    "bandeira_url": "https://a.imagem.app/o2Sm9E.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 42,
+    "nome": "Bolívia",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76ggb.png",
+    "escudo_url": "https://a.imagem.app/o2SW4m.png",
+    "bandeira_url": "https://a.imagem.app/o2Sg4e.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 43,
+    "nome": "Uruguai",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76ggb.png",
+    "escudo_url": "https://a.imagem.app/o2h8SX.png",
+    "bandeira_url": "https://a.imagem.app/o2SMHN.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 44,
+    "nome": "Colômbia",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76ggb.png",
+    "escudo_url": "https://a.imagem.app/o2hAqb.png",
+    "bandeira_url": "https://a.imagem.app/o2SVTC.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 45,
+    "nome": "Chile",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76ggb.png",
+    "escudo_url": "https://a.imagem.app/o2hGut.png",
+    "bandeira_url": "https://a.imagem.app/o2S4dY.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 46,
+    "nome": "Argentina",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76ggb.png",
+    "escudo_url": "https://a.imagem.app/o2hbdQ.png",
+    "bandeira_url": "https://a.imagem.app/o2SUAa.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 47,
+    "nome": "Brasil",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76ggb.png",
+    "escudo_url": "https://a.imagem.app/o2h3b1.png",
+    "bandeira_url": "https://a.imagem.app/o2Sa19.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 48,
+    "nome": "AMÉ. NORTE E CENTRAL",
     "pais": "",
     "continente": "",
     "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/oSpO01.png",
-    "federacao_logo": "https://a.imagem.app/B76MoQ.png"
+    "bandeira_url": "",
+    "logo_continente": "",
+    "federacao_logo": ""
   },
   {
-    "id": 698,
-    "nome": "Catar",
+    "id": 49,
+    "nome": "EUA",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76POt.png",
+    "escudo_url": "https://a.imagem.app/o2hini.png",
+    "bandeira_url": "https://a.imagem.app/o2hYql.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 50,
+    "nome": "Panamá",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76POt.png",
+    "escudo_url": "https://a.imagem.app/o2hFr8.png",
+    "bandeira_url": "https://a.imagem.app/o2hnmS.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 51,
+    "nome": "México",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76POt.png",
+    "escudo_url": "https://a.imagem.app/o2hXPE.png",
+    "bandeira_url": "https://a.imagem.app/o2hKbv.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 52,
+    "nome": "Jamaica",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76POt.png",
+    "escudo_url": "https://a.imagem.app/o2hThe.png",
+    "bandeira_url": "https://a.imagem.app/o2he6T.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 53,
+    "nome": "Honduras",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76POt.png",
+    "escudo_url": "https://a.imagem.app/o2hqqN.png",
+    "bandeira_url": "https://a.imagem.app/o2hsE3.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 54,
+    "nome": "Costa Rica",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76POt.png",
+    "escudo_url": "https://a.imagem.app/o2hJmC.png",
+    "bandeira_url": "https://a.imagem.app/o2h1NZ.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 55,
+    "nome": "Canadá",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76POt.png",
+    "escudo_url": "https://a.imagem.app/BhGdY8.png",
+    "bandeira_url": "https://a.imagem.app/BhGRDi.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 56,
+    "nome": "El Salvador",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76POt.png",
+    "escudo_url": "https://a.imagem.app/BhGI13.png",
+    "bandeira_url": "https://a.imagem.app/BhGQtZ.webp",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 57,
+    "nome": "ÁFRICA",
     "pais": "",
     "continente": "",
     "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/oSpWrW.png",
-    "federacao_logo": "https://a.imagem.app/B76MoQ.png"
+    "bandeira_url": "",
+    "logo_continente": "",
+    "federacao_logo": ""
   },
   {
-    "id": 703,
-    "nome": "Coréia do Sul",
+    "id": 58,
+    "nome": "Mali",
     "pais": "",
-    "continente": "",
-    "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/oSppUt.png",
-    "federacao_logo": "https://a.imagem.app/B76MoQ.png"
+    "continente": "https://a.imagem.app/B76a00.webp",
+    "escudo_url": "https://a.imagem.app/o2h9E9.png",
+    "bandeira_url": "https://a.imagem.app/o2hPk2.png",
+    "logo_continente": "",
+    "federacao_logo": ""
   },
   {
-    "id": 711,
-    "nome": "EAU",
+    "id": 59,
+    "nome": "Tunísia",
     "pais": "",
-    "continente": "",
-    "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/oh8Ak0.png",
-    "federacao_logo": "https://a.imagem.app/B76MoQ.png"
+    "continente": "https://a.imagem.app/B76a00.webp",
+    "escudo_url": "https://a.imagem.app/o2hcOk.png",
+    "bandeira_url": "https://a.imagem.app/o2hVUr.png",
+    "logo_continente": "",
+    "federacao_logo": ""
   },
   {
-    "id": 718,
-    "nome": "Irã",
+    "id": 60,
+    "nome": "Senegal",
     "pais": "",
-    "continente": "",
-    "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/oh8bJy.png",
-    "federacao_logo": "https://a.imagem.app/B76MoQ.png"
+    "continente": "https://a.imagem.app/B76a00.webp",
+    "escudo_url": "https://a.imagem.app/o2hwnV.png",
+    "bandeira_url": "https://a.imagem.app/o2hUJP.png",
+    "logo_continente": "",
+    "federacao_logo": ""
   },
   {
-    "id": 725,
-    "nome": "Uzbequistão",
+    "id": 61,
+    "nome": "Camarões",
     "pais": "",
-    "continente": "",
-    "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/oh8B32.png",
-    "federacao_logo": "https://a.imagem.app/B76MoQ.png"
+    "continente": "https://a.imagem.app/B76a00.webp",
+    "escudo_url": "https://a.imagem.app/o2hCrJ.png",
+    "bandeira_url": "https://a.imagem.app/o2hagl.png",
+    "logo_continente": "",
+    "federacao_logo": ""
   },
   {
-    "id": 727,
-    "nome": "Malásia",
+    "id": 62,
+    "nome": "Costa do Marfim",
     "pais": "",
-    "continente": "",
-    "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/oh8GiP.png",
-    "federacao_logo": "https://a.imagem.app/B76MoQ.png"
+    "continente": "https://a.imagem.app/B76a00.webp",
+    "escudo_url": "https://a.imagem.app/o2hLUG.png",
+    "bandeira_url": "https://a.imagem.app/o2hy3S.png",
+    "logo_continente": "",
+    "federacao_logo": ""
   },
   {
-    "id": 729,
-    "nome": "Time PES",
-    "pais": "",
-    "continente": "",
-    "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/oh8k0v.png",
-    "federacao_logo": "https://a.imagem.app/B76MoQ.png"
-  },
-  {
-    "id": 802,
+    "id": 63,
     "nome": "Egito",
     "pais": "",
+    "continente": "https://a.imagem.app/B76a00.webp",
+    "escudo_url": "https://a.imagem.app/o2huhm.png",
+    "bandeira_url": "https://a.imagem.app/o2hDiv.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 64,
+    "nome": "Gana",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76a00.webp",
+    "escudo_url": "https://a.imagem.app/o2hEJX.png",
+    "bandeira_url": "https://a.imagem.app/o2hNIT.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 65,
+    "nome": "Argélia",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76a00.webp",
+    "escudo_url": "https://a.imagem.app/o2hIgb.png",
+    "bandeira_url": "https://a.imagem.app/o2hOW3.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 66,
+    "nome": "Marrocos",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76a00.webp",
+    "escudo_url": "https://a.imagem.app/o2hRoQ.png",
+    "bandeira_url": "https://a.imagem.app/o2hp0Z.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 67,
+    "nome": "Nigéria",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76a00.webp",
+    "escudo_url": "https://a.imagem.app/o2hZi1.png",
+    "bandeira_url": "https://a.imagem.app/o2k8wi.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 68,
+    "nome": "Africa do Sul",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76a00.webp",
+    "escudo_url": "https://a.imagem.app/BhGg4e.png",
+    "bandeira_url": "https://a.imagem.app/BhGm9E.webp",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 69,
+    "nome": "Angola",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76a00.webp",
+    "escudo_url": "https://a.imagem.app/BhGVTC.png",
+    "bandeira_url": "https://a.imagem.app/BhGMHN.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 70,
+    "nome": "ÁSIA - OCEANIA",
+    "pais": "",
     "continente": "",
     "escudo_url": "",
-    "bandeira_url": "https://a.imagem.app/o7BZa2.png",
-    "federacao_logo": "https://a.imagem.app/B76a00.webp"
+    "bandeira_url": "",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 71,
+    "nome": "Omã",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76MoQ.png",
+    "escudo_url": "https://a.imagem.app/o2kte3.png",
+    "bandeira_url": "https://a.imagem.app/o2z2ZS.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 72,
+    "nome": "Coréia do Norte",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76MoQ.png",
+    "escudo_url": "https://a.imagem.app/o2kCpT.png",
+    "bandeira_url": "https://a.imagem.app/o2zzxl.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 73,
+    "nome": "Jordânia",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76MoQ.png",
+    "escudo_url": "https://a.imagem.app/o2kuCZ.png",
+    "bandeira_url": "https://a.imagem.app/o2zY8v.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 74,
+    "nome": "Iraque",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76MoQ.png",
+    "escudo_url": "https://a.imagem.app/o2kEfi.png",
+    "bandeira_url": "https://a.imagem.app/o2znsT.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 75,
+    "nome": "Irã",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76MoQ.png",
+    "escudo_url": "https://a.imagem.app/o2kQ28.png",
+    "bandeira_url": "https://a.imagem.app/o2z0t3.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 76,
+    "nome": "Arábia Saudita",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76MoQ.png",
+    "escudo_url": "https://a.imagem.app/o2kRlE.png",
+    "bandeira_url": "https://a.imagem.app/o2zKyZ.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 77,
+    "nome": "Líbano",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76MoQ.png",
+    "escudo_url": "https://a.imagem.app/o2kZMe.png",
+    "bandeira_url": "https://a.imagem.app/o2zs7i.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 78,
+    "nome": "Nova Zelândia",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76MoQ.png",
+    "escudo_url": "https://a.imagem.app/o2kmBN.png",
+    "bandeira_url": "https://a.imagem.app/o2z198.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 79,
+    "nome": "Emirados Árabes Unidos",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76MoQ.png",
+    "escudo_url": "https://a.imagem.app/o2kgXC.png",
+    "bandeira_url": "https://a.imagem.app/o2z6VE.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 80,
+    "nome": "Coréia do Sul",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76MoQ.png",
+    "escudo_url": "https://a.imagem.app/o2kvRY.png",
+    "bandeira_url": "https://a.imagem.app/o2zFHe.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 81,
+    "nome": "Kuait",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76MoQ.png",
+    "escudo_url": "https://a.imagem.app/o2kMpa.png",
+    "bandeira_url": "https://a.imagem.app/o2zXxN.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 82,
+    "nome": "Tailândia",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76MoQ.png",
+    "escudo_url": "https://a.imagem.app/o2k4e9.png",
+    "bandeira_url": "https://a.imagem.app/o2zxZC.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 83,
+    "nome": "China",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76MoQ.png",
+    "escudo_url": "https://a.imagem.app/o2kPLk.png",
+    "bandeira_url": "https://a.imagem.app/o2zqAY.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 84,
+    "nome": "Austrália",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76MoQ.png",
+    "escudo_url": "https://a.imagem.app/o2kUfV.png",
+    "bandeira_url": "https://a.imagem.app/o2zJsa.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 85,
+    "nome": "Catar",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76MoQ.png",
+    "escudo_url": "https://a.imagem.app/o2kf2J.png",
+    "bandeira_url": "https://a.imagem.app/o2zjt9.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 86,
+    "nome": "Uzbequistão",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76MoQ.png",
+    "escudo_url": "https://a.imagem.app/o2ky5G.png",
+    "bandeira_url": "https://a.imagem.app/o2zlDk.png",
+    "logo_continente": "",
+    "federacao_logo": ""
+  },
+  {
+    "id": 87,
+    "nome": "Japão",
+    "pais": "",
+    "continente": "https://a.imagem.app/B76MoQ.png",
+    "escudo_url": "https://a.imagem.app/o2kDMm.png",
+    "bandeira_url": "https://a.imagem.app/o2z97V.png",
+    "logo_continente": "",
+    "federacao_logo": ""
   }
 ];

@@ -3,7 +3,18 @@
     <div class="d-flex justify-content-between align-items-center mb-4 px-2">
       <div class="d-flex align-items-center gap-3">
         <h2 class="m-0"><i class="bi bi-person-badge me-2"></i>MINHA CARREIRA</h2>
-        <GameButton v-if="history.length > 0" class="btn-sm" @click="openForm">
+        
+        <!-- Abas de Navegação -->
+        <div class="d-flex gap-2 ms-4">
+          <button @click="activeType = 'clube'" class="tab-button" :class="{ active: activeType === 'clube' }">
+            <i class="bi bi-shield-shaded me-2"></i>CLUBES
+          </button>
+          <button @click="activeType = 'selecao'" class="tab-button" :class="{ active: activeType === 'selecao' }">
+            <i class="bi bi-globe-americas me-2"></i>SELEÇÕES
+          </button>
+        </div>
+
+        <GameButton v-if="filteredHistory.length > 0" class="btn-sm" @click="openForm">
           <i class="bi bi-plus-circle me-1"></i> NOVA TEMPORADA
         </GameButton>
       </div>
@@ -11,7 +22,7 @@
     </div>
   </div>
     <!-- State: No History -->
-    <div v-if="history.length === 0 && !showForm" class="text-center p-5">
+    <div v-if="filteredHistory.length === 0 && !showForm" class="text-center p-5">
       <GamePanel>
         <div class="py-5">
           <i class="bi bi-controller display-1 opacity-25 mb-4"></i>
@@ -73,34 +84,63 @@
             <div class="contract-banner position-relative d-flex align-items-center justify-content-between p-3 overflow-hidden rounded-3">
                 
                 <!-- Background: Escudo Marca D'água -->
-                <div class="watermark-shield" v-if="getCompLogo(selectedEntry.timeNome) || true">
-                    <TeamShield :teamName="selectedEntry.timeNome" :size="300" borderless class="grayscale-shield" />
+                <div class="watermark-shield">
+                    <template v-if="selectedEntry.tipo === 'clube'">
+                        <TeamShield :teamName="selectedEntry.timeNome" :size="300" borderless class="grayscale-shield" />
+                    </template>
+                    <template v-else-if="selectedNationalTeamData">
+                        <img :src="selectedNationalTeamData.escudo_url" class="shield-img" style="height: 90%; transform: translate(40%, 0) rotate(-15deg); filter: contrast(1.1) brightness(0.9); opacity: 0.50;">
+                    </template>
                 </div>
 
-                <!-- Background: Bandeira do País (Direita) -->
-                <div class="watermark-flag" v-if="selectedEntry.pais">
-                        <NationalFlag :countryName="selectedEntry.pais" :size="300" class="flag-img" />
+                <!-- Background: Logo Continental (Direita) -->
+                <div class="watermark-flag">
+                     <template v-if="selectedEntry.tipo === 'selecao' && selectedNationalTeamData">
+                        <img :src="selectedNationalTeamData.continente" class="flag-img opacity-75" style="width: 220px; filter: drop-shadow(0 0 20px rgba(255,255,255,0.1))">
+                     </template>
+                     <NationalFlag v-else :countryName="selectedEntry.pais" :size="300" class="flag-img" />
                 </div>
 
                 <!-- Conteúdo Header -->
                 <div class="content z-1 w-100 d-flex align-items-center justify-content-between">
                     <div class="d-flex align-items-center gap-4">
                         <TeamShield 
+                            v-if="selectedEntry.tipo === 'clube'"
                             :teamName="selectedEntry.timeNome" 
                             :size="120" 
                             premium 
                             :countryName="selectedEntry.pais" 
                             :season="selectedEntry.temporada"
                         />
+                        <div v-else class="shield-wrapper premium-mode d-flex align-items-center justify-content-center" style="width: 180px; height: 180px; background: rgba(255,255,255,0.03); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); position: relative; overflow: hidden;">
+                            <div v-if="selectedNationalTeamData?.bandeira_url" class="premium-flag-bg" :style="{ backgroundImage: `url(${selectedNationalTeamData.bandeira_url})`, filter: 'blur(10px) brightness(0.4)', opacity: 0.8, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }"></div>
+                            <div class="shield-container d-flex align-items-center justify-content-center" style="width: 100%; height: 100%; position: relative; z-index: 1;">
+                                <img :src="selectedNationalTeamData?.escudo_url" style="width: 155px; height: 155px; object-fit: contain; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.6))">
+                            </div>
+                        </div>
+
                         <div>
                             <div class="text-warning x-small fw-black text-uppercase ls-2 mb-1">Contrato Atual</div>
-                            <h1 class="m-0 fw-black text-uppercase d-flex align-items-center gap-2">
-                                {{ selectedEntry.timeNome }}
-                                <i class="bi bi-controller text-neon-green pulse-neon" style="font-size: 1.1em;"></i>
-                            </h1>
-                            <div class="d-flex align-items-center gap-2 opacity-75">
-                                <NationalFlag :countryName="selectedEntry.pais" :size="20" />
-                                <span class="fw-bold text-uppercase">{{ selectedEntry.pais }}</span>
+                            <div class="d-flex align-items-center gap-3">
+                                <h1 class="m-0 fw-black text-uppercase d-flex align-items-center gap-2" style="font-size: 2.8rem;">
+                                    {{ selectedEntry.timeNome }}
+                                    <i v-if="selectedEntry.tipo === 'selecao'" class="bi bi-controller text-neon-green pulse-neon" style="font-size: 0.8em;"></i>
+                                </h1>
+                                <div v-if="selectedEntry.tipo === 'selecao' && selectedNationalTeamData" class="rounded-circle overflow-hidden border border-2 border-white border-opacity-25 shadow-lg" style="width: 45px; height: 45px;">
+                                    <img :src="selectedNationalTeamData.bandeira_url" class="w-100 h-100 object-fit-cover">
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-2 mt-2" :class="selectedEntry.tipo === 'selecao' ? 'opacity-100' : 'opacity-75'">
+                                <template v-if="selectedEntry.tipo === 'selecao' && selectedNationalTeamData">
+                                    <div class="bg-white bg-opacity-10 rounded-pill px-2 py-1 d-flex align-items-center gap-2">
+                                        <img :src="selectedNationalTeamData.continente" width="22" style="object-fit: contain">
+                                        <span class="fw-black text-uppercase small ls-1">{{ currentFederation?.nome || 'CONMEBOL' }}</span>
+                                    </div>
+                                </template>
+                                <template v-else>
+                                    <NationalFlag :countryName="selectedEntry.pais" :size="20" />
+                                    <span class="fw-bold text-uppercase">{{ selectedEntry.pais }}</span>
+                                </template>
                              </div>
                         </div>
                     </div>
@@ -118,9 +158,9 @@
         </div>
 
         <!-- Navigation between career seasons -->
-        <div v-if="history.length > 1" class="col-12 px-2 mb-3">
+        <div v-if="filteredHistory.length > 1" class="col-12 px-2 mb-3">
             <div class="career-nav d-flex gap-2 justify-content-center flex-wrap">
-                <button v-for="(h, idx) in history" :key="h.id" 
+                <button v-for="(h, idx) in filteredHistory" :key="h.id" 
                         class="btn btn-sm" :class="selectedEntry?.id === h.id ? 'btn-warning' : 'btn-outline-secondary'"
                         @click="selectedEntry = h; careerIndex = idx">
                     {{ h.temporada }}
@@ -150,23 +190,27 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Linha da Liga (Auto/Sync) -->
+                        <!-- Linha da Liga / Copa Continental ou Mundo (Auto/Sync) -->
                         <tr class="row-liga">
-                            <td class="text-start ps-3 fw-bold"><span>{{ currentSeasonData?.nome || 'Sincronizar Liga...' }}</span></td>
-                            <td class="fw-bold"><span>{{ currentSeasonData?.posicao }}°</span></td>
-                            <td><span>{{ currentSeasonData?.jogos }}</span></td>
-                            <td><span>{{ currentSeasonData?.pontos }}</span></td>
-                            <td><span>{{ currentSeasonData?.vitorias }}</span></td>
-                            <td><span>{{ currentSeasonData?.empates }}</span></td>
-                            <td><span>{{ currentSeasonData?.derrotas }}</span></td>
-                            <td><span>{{ currentSeasonData?.golsPro }}</span></td>
-                            <td><span>{{ currentSeasonData?.golsContra }}</span></td>
-                            <td><span>{{ currentSeasonData?.saldo }}</span></td>
+                            <td class="text-start ps-3 fw-bold">
+                                <span>{{ currentSeasonData?.nome || (selectedEntry.tipo === 'selecao' ? 'Copa do Mundo / Continental...' : 'Sincronizar Liga...') }}</span>
+                            </td>
+                            <td class="fw-bold"><span>{{ currentSeasonData?.posicao ? currentSeasonData.posicao + '°' : '---' }}</span></td>
+                            <td><span>{{ currentSeasonData?.jogos || 0 }}</span></td>
+                            <td><span>{{ currentSeasonData?.pontos || 0 }}</span></td>
+                            <td><span>{{ currentSeasonData?.vitorias || 0 }}</span></td>
+                            <td><span>{{ currentSeasonData?.empates || 0 }}</span></td>
+                            <td><span>{{ currentSeasonData?.derrotas || 0 }}</span></td>
+                            <td><span>{{ currentSeasonData?.golsPro || 0 }}</span></td>
+                            <td><span>{{ currentSeasonData?.golsContra || 0 }}</span></td>
+                            <td><span>{{ currentSeasonData?.saldo || 0 }}</span></td>
                             <td class="fw-black"><span>{{ calculateWinRate(currentSeasonData) }}%</span></td>
                         </tr>
-                        <!-- Linhas de Copas (Manual Input) -->
+                        <!-- Linhas de Copas / Amistosos (Manual Input) -->
                         <tr class="row-copas">
-                            <td class="text-start ps-3 fw-bold"><span>Total outras Competições</span></td>
+                            <td class="text-start ps-3 fw-bold">
+                                <span>{{ selectedEntry.tipo === 'selecao' ? 'AMISTOSOS NA TEMPORADA' : 'TOTAL OUTRAS COMPETIÇÕES' }}</span>
+                            </td>
                             <td><span>---</span></td>
                             <td class="fw-bold"><span>{{ copasJogosCalculado }}</span></td>
                             <td class="fw-bold"><span>{{ copasPontosCalculado }}</span></td>
@@ -314,7 +358,7 @@
     </div>
 
     <!-- SALA DE TROFÉUS (Link) -->
-    <div v-if="history.length > 0 && !showForm" class="mt-5 px-2">
+    <div v-if="filteredHistory.length > 0 && !showForm" class="mt-5 px-2">
         <GamePanel customClass="p-0 overflow-hidden">
             <div class="p-5 text-center bg-black bg-opacity-25 d-flex flex-column align-items-center justify-content-center" style="min-height: 200px;">
                 <i class="bi bi-trophy-fill mb-3 text-warning" style="font-size: 3rem; filter: drop-shadow(0 0 15px rgba(255,193,7,0.4));" />
@@ -342,17 +386,33 @@ import CareerGauge from '../components/CareerGauge.vue'
 import { careerStore } from '../services/career.store'
 import { seasonStore } from '../services/season.store'
 import { rankingsStore } from '../services/rankings.store'
+import { NATIONAL_TEAMS_DATA } from '../data/nationalTeams.data'
 import { CLUBS_DATA } from '../data/clubs.data'
+import { FEDERATIONS_DATA } from '../services/federations.data'
 import { ALL_COMPETITIONS_DATA } from '../services/competitions.data'
 import { INTERNATIONAL_DATA } from '../data/internationalCompetitions'
+import { dataSearchService } from '../services/dataSearch.service'
 import { getTrofeuPath, normalizeString } from '../services/utils'
 
 const history = computed(() => careerStore.history)
 const selectedEntry = ref(null)
 const careerIndex = ref(0)
+const activeType = ref('clube') // 'clube' | 'selecao'
 const showForm = ref(false)
 const showTeams = ref(false)
 const showTrophyModal = ref(false)
+
+const filteredHistory = computed(() => {
+    return history.value.filter(h => h.tipo === activeType.value)
+})
+
+watch(activeType, () => {
+    if (filteredHistory.value.length > 0) {
+        selectedEntry.value = filteredHistory.value[filteredHistory.value.length - 1]
+    } else {
+        selectedEntry.value = null
+    }
+})
 
 const entryForm = ref({
     temporada: '',
@@ -369,6 +429,20 @@ const entryForm = ref({
 const autoRankFinal = computed(() => {
   if (!selectedEntry.value) return null
   return rankingsStore.getTeamRank(selectedEntry.value.timeNome, selectedEntry.value.temporada)
+})
+
+const selectedNationalTeamData = computed(() => {
+    if (!selectedEntry.value || selectedEntry.value.tipo !== 'selecao') return null
+    return dataSearchService.findNationalTeam(selectedEntry.value.timeNome)
+})
+
+const currentFederation = computed(() => {
+    if (!selectedNationalTeamData.value) return null
+    // continente field in nationalTeams.data.js is already the logo URL
+    const logoUrl = selectedNationalTeamData.value.continente
+    
+    // Find federation name in FEDERATIONS_DATA by logo URL
+    return Object.values(FEDERATIONS_DATA).find(f => f.logo === logoUrl)
 })
 
 const rankEvolution = computed(() => {
@@ -399,16 +473,21 @@ onMounted(async () => {
     await seasonStore.loadAll() // Carregar temporadas para buscar resultados automáticos
     await rankingsStore.loadAll() // Carregar rankings para sincronização
     if (history.value.length > 0) {
-        // Selecionar a última temporada (mais recente/atual)
-        const lastIndex = history.value.length - 1
-        selectedEntry.value = history.value[lastIndex]
-        careerIndex.value = lastIndex
+        // Selecionar a última temporada do tipo atual
+        const activeHistory = history.value.filter(h => h.tipo === activeType.value)
+        if (activeHistory.length > 0) {
+            selectedEntry.value = activeHistory[activeHistory.length - 1]
+        }
     }
 })
 
 const filteredClubs = computed(() => {
     if (!entryForm.value.timeNome || entryForm.value.timeNome.length < 2) return []
     const q = entryForm.value.timeNome.toLowerCase()
+    
+    if (activeType.value === 'selecao') {
+        return NATIONAL_TEAMS_DATA.filter(c => c.nome.toLowerCase().includes(q)).slice(0, 5)
+    }
     return CLUBS_DATA.filter(c => c.nome.toLowerCase().includes(q)).slice(0, 5)
 })
 
@@ -423,6 +502,7 @@ const openForm = (entry = null) => {
             temporada: '',
             timeNome: '',
             pais: '',
+            tipo: activeType.value,
             liga: { nome: '', posicao: 0, jogos: 0, vitorias: 0, empates: 0, derrotas: 0, golsPro: 0, golsContra: 0, pontos: 0, saldo: 0 },
             copas: { jogos: 0, vitorias: 0, empates: 0, derrotas: 0, golsPro: 0, golsContra: 0, pontos: 0 },
             titulos: [],
@@ -443,10 +523,23 @@ const closeForm = () => {
 
 const selectClub = (club) => {
     entryForm.value.timeNome = club.nome
-    entryForm.value.pais = club.pais
-    showTeams.value = false
     
-    // Tentar buscar liga automática
+    if (activeType.value === 'selecao') {
+        const fedMap = {
+            'https://a.imagem.app/B76yUr.png': 'Europa',
+            'https://a.imagem.app/B76ggb.png': 'América do Sul',
+            'https://a.imagem.app/B76POt.png': 'América do Norte',
+            'https://a.imagem.app/B76a00.webp': 'África',
+            'https://a.imagem.app/B76MoQ.png': 'Ásia'
+        }
+        entryForm.value.pais = fedMap[club.continente] || 'Internacional'
+        // Guardar nome original para a bandeira
+        entryForm.value.realPais = club.nome 
+    } else {
+        entryForm.value.pais = club.pais
+    }
+    
+    showTeams.value = false
     tryLookupLeagueData(club.nome, entryForm.value.temporada)
 }
 
@@ -487,10 +580,24 @@ const tryLookupLeagueData = async (teamName, seasonYear) => {
                 saldo: parseInt(cells[8]) || 0
             }
 
-            const isLeague = season.competitionName.toLowerCase().match(/liga|serie|division|ligue|bundesliga|premiership|primera|eredivisie|primeira|campeonato/)
+            // Lógica de Detecção de Competição Principal
+            let isMainComp = false
+            const lowerComp = season.competitionName.toLowerCase()
             
-            if (isLeague || entryForm.value.liga.nome === '') {
+            if (entryForm.value.tipo === 'selecao') {
+                // Para seleções, prioridade é Copa do Mundo ou Continental (Euro, Copa América, etc)
+                isMainComp = lowerComp.match(/copa do mundo|world cup|euro|copa américa|copa africa|asian cup|gold cup/)
+            } else {
+                // Para clubes, prioridade é Liga/Campeonato Nacional
+                isMainComp = lowerComp.match(/liga|serie|division|ligue|bundesliga|premiership|primera|eredivisie|primeira|campeonato/)
+            }
+            
+            if (isMainComp || entryForm.value.liga.nome === '') {
                 if (entryForm.value.liga.nome === '') {
+                    entryForm.value.liga = { ...stats, nome: season.competitionName, posicao: lines.indexOf(teamLine) + 1 }
+                } else if (isMainComp) {
+                    // Se achou uma competição principal e já tinha algo (talvez aleatório), sobrescreve ou soma?
+                    // Geralmente queremos a principal. Se for a Copa do Mundo, ela é a principal.
                     entryForm.value.liga = { ...stats, nome: season.competitionName, posicao: lines.indexOf(teamLine) + 1 }
                 } else {
                     entryForm.value.liga.jogos += stats.jogos
@@ -1614,6 +1721,35 @@ watch(selectedEntry, async (newVal) => {
 
 .letter-spacing-2 {
     letter-spacing: 2px;
+}
+
+.tab-button {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 30px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 8px 24px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  letter-spacing: 1.5px;
+  display: flex;
+  align-items: center;
+  backdrop-filter: blur(5px);
+}
+
+.tab-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.tab-button.active {
+  background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+  color: #000;
+  border-color: #ffc107;
+  box-shadow: 0 0 15px rgba(255, 193, 7, 0.4);
 }
 </style>
 

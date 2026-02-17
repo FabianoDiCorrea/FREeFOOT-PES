@@ -34,7 +34,7 @@
             <div class="col-md-6">
               <h3>IMPORTAR BASE DO PES</h3>
               <p class="opacity-75 m-0">Converta sua planilha de clubes e seleções para o formato do sistema.</p>
-              <small class="text-secondary opacity-50">Colunas: TIME, LINK ESCUDO, LINK BANDEIRA NACIONAL, CONTINENTE, PAÍS, LOGO CONTINENTE</small>
+              <small class="text-secondary opacity-50">Colunas: TIME, LINK ESCUDO, LINK BANDEIRA NACIONAL, CONTINENTE, PAÍS, LOGO CONTINENTE, FEDERAÇÃO</small>
             </div>
             <div class="col-md-4">
               <input type="file" ref="xlsxInput" @change="handlePESImport" class="d-none" accept=".xlsx, .xls">
@@ -134,13 +134,14 @@ const handlePESImport = (event) => {
           continente: rowData['CONTINENTE'] || '',
           escudo_url: rowData['LINK ESCUDO'] || '',
           bandeira_url: rowData['LINK BANDEIRA NACIONAL'] || '',
-          logo_continente: rowData['LOGO CONTINENTE'] || ''
+          logo_continente: rowData['LOGO CONTINENTE'] || '',
+          federacao_logo: rowData['FEDERAÇÃO'] || rowData['LINK FEDERAÇÃO'] || rowData['FEDERACAO'] || ''
         }
 
         // Tentar identificar se é seleção
         if (item.nome.toUpperCase().includes('SELEÇÃO') || 
             item.continente.toUpperCase().includes('SELEÇÕES') ||
-            !item.pais) {
+            !item.pais || item.federacao_logo) { /* Se tem federação logo, é forte indicio */
           nationals.push(item)
         } else {
           clubs.push(item)

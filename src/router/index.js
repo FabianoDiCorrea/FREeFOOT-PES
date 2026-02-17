@@ -14,6 +14,8 @@ const router = createRouter({
         { path: '/competicao/:id/historico', name: 'competition-history', component: () => import('../views/CompetitionHistoryView.vue') },
         { path: '/pais/:id/historico', name: 'country-history', component: () => import('../views/CountryHistoryView.vue') },
         { path: '/pais/:id/matriz', name: 'country-matrix', component: () => import('../views/CountrySeasonMatrixView.vue') },
+        { path: '/selecao/:id/historico', name: 'national-history', component: () => import('../views/NationalHistoryView.vue') },
+        { path: '/selecao/:id/matriz', name: 'national-matrix', component: () => import('../views/NationalSeasonMatrixView.vue') },
         { path: '/checklist', name: 'season-checklist', component: () => import('../views/SeasonChecklistView.vue') },
         { path: '/sala-de-trofeus', name: 'trophy-room', component: () => import('../views/TrophyRoomView.vue') },
     ],

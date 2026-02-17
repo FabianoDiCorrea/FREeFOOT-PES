@@ -10,13 +10,31 @@
       <LogoFREeFOOT />
     </div>
 
+    <!-- Tabs de Navegação -->
+    <div class="d-flex justify-content-center gap-4 mb-4">
+      <button 
+        class="tab-button" 
+        :class="{ active: activeTab === 'clubes' }"
+        @click="activeTab = 'clubes'; resetNavigation()"
+      >
+        <i class="bi bi-shield-shaded me-2"></i>MUNDO DOS CLUBES
+      </button>
+      <button 
+        class="tab-button" 
+        :class="{ active: activeTab === 'selecoes' }"
+        @click="activeTab = 'selecoes'; resetNavigation()"
+      >
+        <i class="bi bi-flag-fill me-2"></i>MUNDO DAS SELEÇÕES
+      </button>
+    </div>
+
     <!-- Breadcrumb -->
     <div class="mb-4 d-flex gap-2 align-items-center flex-wrap px-2">
       <button @click="resetNavigation" class="breadcrumb-btn" :class="{ active: !selectedContinent }">
-        MUNDO
+        {{ activeTab === 'clubes' ? 'MUNDO DOS CLUBES' : 'MUNDO DAS SELEÇÕES' }}
       </button>
       <i class="bi bi-chevron-right opacity-25" v-if="selectedContinent"></i>
-      <button v-if="selectedContinent" @click="backToCountries" class="breadcrumb-btn" :class="{ active: selectedContinent && !selectedCountry }">
+      <button v-if="selectedContinent" @click="backToCountries" class="breadcrumb-btn" :class="{ active: selectedContinent && !selectedCountry && (activeTab === 'clubes' || !selectedCompetition) }">
         {{ selectedContinent.continente }}
       </button>
       <i class="bi bi-chevron-right opacity-25" v-if="selectedCountry"></i>
@@ -259,9 +277,11 @@
         </div>
       </div>
 
-      <!-- NÍVEL 2: PASES -->
+      <!-- NÍVEL 2: PAÍSES (CLUBES) ou COMPETIÇÕES (SELEÇÕES) -->
       <div v-else-if="selectedContinent && !selectedCountry" class="col-12 px-2">
-        <div class="game-grid-auto">
+        
+        <!-- MODO CLUBES: LISTA DE PAÍSES -->
+        <div v-if="activeTab === 'clubes'" class="game-grid-auto">
           <div v-for="pais in selectedContinent.paises" :key="pais.nome">
             <GamePanel 
               :customClass="'h-100 cursor-pointer country-card-modern ' + getFederationColorClass(selectedContinent ? getFederation(selectedContinent.continente).nome : '')"
@@ -281,12 +301,59 @@
             </GamePanel>
           </div>
         </div>
+
+        <!-- MODO SELEÇÕES: LISTA DE COMPETIÇÕES (DIRETO) -->
+        <div v-else-if="activeTab === 'selecoes'" class="animated-fade-in">
+          <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary border-opacity-25">
+             <h4 class="text-white m-0 text-uppercase fw-black">
+               <i class="bi bi-globe2 me-2 text-info"></i>Competições - {{ selectedContinent.continente }}
+             </h4>
+             <div class="d-flex gap-2">
+               <button class="btn btn-outline-info fw-bold text-uppercase small" @click="$router.push(`/selecao/${selectedContinent.continente}/historico`)">
+                 <i class="bi bi-table me-2"></i> VER HISTÓRICO GERAL
+               </button>
+               <button class="btn btn-info fw-black text-uppercase small text-dark" style="background: #00f2ff;" @click="$router.push(`/selecao/${selectedContinent.continente}/matriz`)">
+                 <i class="bi bi-calendar3 me-2"></i> VER MATRIZ EXPERT
+               </button>
+             </div>
+          </div>
+          
+          <div class="game-grid-auto">
+            <div v-for="comp in selectedContinent.competicoes" :key="comp.id">
+              <GamePanel 
+                  :customClass="'comp-card-premium h-100 cursor-pointer ' + getFederationColorClass(selectedContinent.continente === 'Mundial' ? 'FIFA' : getFederation(selectedContinent.continente).nome)"
+                  @click="selectCompetition(comp)"
+                >
+                  <div class="d-flex align-items-center gap-3">
+                    <div class="comp-items-horizontal d-flex gap-2">
+                      <div class="comp-logo-container-highlight">
+                        <img v-if="comp.logo" :src="getCachedLogo(comp.logo)" @error="(e) => e.target.style.display='none'" class="comp-logo-premium">
+                        <img v-else-if="selectedContinent && getFederation(selectedContinent.continente).logo" :src="getCachedLogo(getFederation(selectedContinent.continente).logo)" class="comp-logo-premium p-1" title="Competição Oficial">
+                        <i v-else class="bi bi-trophy fs-4 text-dark opacity-50"></i>
+                      </div>
+                      
+                      <div v-if="comp.trofeu" class="comp-logo-container-highlight">
+                        <img :src="getTrofeuPath(comp.trofeu)" class="comp-logo-premium">
+                      </div>
+                    </div>
+
+                    <div class="flex-grow-1 min-w-0">
+                      <h5 class="mb-2 fw-bold text-uppercase competition-title">{{ comp.nome }}</h5>
+                      <span class="badge badge-game-type" :class="'badge-' + (comp.tipo ? comp.tipo.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '') : 'copa')">
+                        {{ comp.tipo }}
+                      </span>
+                    </div>
+                  </div>
+                </GamePanel>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- NÍVEL 1: MUNDO (Internacionais + Continentes) -->
       <div v-else class="col-12 px-2">
-        <!-- SEÇÃO: COMPETIÇÕES INTERNACIONAIS -->
-        <div class="mb-5 animated-fade-in">
+        <!-- SEÇÃO: COMPETIÇÕES INTERNACIONAIS (CLUBES) -->
+        <div v-if="activeTab === 'clubes'" class="mb-5 animated-fade-in">
           <h3 class="mb-4 text-warning fw-bold"><i class="bi bi-trophy me-2"></i>COMPETIÇÕES INTERNACIONAIS</h3>
           <div class="international-grid">
             <div v-for="comp in INTERNATIONAL_DATA" :key="comp.id" class="col">
@@ -325,7 +392,9 @@
         <hr class="border-secondary opacity-10 mb-5">
 
         <h3 class="mb-4 text-secondary fw-bold"><i class="bi bi-map me-2"></i>CONTINENTES</h3>
-        <div class="game-grid-auto">
+        
+        <!-- CONTINENTES (CLUBES) -->
+        <div v-if="activeTab === 'clubes'" class="game-grid-auto">
           <div v-for="cont in ALL_COMPETITIONS_DATA" :key="cont.continente">
             <GamePanel 
               :customClass="'h-100 cursor-pointer card-hover ' + getFederationColorClass(getFederation(cont.continente).nome)"
@@ -337,6 +406,27 @@
                 <h3 class="mb-1">{{ cont.continente }}</h3>
                 <p class="small text-secondary fw-bold">{{ getFederation(cont.continente).nome }}</p>
                 <p class="opacity-75 small">{{ cont.paises.length }} Países</p>
+              </div>
+            </GamePanel>
+          </div>
+        </div>
+
+        <!-- CONTINENTES (SELEÇÕES) -->
+        <div v-if="activeTab === 'selecoes'" class="game-grid-auto">
+          <div v-for="cont in NATIONAL_COMPETITIONS_STRUCTURE" :key="cont.id">
+            <GamePanel 
+              :customClass="'h-100 cursor-pointer card-hover ' + getFederationColorClass(cont.continente === 'Mundial' ? 'FIFA' : getFederation(cont.continente).nome)"
+              @click="selectContinent(cont)"
+            >
+              <div class="text-center py-4">
+                <img v-if="cont.logo_continente" :src="getCachedLogo(cont.logo_continente)" class="mb-3 fed-logo" alt="">
+                <img v-else-if="getFederation(cont.continente).logo" :src="getCachedLogo(getFederation(cont.continente).logo)" class="mb-3 fed-logo">
+                <i v-else class="bi bi-globe2 fs-1 text-info mb-3 d-block"></i>
+
+                <h3 class="mb-1 fw-bold text-uppercase">
+                  {{ cont.continente === 'Mundial' ? 'MUNDIAL' : getFederation(cont.continente).nome }}
+                </h3>
+                <div class="mt-2 text-secondary small opacity-50 fw-bold">{{ cont.continente }}</div>
               </div>
             </GamePanel>
           </div>
@@ -746,6 +836,7 @@ import LogoFREeFOOT from '../components/LogoFREeFOOT.vue'
 import TeamShield from '../components/TeamShield.vue'
 import NationalFlag from '../components/NationalFlag.vue'
 import { ALL_COMPETITIONS_DATA } from '../services/competitions.data'
+import { NATIONAL_COMPETITIONS_STRUCTURE } from '../services/national.data'
 import { INTERNATIONAL_DATA } from '../data/internationalCompetitions'
 import { FEDERATIONS_DATA } from '../services/federations.data'
 import { seasonStore } from '../services/season.store'
@@ -756,13 +847,90 @@ import { db } from '../services/db'
 import { imageCacheService } from '../services/imageCache.service'
 import { careerStore } from '../services/career.store'
 
-const selectedContinent = ref(null)
-const selectedCountry = ref(null)
-const selectedCompetition = ref(null)
 const showNewSeasonForm = ref(false)
 
 const route = useRoute()
 const router = useRouter()
+
+const resetNavigation = () => {
+  selectedContinent.value = null
+  selectedCountry.value = null
+  selectedCompetition.value = null
+  showNewSeasonForm.value = false
+  isEditing.value = false
+  localStorage.removeItem('freefoot_universo_nav')
+}
+
+const backToCountries = () => {
+  selectedCountry.value = null
+  selectedCompetition.value = null
+  showNewSeasonForm.value = false
+  isEditing.value = false
+}
+
+const backToCompetitions = () => {
+  selectedCompetition.value = null
+  showNewSeasonForm.value = false
+  isEditing.value = false
+}
+
+const restoreNavigation = () => {
+  if (route.query.compId) {
+    const compId = parseInt(route.query.compId)
+    let foundComp = null, foundCountry = null, foundContinent = null
+    for (const cont of ALL_COMPETITIONS_DATA) {
+      if (cont.paises) {
+        for (const p of cont.paises) {
+          const c = p.competicoes.find(item => item.id === compId)
+          if (c) { foundComp = c; foundCountry = p; foundContinent = cont; break }
+        }
+      }
+      if (foundComp) break
+      if (cont.continentais) {
+        const c = cont.continentais.find(item => item.id === compId)
+        if (c) { foundComp = c; foundContinent = cont; break }
+      }
+    }
+    if (!foundComp) foundComp = INTERNATIONAL_DATA.find(c => c.id === compId)
+    if (foundComp) {
+      selectedContinent.value = foundContinent; selectedCountry.value = foundCountry; selectedCompetition.value = foundComp;
+      const targetCountry = foundComp.pais || foundCountry?.nome || foundContinent?.continente
+      seasonStore.loadSeasons(foundComp.nome, targetCountry)
+      router.replace({ query: {} })
+      return
+    }
+  }
+
+  if (route.query.reset === 'true') {
+    resetNavigation()
+    router.replace({ query: {} })
+    return
+  }
+  
+  const savedNav = localStorage.getItem('freefoot_universo_nav')
+  if (savedNav) {
+    try {
+      const state = JSON.parse(savedNav)
+      if (state.activeTab) activeTab.value = state.activeTab
+      if (state.continent) selectedContinent.value = state.continent
+      if (state.country) selectedCountry.value = state.country
+      if (state.competition && state.competition.nome) {
+        const allComps = [
+          ...ALL_COMPETITIONS_DATA.flatMap(c => c.paises?.flatMap(p => p.competicoes) || []),
+          ...ALL_COMPETITIONS_DATA.flatMap(c => c.continentais || []),
+          ...NATIONAL_COMPETITIONS_STRUCTURE.flatMap(c => c.competicoes || []),
+          ...INTERNATIONAL_DATA
+        ]
+        const foundComp = allComps.find(c => c.id === state.competition.id) || allComps.find(c => c.nome === state.competition.nome)
+        if (foundComp) {
+          selectedCompetition.value = foundComp
+          const targetCountry = foundComp.pais || selectedCountry.value?.nome || selectedContinent.value?.continente
+          seasonStore.loadSeasons(foundComp.nome, targetCountry)
+        }
+      }
+    } catch (e) { console.error("Erro ao restaurar navegação:", e) }
+  }
+}
 
 // Watch para reset de navegação via Menu
 watch(() => route.query.reset, (newVal) => {
@@ -775,9 +943,29 @@ watch(() => route.query.reset, (newVal) => {
 const isEditing = ref(false)
 const currentEditId = ref(null)
 
+// 0. Pré-carregar estado de navegação para evitar flash visual
+const getSavedNav = () => {
+  try {
+    const saved = localStorage.getItem('freefoot_universo_nav')
+    return saved ? JSON.parse(saved) : null
+  } catch (e) { return null }
+}
+const initialNav = getSavedNav()
+
+const activeTab = ref(initialNav?.activeTab || 'clubes') // 'clubes' | 'selecoes'
+const selectedContinent = ref(initialNav?.continent || null)
+const selectedCountry = ref(initialNav?.country || null)
+const selectedCompetition = ref(null) // Será restaurado via restoreNavigation()
 const viewMode = ref('list') // 'list' ou 'form'
 const teamSearchQuery = ref({ campeao: '', vice: '', clubeArtilheiro: '', participantes: '', participantesTexto: '' })
 const showTeamResults = ref({ campeao: false, vice: false, clubeArtilheiro: false, participantes: false })
+
+// Restaurar competição e outros estados complexos imediatamente
+try {
+  restoreNavigation()
+} catch (e) {
+  console.error("Erro na restauração síncrona:", e)
+}
 
 const newSeason = ref({
   id: null,
@@ -980,6 +1168,8 @@ const getFederationColorClass = (fedName) => {
   if (name.includes('UEFA')) return 'neon-uefa';
   if (name.includes('CONCACAF')) return 'neon-concacaf';
   if (name.includes('FIFA')) return 'neon-fifa';
+  if (name.includes('CAF')) return 'neon-caf';
+  if (name.includes('AFC')) return 'neon-afc';
   return '';
 }
 
@@ -1102,27 +1292,7 @@ const selectCompetition = async (comp) => {
   }
 }
 
-const resetNavigation = () => {
-  selectedContinent.value = null
-  selectedCountry.value = null
-  selectedCompetition.value = null
-  showNewSeasonForm.value = false
-  isEditing.value = false
-  localStorage.removeItem('freefoot_universo_nav')
-}
 
-const backToCountries = () => {
-  selectedCountry.value = null
-  selectedCompetition.value = null
-  showNewSeasonForm.value = false
-  isEditing.value = false
-}
-
-const backToCompetitions = () => {
-  selectedCompetition.value = null
-  showNewSeasonForm.value = false
-  isEditing.value = false
-}
 
 const countTitles = (teamName, seasonStr) => {
   if (!teamName || !selectedCompetition.value || !seasonStr) return 0
@@ -1413,8 +1583,9 @@ const cacheImages = async (data) => {
 }
 
 // Persistncia de navegação
-watch([selectedContinent, selectedCountry, selectedCompetition], () => {
+watch([selectedContinent, selectedCountry, selectedCompetition, activeTab], () => {
   const state = {
+    activeTab: activeTab.value,
     continent: selectedContinent.value,
     country: selectedCountry.value,
     competition: selectedCompetition.value ? { nome: selectedCompetition.value.nome } : null
@@ -1422,113 +1593,7 @@ watch([selectedContinent, selectedCountry, selectedCompetition], () => {
   localStorage.setItem('freefoot_universo_nav', JSON.stringify(state))
 }, { deep: true })
 
-const restoreNavigation = () => {
-  // 1. Deep Link via Query Param (Checklist Access)
-  if (route.query.compId) {
-    const compId = parseInt(route.query.compId)
-    
-    let foundComp = null
-    let foundCountry = null
-    let foundContinent = null
 
-    // Busca exaustiva em todos os dados
-    for (const cont of ALL_COMPETITIONS_DATA) {
-      if (cont.paises) {
-        for (const p of cont.paises) {
-          const c = p.competicoes.find(item => item.id === compId)
-          if (c) { 
-            foundComp = c
-            foundCountry = p
-            foundContinent = cont
-            break
-          }
-        }
-      }
-      if (foundComp) break
-      
-      if (cont.continentais) {
-        const c = cont.continentais.find(item => item.id === compId)
-        if (c) {
-          foundComp = c
-          foundContinent = cont
-          break
-        }
-      }
-    }
-
-    if (!foundComp) {
-      foundComp = INTERNATIONAL_DATA.find(c => c.id === compId)
-    }
-
-    if (foundComp) {
-      selectedContinent.value = foundContinent
-      selectedCountry.value = foundCountry
-      selectedCompetition.value = foundComp
-      
-      const targetCountry = foundComp.pais || foundCountry?.nome || foundContinent?.continente
-      seasonStore.loadSeasons(foundComp.nome, targetCountry)
-
-      router.replace({ query: {} })
-      return
-    }
-  }
-
-  if (route.query.reset === 'true') {
-    resetNavigation()
-    router.replace({ query: {} })
-    return
-  }
-  
-  // 2. LocalStorage Restore
-  const savedNav = localStorage.getItem('freefoot_universo_nav')
-  if (savedNav) {
-    try {
-      const state = JSON.parse(savedNav)
-      if (!state || typeof state !== 'object') {
-        localStorage.removeItem('freefoot_universo_nav')
-        return
-      }
-
-      if (state.continent) selectedContinent.value = state.continent
-      if (state.country) selectedCountry.value = state.country
-      
-      if (state.competition && state.competition.nome) {
-        const allComps = [
-          ...ALL_COMPETITIONS_DATA.flatMap(c => c.paises?.flatMap(p => p.competicoes) || []),
-          ...ALL_COMPETITIONS_DATA.flatMap(c => c.continentais || []),
-          ...INTERNATIONAL_DATA
-        ]
-        
-        const foundComp = allComps.find(c => c.id === state.competition.id) || 
-                          allComps.find(c => c.nome === state.competition.nome)
-
-        if (foundComp) {
-          selectedCompetition.value = foundComp
-          const targetCountry = foundComp.pais || selectedCountry.value?.nome || selectedContinent.value?.continente
-          seasonStore.loadSeasons(foundComp.nome, targetCountry)
-          
-          if (foundComp.tipo === 'internacional') {
-             const fedMap = {
-                'CONMEBOL': 'América do Sul',
-                'UEFA': 'Europa',
-                'CONCACAF': 'América do Norte',
-                'FIFA': 'FIFA'
-             }
-             const fedKey = fedMap[foundComp.continente]
-             if (fedKey && !selectedCountry.value) {
-                 selectedCountry.value = {
-                    nome: foundComp.continente,
-                    bandeira: FEDERATIONS_DATA[fedKey]?.logo || ''
-                 }
-             }
-          }
-        }
-      }
-    } catch (e) {
-      console.error("Erro ao restaurar navegação:", e)
-    }
-  }
-}
 
 onMounted(async () => {
   await seasonStore.loadAll()
@@ -1547,12 +1612,7 @@ onMounted(async () => {
     }
   }
 
-  // 2. Restaurar estado de navegação com segurança
-  try {
-    restoreNavigation()
-  } catch (e) {
-    console.error("Erro ao restaurar navegação:", e)
-  }
+  // 2. Restaurar estado de navegação com segurança (removido do onMounted para rodar no setup)
 
   // 3. Carregar Cache de Imagens Geral em background
   try {
@@ -2558,6 +2618,77 @@ onMounted(async () => {
   0% { opacity: 0.7; transform: scale(1); }
   50% { opacity: 1; transform: scale(1.2); }
   100% { opacity: 0.7; transform: scale(1); }
+}
+
+
+.tab-button {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 30px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 12px 30px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  letter-spacing: 1.5px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  backdrop-filter: blur(5px);
+}
+
+.tab-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.tab-button.active {
+  background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+  color: #000;
+  border-color: #ffc107;
+  box-shadow: 0 0 20px rgba(255, 193, 7, 0.4);
+  transform: translateY(-2px);
+}
+
+.tab-button.active i {
+  color: #000;
+}
+
+.neon-caf {
+  box-shadow: 0 0 10px rgba(255, 193, 7, 0.2);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+}
+.neon-caf:hover {
+  box-shadow: 0 0 20px rgba(255, 193, 7, 0.6), inset 0 0 10px rgba(255, 193, 7, 0.2);
+  border-color: #ffc107;
+}
+
+.neon-afc {
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
+  border: 1px solid rgba(0, 229, 255, 0.3);
+}
+.neon-afc:hover {
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.6), inset 0 0 10px rgba(0, 229, 255, 0.2);
+  border-color: #00e5ff;
+}
+
+
+.competition-title {
+  font-size: 0.85rem; /* Reduced slightly more to fit long names */
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2; /* Standard property */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 2.5em; 
+  display: flex; /* Fallback for alignment */ 
+  align-items: center;
 }
 </style>
 

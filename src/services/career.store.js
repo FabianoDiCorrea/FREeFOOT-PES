@@ -9,7 +9,12 @@ export const careerStore = reactive({
     async loadAll() {
         this.loading = true;
         try {
-            this.history = await careerService.getAll();
+            const data = await careerService.getAll();
+            // Migração: registros sem tipo são 'clube'
+            this.history = data.map(h => ({
+                ...h,
+                tipo: h.tipo || 'clube'
+            }));
         } catch (e) {
             console.error('Erro ao carregar histórico de carreira:', e);
         } finally {
@@ -19,6 +24,8 @@ export const careerStore = reactive({
 
     async saveEntry(entry) {
         try {
+            // Garantir que tipo esteja presente
+            if (!entry.tipo) entry.tipo = 'clube';
             const saved = await careerService.save(entry);
             // Atualizar lista local
             const index = this.history.findIndex(h => h.id === saved.id);
@@ -47,8 +54,9 @@ export const careerStore = reactive({
      * Verifica se um determinado time em uma determinada temporada foi comandado pelo usuário.
      * @param {string} teamName 
      * @param {string} seasonYear 
+     * @param {string} tipo - 'clube' ou 'selecao' (opcional)
      */
-    isUserTeam(teamName, seasonYear) {
+    isUserTeam(teamName, seasonYear, tipo = null) {
         if (!teamName || !seasonYear) return false;
         const normalizedTeam = teamName.toLowerCase().trim();
         const normalizedYear = seasonYear.toString().toLowerCase().trim().replace(/\s/g, '');
@@ -56,7 +64,8 @@ export const careerStore = reactive({
         return this.history.some(h => {
             const hTeam = h.timeNome?.toLowerCase().trim();
             const hYear = h.temporada?.toString().toLowerCase().trim().replace(/\s/g, '');
-            return hTeam === normalizedTeam && hYear === normalizedYear;
+            const typeMatch = !tipo || h.tipo === tipo;
+            return hTeam === normalizedTeam && hYear === normalizedYear && typeMatch;
         });
     },
 

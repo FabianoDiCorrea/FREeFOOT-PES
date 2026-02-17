@@ -16,12 +16,12 @@ export const FEDERATIONS_DATA = {
     },
     "África": {
         nome: "CAF",
-        logo: "https://upload.wikimedia.org/wikipedia/en/thumb/5/54/Confederation_of_African_Football_logo.svg/1200px-Confederation_of_African_Football_logo.svg.png",
+        logo: "https://a.imagem.app/B76a00.webp",
         file: "caf.png"
     },
     "Ásia": {
         nome: "AFC",
-        logo: "https://upload.wikimedia.org/wikipedia/en/thumb/0/05/Asian_Football_Confederation_logo.svg/1200px-Asian_Football_Confederation_logo.svg.png",
+        logo: "https://a.imagem.app/B76MoQ.png",
         file: "afc.png"
     },
     "Oceania": {
@@ -33,5 +33,20 @@ export const FEDERATIONS_DATA = {
         nome: "FIFA",
         logo: "/logos/competitions/fifa.png",
         file: "fifa.png"
+    },
+    "Mundial": {
+        nome: "FIFA",
+        logo: "/logos/competitions/fifa.png",
+        file: "fifa.png"
+    },
+    "América": {
+        nome: "CONMEBOL",
+        logo: "https://a.imagem.app/B76ggb.png",
+        file: "conmebol.png"
+    },
+    "Ásia - Oceania": {
+        nome: "AFC",
+        logo: "https://a.imagem.app/B76MoQ.png",
+        file: "afc.png"
     }
 };
