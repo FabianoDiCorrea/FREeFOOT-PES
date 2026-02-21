@@ -2,24 +2,34 @@
   <div class="view-container">
     <h2 class="mb-4">BACKUP</h2>
     <div class="row g-4">
-      <div class="col-md-6">
+      <div class="col-md-4">
         <GamePanel>
           <div class="text-center p-4">
             <i class="bi bi-download fs-1 mb-3 text-secondary"></i>
             <h3>EXPORTAR BACKUP COMPLETO</h3>
-            <p class="mb-4 opacity-75">Gere um arquivo JSON com todos os dados salvos e **todas as imagens de escudos e bandeiras**.</p>
+            <p class="mb-4 opacity-75">Gere um arquivo JSON com todos os dados salvos e imagens.</p>
             <GameButton @click="handleExport" class="w-100">Exportar Agora</GameButton>
           </div>
         </GamePanel>
       </div>
-      <div class="col-md-6">
+      <div class="col-md-4">
         <GamePanel>
           <div class="text-center p-4">
             <i class="bi bi-upload fs-1 mb-3 text-warning"></i>
             <h3>RESTAURAR SAVE FILE</h3>
-            <p class="mb-4 opacity-75">Restaure seu progresso e **recupere todas as imagens** de um backup salvo.</p>
+            <p class="mb-4 opacity-75">Restaure seu progresso de um backup salvo.</p>
             <input type="file" ref="jsonInput" @change="handleImport" class="d-none" accept=".json">
             <GameButton @click="$refs.jsonInput.click()" class="w-100">Importar Arquivo</GameButton>
+          </div>
+        </GamePanel>
+      </div>
+      <div class="col-md-4">
+        <GamePanel>
+          <div class="text-center p-4">
+            <i class="bi bi-trash fs-1 mb-3 text-danger"></i>
+            <h3>HARD RESET</h3>
+            <p class="mb-4 opacity-75">Apaga **todos** os dados. Use apenas se tiver backup!</p>
+            <GameButton @click="handleClearAll" class="w-100 btn-danger">Zerar Sistema</GameButton>
           </div>
         </GamePanel>
       </div>
@@ -205,5 +215,18 @@ const handleImport = async (event) => {
     }
   }
   reader.readAsText(file)
+}
+
+const handleClearAll = async () => {
+  if (!confirm('ATENÇÃO: Isso apagará TODOS os seus dados e imagens definitivamente. Você tem absoluta certeza?')) return
+  if (!confirm('ÚLTIMO AVISO: Não há volta sem um backup previo. Confirmar reset total?')) return
+
+  const success = await db.clearDatabase()
+  if (success) {
+    alert('Sistema zerado com sucesso! Reiniciando...')
+    window.location.reload()
+  } else {
+    alert('Erro ao limpar banco de dados.')
+  }
 }
 </script>

@@ -6,6 +6,9 @@
           <button @click="$router.push('/checklist')" class="btn btn-outline-warning btn-sm fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.7rem;">
             <i class="bi bi-list-check me-1"></i> Checklist
           </button>
+          <button @click="$router.push('/clubes')" class="btn btn-outline-info btn-sm fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.7rem;">
+            <i class="bi bi-shield-shaded me-1"></i> Gestão de Clubes
+          </button>
       </div>
       <LogoFREeFOOT />
     </div>
@@ -77,9 +80,14 @@
                     <i class="bi bi-plus-circle me-2"></i> REGISTRAR TEMPORADA
                   </GameButton>
                   
-                  <button class="btn btn-outline-info py-2 fw-bold text-uppercase small" @click="$router.push(`/competicao/${selectedCompetition.id}/historico`)">
-                    <i class="bi bi-trophy me-1"></i> 🏆 HISTÓRICO
-                  </button>
+                  <div class="d-flex gap-2">
+                    <button class="btn btn-outline-info flex-grow-1 py-2 fw-bold text-uppercase small" @click="$router.push(`/competicao/${selectedCompetition.id}/historico`)">
+                      <i class="bi bi-trophy me-1"></i> 🏆 HISTÓRICO
+                    </button>
+                    <button class="btn btn-outline-warning py-2 fw-bold text-uppercase small" @click="importFromIMLPES" title="Importar dados do extrator iMLPES">
+                      <i class="bi bi-download"></i>
+                    </button>
+                  </div>
                 </div>
               </div>
             </GamePanel>
@@ -115,6 +123,7 @@
                           <div class="d-flex flex-column">
                             <div class="d-flex align-items-center gap-1 no-wrap">
                               <span class="fw-bold text-uppercase name-cell">{{ s.campeao }}</span>
+                              <img v-if="isFromLib(s.campeao)" src="/logos/competitions/classdaliberta.png" class="lib-indicator-mini ms-1" title="Vindo da Libertadores">
                               <i v-if="careerStore.isUserTeam(s.campeao, s.ano)" class="bi bi-controller ms-1 text-neon-green pulse-neon"></i>
                               
                               <!-- identificação de País e federação (Mundial - Mesma Linha) -->
@@ -123,14 +132,14 @@
                                   <NationalFlag :countryName="getClubInfo(s.campeao).pais" :forceUrl="getClubInfo(s.campeao).bandeira" :size="14" />
                                   <span class="x-small fw-bold text-uppercase">{{ getClubInfo(s.campeao).pais }}</span>
                                 </div>
-                                <div class="d-flex align-items-center gap-1 ms-1 opacity-50">
+                                <div class="d-flex align-items-center gap-1 ms-1">
                                   <img v-if="getClubInfo(s.campeao).federacaoLogo" :src="getCachedLogo(getClubInfo(s.campeao).federacaoLogo)" style="height: 12px; width: fit-content;">
                                   <span class="x-small fw-bold text-uppercase">{{ getClubInfo(s.campeao).federacao }}</span>
                                 </div>
                               </template>
 
                               <!-- identificação de País (Comum - Mesma Linha) -->
-                              <div v-else-if="selectedCompetition?.tipo === 'internacional' && getClubInfo(s.campeao)" class="d-flex align-items-center gap-1 ms-1 opacity-50">
+                              <div v-else-if="selectedCompetition?.tipo === 'internacional' && getClubInfo(s.campeao)" class="d-flex align-items-center gap-1 ms-1">
                                 <NationalFlag :countryName="getClubInfo(s.campeao).pais" :forceUrl="getClubInfo(s.campeao).bandeira" :size="16" />
                                 <span class="x-small fw-bold text-uppercase">{{ getClubInfo(s.campeao).pais }}</span>
                               </div>
@@ -144,34 +153,35 @@
                               </div>
                             </div>
                             
-                            <small class="text-secondary x-small fw-bold opacity-75 mt-1">
+                            <small class="text-secondary x-small fw-bold mt-1">
                               {{ countTitles(s.campeao, s.ano) }} TÍTULOS
                             </small>
                           </div>
                         </div>
                       </td>
                       <td class="text-nowrap">
-                        <div class="d-flex align-items-center gap-2 opacity-100">
+                        <div class="d-flex align-items-center gap-2">
                           <TeamShield :teamName="s.vice" :size="28" :season="s.ano" />
                           <div class="d-flex flex-column">
                             <div class="d-flex align-items-center gap-1 no-wrap">
                               <span class="small text-uppercase name-cell-vice">{{ s.vice || '-' }}</span>
+                              <img v-if="s.vice && isFromLib(s.vice)" src="/logos/competitions/classdaliberta.png" class="lib-indicator-mini ms-1" title="Vindo da Libertadores">
                               <i v-if="s.vice && careerStore.isUserTeam(s.vice, s.ano)" class="bi bi-controller ms-1 text-neon-green pulse-neon"></i>
                               
                               <!-- identificação de País e federação (Mundial - Mesma Linha - Vice) -->
                               <template v-if="(selectedCompetition?.modoRegistro === 'mundial' || selectedCompetition?.nome === 'Mundial de Clubes') && s.vice && getClubInfo(s.vice)">
-                                <div class="d-flex align-items-center gap-1 ms-2 opacity-50 border-start border-secondary border-opacity-25 ps-2">
+                                <div class="d-flex align-items-center gap-1 ms-2 border-start border-secondary border-opacity-25 ps-2">
                                   <NationalFlag :countryName="getClubInfo(s.vice).pais" :forceUrl="getClubInfo(s.vice).bandeira" :size="12" />
                                   <span style="font-size: 0.6rem;" class="fw-bold text-uppercase">{{ getClubInfo(s.vice).pais }}</span>
                                 </div>
-                                <div class="d-flex align-items-center gap-1 ms-1 opacity-50">
+                                <div class="d-flex align-items-center gap-1 ms-1">
                                   <img v-if="getClubInfo(s.vice).federacaoLogo" :src="getCachedLogo(getClubInfo(s.vice).federacaoLogo)" style="height: 10px; width: fit-content;">
                                   <span style="font-size: 0.6rem;" class="fw-bold text-uppercase">{{ getClubInfo(s.vice).federacao }}</span>
                                 </div>
                               </template>
 
                               <!-- identificação de País (Comum - Mesma Linha - Vice) -->
-                              <div v-else-if="selectedCompetition?.tipo === 'internacional' && s.vice && getClubInfo(s.vice)" class="d-flex align-items-center gap-1 ms-1 opacity-50">
+                              <div v-else-if="selectedCompetition?.tipo === 'internacional' && s.vice && getClubInfo(s.vice)" class="d-flex align-items-center gap-1 ms-1">
                                 <NationalFlag :countryName="getClubInfo(s.vice).pais" :forceUrl="getClubInfo(s.vice).bandeira" :size="14" />
                                 <span class="x-small fw-bold text-uppercase">{{ getClubInfo(s.vice).pais }}</span>
                               </div>
@@ -185,7 +195,7 @@
                               </div>
                             </div>
 
-                            <small v-if="s.vice" class="text-secondary x-small fw-bold opacity-50 mt-1">
+                            <small v-if="s.vice" class="text-secondary x-small fw-bold mt-1">
                               {{ countVices(s.vice, s.ano) }} VICES
                             </small>
                           </div>
@@ -598,7 +608,7 @@
               
               <div class="mb-4">
                 <label class="form-label fw-bold text-secondary text-uppercase small">Temporada</label>
-                <input type="text" v-model="newSeason.ano" class="form-control game-input text-center fs-3 fw-black text-warning" placeholder="Ex: 2027/2028" style="height: 60px;">
+                <input type="text" v-model="newSeason.ano" class="form-control game-input text-center fs-3 fw-black text-warning" placeholder="EX: 2024 / 2025 = 2025" style="height: 60px;">
               </div>
 
               <div class="row g-4">
@@ -715,6 +725,15 @@
             <!-- SEÇÃO 2: TABELA (OPCIONAL) -->
             <div class="form-section-premium">
               <h4 class="text-info fw-black mb-3 text-uppercase"><i class="bi bi-list-ol me-2"></i>TABELA FINAL (OPCIONAL)</h4>
+              
+              <!-- NOVO: CHAVEAMENTO MUNDIAL (Componente Premium) -->
+              <div v-if="selectedCompetition.modoRegistro === 'mundial' || selectedCompetition.nome === 'Mundial de Clubes'" class="mb-4">
+                <MundialBracket 
+                  :mundial="newSeason.mundial" 
+                  :isEditable="true" 
+                />
+              </div>
+
               <p class="text-secondary small mb-3">Cole aqui o conteúdo da tabela final da competição.</p>
               <textarea v-model="newSeason.tabela" class="form-control game-textarea" rows="8" placeholder="Cole a tabela aqui..."></textarea>
               
@@ -827,8 +846,13 @@
   </div>
 </template>
 
+<!-- Nome necessário para o keep-alive identificar o componente -->
+<script>
+export default { name: 'UniversoView' }
+</script>
+
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue'
+import { ref, onMounted, onActivated, watch, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import GamePanel from '../components/GamePanel.vue'
 import GameButton from '../components/GameButton.vue'
@@ -840,11 +864,12 @@ import { NATIONAL_COMPETITIONS_STRUCTURE } from '../services/national.data'
 import { INTERNATIONAL_DATA } from '../data/internationalCompetitions'
 import { FEDERATIONS_DATA } from '../services/federations.data'
 import { seasonStore } from '../services/season.store'
-import { getSeasonFinalYear, getTrofeuPath } from '../services/utils'
+import { getSeasonFinalYear, getTrofeuPath, getNextSeasonYear } from '../services/utils'
 import { CLUBS_DATA } from '../data/clubs.data'
 import { NATIONAL_TEAMS_DATA } from '../data/nationalTeams.data'
 import { db } from '../services/db'
 import { imageCacheService } from '../services/imageCache.service'
+import MundialBracket from '../components/MundialBracket.vue'
 import { careerStore } from '../services/career.store'
 
 const showNewSeasonForm = ref(false)
@@ -894,8 +919,8 @@ const restoreNavigation = () => {
     if (!foundComp) foundComp = INTERNATIONAL_DATA.find(c => c.id === compId)
     if (foundComp) {
       selectedContinent.value = foundContinent; selectedCountry.value = foundCountry; selectedCompetition.value = foundComp;
-      const targetCountry = foundComp.pais || foundCountry?.nome || foundContinent?.continente
-      seasonStore.loadSeasons(foundComp.nome, targetCountry)
+      // NÃO chamar loadSeasons() aqui — sem await neste contexto causa race condition.
+      // O onMounted aguarda corretamente e chama loadSeasons() após restaurar o estado.
       router.replace({ query: {} })
       return
     }
@@ -924,8 +949,8 @@ const restoreNavigation = () => {
         const foundComp = allComps.find(c => c.id === state.competition.id) || allComps.find(c => c.nome === state.competition.nome)
         if (foundComp) {
           selectedCompetition.value = foundComp
-          const targetCountry = foundComp.pais || selectedCountry.value?.nome || selectedContinent.value?.continente
-          seasonStore.loadSeasons(foundComp.nome, targetCountry)
+          // NÃO chamar loadSeasons() aqui — sem await neste contexto causa race condition.
+          // O onMounted aguarda corretamente e chama loadSeasons() após restaurar o estado.
         }
       }
     } catch (e) { console.error("Erro ao restaurar navegação:", e) }
@@ -957,8 +982,48 @@ const selectedContinent = ref(initialNav?.continent || null)
 const selectedCountry = ref(initialNav?.country || null)
 const selectedCompetition = ref(null) // Será restaurado via restoreNavigation()
 const viewMode = ref('list') // 'list' ou 'form'
-const teamSearchQuery = ref({ campeao: '', vice: '', clubeArtilheiro: '', participantes: '', participantesTexto: '' })
-const showTeamResults = ref({ campeao: false, vice: false, clubeArtilheiro: false, participantes: false })
+const teamSearchQuery = ref({ 
+  campeao: '', vice: '', clubeArtilheiro: '', participantes: '', participantesTexto: '',
+  semi1t1: '', semi1t2: '', semi2t1: '', semi2t2: '',
+  finalt1: '', finalt2: '', terceirot1: '', terceirot2: ''
+})
+const showTeamResults = ref({ 
+  campeao: false, vice: false, clubeArtilheiro: false, participantes: false,
+  semi1t1: false, semi1t2: false, semi2t1: false, semi2t2: false,
+  finalt1: false, finalt2: false, terceirot1: false, terceirot2: false
+})
+
+const libTeamsCurrentSeason = ref([])
+
+const loadLibTeams = async (year) => {
+  if (!year) return
+  try {
+    const allSeasons = await seasonService.getAll()
+    const libS = allSeasons.find(s => (s.competitionName === 'Libertadores' || s.competitionName === 'Copa Libertadores') && s.ano === year)
+    if (libS) {
+      const teams = []
+      if (libS.tabela) {
+         libS.tabela.split('\n').filter(l => l.trim()).forEach(line => {
+           let cells = line.split('\t')
+           if (cells.length === 1) cells = line.split(/\s{2,}/)
+           if (cells[0]) teams.push(cells[0].replace(/^\d+[\s.]*/, '').trim())
+         })
+      }
+      if (libS.participantes) libS.participantes.forEach(p => teams.push(p.nome))
+      libTeamsCurrentSeason.value = [...new Set(teams)]
+    } else {
+      libTeamsCurrentSeason.value = []
+    }
+  } catch (e) {
+    console.error("Erro ao carregar times da Libertadores:", e)
+    libTeamsCurrentSeason.value = []
+  }
+}
+
+const isFromLib = (teamName) => {
+  if (!teamName || selectedCompetition.value?.nome !== 'Sul-Americana') return false
+  return libTeamsCurrentSeason.value.some(t => t.toLowerCase().trim() === teamName.toLowerCase().trim())
+}
 
 // Restaurar competição e outros estados complexos imediatamente
 try {
@@ -976,7 +1041,13 @@ const newSeason = ref({
   topScorers: [],
   participantes: [],
   tabela: '',
-  promovidosPlayoff: []
+  promovidosPlayoff: [],
+  mundial: {
+    semi1: { time1: '', time2: '', placar1: 0, placar2: 0, pen1: 0, pen2: 0 },
+    semi2: { time1: '', time2: '', placar1: 0, placar2: 0, pen1: 0, pen2: 0 },
+    final: { time1: '', time2: '', placar1: 0, placar2: 0, pen1: 0, pen2: 0 },
+    terceiro: { time1: '', time2: '', placar1: 0, placar2: 0, pen1: 0, pen2: 0 }
+  }
 })
 
 const showScorerModal = ref(false)
@@ -1002,6 +1073,28 @@ const filteredTeams = (query) => {
   return CLUBS_DATA.filter(c => c.nome.toLowerCase().includes(q)).slice(0, 10);
 }
 
+const updateMundialPositions = (phase, field, value) => {
+  if (!newSeason.value.mundial) return;
+  newSeason.value.mundial[phase][field] = value;
+  
+  // Recalcular Campeão e Vice se a final estiver preenchida
+  const m = newSeason.value.mundial;
+  if (m.final.time1 && m.final.time2 && (m.final.placar1 !== '' || m.final.placar2 !== '')) {
+    const p1 = parseInt(m.final.placar1) || 0;
+    const p2 = parseInt(m.final.placar2) || 0;
+    const pn1 = parseInt(m.final.pen1) || 0;
+    const pn2 = parseInt(m.final.pen2) || 0;
+
+    if (p1 > p2 || (p1 === p2 && pn1 > pn2)) {
+      newSeason.value.campeao = m.final.time1;
+      newSeason.value.vice = m.final.time2;
+    } else if (p2 > p1 || (p2 === p1 && pn2 > pn1)) {
+      newSeason.value.campeao = m.final.time2;
+      newSeason.value.vice = m.final.time1;
+    }
+  }
+}
+
 const selectTeam = (type, teamName) => {
   if (type === 'campeao') {
     newSeason.value.campeao = teamName;
@@ -1016,6 +1109,22 @@ const selectTeam = (type, teamName) => {
     addParticipant(teamName);
     teamSearchQuery.value.participantes = '';
     showTeamResults.value.participantes = false;
+  } else if (type.startsWith('mundial_')) {
+    const slot = type.replace('mundial_', ''); // ex: semi1t1
+    const parts = slot.match(/([a-z]+)(\d)t(\d)/); // [match, phase, num, team]
+    if (parts) {
+      const field = `semi${parts[2]}`;
+      const teamField = `time${parts[3]}`;
+      updateMundialPositions(field, teamField, teamName);
+    } else if (slot.startsWith('finalt')) {
+      const teamNum = slot.replace('finalt', '');
+      updateMundialPositions('final', `time${teamNum}`, teamName);
+    } else if (slot.startsWith('terceirot')) {
+      const teamNum = slot.replace('terceirot', '');
+      updateMundialPositions('terceiro', `time${teamNum}`, teamName);
+    }
+    teamSearchQuery.value[slot] = '';
+    showTeamResults.value[slot] = false;
   }
 }
 
@@ -1281,6 +1390,11 @@ const selectCompetition = async (comp) => {
   selectedCompetition.value = comp
   await seasonStore.loadSeasons(comp.nome, comp.pais || selectedCountry.value?.nome)
   
+  if (comp.nome === 'Sul-Americana') {
+    const lastSeason = seasonStore.list[0];
+    if (lastSeason) loadLibTeams(lastSeason.ano);
+  }
+
   for (const s of seasonStore.list) {
     const scorers = s.topScorers || (s.artilheiro && s.artilheiro.nome ? [s.artilheiro] : [])
     for (const sc of scorers) {
@@ -1298,11 +1412,15 @@ const countTitles = (teamName, seasonStr) => {
   if (!teamName || !selectedCompetition.value || !seasonStr) return 0
   const currentYear = getSeasonFinalYear(seasonStr)
   
-  return seasonStore.list.filter(s => {
+  const matches = seasonStore.list.filter(s => {
+    const isSameComp = s.competitionName === selectedCompetition.value.nome
     const isSameTeam = s.campeao.toLowerCase().trim() === teamName.toLowerCase().trim()
     const isPastOrPresent = getSeasonFinalYear(s.ano) <= currentYear
-    return isSameTeam && isPastOrPresent
-  }).length
+    return isSameComp && isSameTeam && isPastOrPresent
+  })
+
+  // Usar Set de anos para garantir que não contemos títulos duplicados no mesmo ano
+  return new Set(matches.map(s => getSeasonFinalYear(s.ano))).size
 }
 
 const getIndividualStars = (titles) => {
@@ -1319,11 +1437,14 @@ const countVices = (teamName, seasonStr) => {
   if (!teamName || !selectedCompetition.value || !seasonStr) return 0
   const currentYear = getSeasonFinalYear(seasonStr)
   
-  return seasonStore.list.filter(s => {
+  const matches = seasonStore.list.filter(s => {
+    const isSameComp = s.competitionName === selectedCompetition.value.nome
     const hasVice = s.vice && s.vice.toLowerCase().trim() === teamName.toLowerCase().trim()
     const isPastOrPresent = getSeasonFinalYear(s.ano) <= currentYear
-    return hasVice && isPastOrPresent
-  }).length
+    return isSameComp && hasVice && isPastOrPresent
+  })
+
+  return new Set(matches.map(s => getSeasonFinalYear(s.ano))).size
 }
 
 const getIndividualVices = (vices) => {
@@ -1341,7 +1462,13 @@ const prepareEdit = async (season) => {
     ...season,
     topScorers: season.topScorers || (season.artilheiro && season.artilheiro.nome ? [season.artilheiro] : []),
     participantes: season.participantes || [],
-    promovidosPlayoff: season.promovidosPlayoff || []
+    promovidosPlayoff: season.promovidosPlayoff || [],
+    mundial: season.mundial || {
+      semi1: { time1: '', time2: '', placar1: 0, placar2: 0, pen1: 0, pen2: 0 },
+      semi2: { time1: '', time2: '', placar1: 0, placar2: 0, pen1: 0, pen2: 0 },
+      final: { time1: '', time2: '', placar1: 0, placar2: 0, pen1: 0, pen2: 0 },
+      terceiro: { time1: '', time2: '', placar1: 0, placar2: 0, pen1: 0, pen2: 0 }
+    }
   }))
   
   // Carregar o primeiro artilheiro no formulrio unificado (opcional no form)
@@ -1384,19 +1511,156 @@ const resetScorerForm = () => {
 const openForm = () => {
   isEditing.value = false
   currentEditId.value = null
+
+  // Identificar o último ano registrado para esta competição
+  let lastYear = ''
+  if (seasonStore.list.length > 0) {
+    // seasonStore.list geralmente está ordenado ou podemos pegar o de maior ano
+    const sorted = [...seasonStore.list].sort((a, b) => getSeasonFinalYear(b.ano) - getSeasonFinalYear(a.ano))
+    lastYear = sorted[0].ano
+  }
+
   newSeason.value = {
     id: null,
-    ano: '',
+    ano: lastYear ? getNextSeasonYear(lastYear) : '',
     campeao: '',
     vice: '',
     competitionName: selectedCompetition.value.nome,
     topScorers: [],
     participantes: [],
     tabela: '',
-    promovidosPlayoff: []
+    promovidosPlayoff: [],
+    mundial: {
+      semi1: { time1: '', time2: '', placar1: 0, placar2: 0, pen1: 0, pen2: 0 },
+      semi2: { time1: '', time2: '', placar1: 0, placar2: 0, pen1: 0, pen2: 0 },
+      final: { time1: '', time2: '', placar1: 0, placar2: 0, pen1: 0, pen2: 0 },
+      terceiro: { time1: '', time2: '', placar1: 0, placar2: 0, pen1: 0, pen2: 0 }
+    }
   }
   resetScorerForm()
   viewMode.value = 'form'
+}
+
+// Watcher para detectar Campeão e Vice automaticamente ao colar a tabela
+watch(() => newSeason.value.tabela, (newTable) => {
+  if (!newTable || isEditing.value) return
+
+  const lines = newTable.split('\n').filter(l => l.trim())
+  if (lines.length >= 2) {
+    const parseLine = (line) => {
+      let cells = line.split('\t')
+      if (cells.length === 1) cells = line.split(/\s{2,}/)
+      if (cells.length === 1) {
+        const match = line.match(/^([^\d]+)(.*)$/)
+        if (match) return match[1].trim()
+      }
+      return cells[0] ? cells[0].replace(/^\d+[\s.]*/, '').trim() : ''
+    }
+
+    const champ = parseLine(lines[0])
+    const vice = parseLine(lines[1])
+
+    if (champ && !newSeason.value.campeao) newSeason.value.campeao = champ
+    if (vice && !newSeason.value.vice) newSeason.value.vice = vice
+  }
+})
+
+// NOVO: Watcher para detectar Campeão e Vice do Mundial a partir do chaveamento (Restaurado)
+watch(() => newSeason.value.mundial.final, (final) => {
+  if (!final.time1 || !final.time2) return
+  if (final.placar1 === 0 && final.placar2 === 0 && !isEditing.value) return
+
+  let champ = ''
+  let vice = ''
+
+  if (final.placar1 > final.placar2) {
+    champ = final.time1
+    vice = final.time2
+  } else if (final.placar2 > final.placar1) {
+    champ = final.time2
+    vice = final.time1
+  } else if (final.pen1 || final.pen2) {
+    if (final.pen1 > final.pen2) {
+      champ = final.time1
+      vice = final.time2
+    } else if (final.pen2 > final.pen1) {
+      champ = final.time2
+      vice = final.time1
+    }
+  }
+
+  if (champ) newSeason.value.campeao = champ
+  if (vice) newSeason.value.vice = vice
+}, { deep: true })
+
+// NOVO: Watcher para progressão automática de Semi para Final/3º Lugar
+watch([() => newSeason.value.mundial.semi1, () => newSeason.value.mundial.semi2], ([s1, s2]) => {
+  if (isEditing.value) return
+
+  // Semi 1 -> Final/3º
+  if (s1.time1 && s1.time2) {
+    if (s1.placar1 > s1.placar2 || (s1.placar1 === s1.placar2 && s1.pen1 > s1.pen2)) {
+      newSeason.value.mundial.final.time1 = s1.time1
+      newSeason.value.mundial.terceiro.time1 = s1.time2
+    } else if (s1.placar2 > s1.placar1 || (s1.placar2 === s1.placar1 && s1.pen2 > s1.pen1)) {
+      newSeason.value.mundial.final.time1 = s1.time2
+      newSeason.value.mundial.terceiro.time1 = s1.time1
+    }
+  }
+
+  // Semi 2 -> Final/3º
+  if (s2.time1 && s2.time2) {
+    if (s2.placar1 > s2.placar2 || (s2.placar1 === s2.placar2 && s2.pen1 > s2.pen2)) {
+      newSeason.value.mundial.final.time2 = s2.time1
+      newSeason.value.mundial.terceiro.time2 = s2.time2
+    } else if (s2.placar2 > s2.placar1 || (s2.placar2 === s2.placar1 && s2.pen2 > s2.pen1)) {
+      newSeason.value.mundial.final.time2 = s2.time2
+      newSeason.value.mundial.terceiro.time2 = s2.time1
+    }
+  }
+}, { deep: true })
+
+const importFromIMLPES = () => {
+  const jsonInput = prompt("Cole aqui o conteúdo do arquivo 'latest_ml_save.json' gerado pelo iMLPES:");
+  if (!jsonInput) return;
+
+  try {
+    const data = JSON.parse(jsonInput);
+    
+    // 1. Abrir o formulário
+    openForm();
+
+    // 2. Preencher tabela formatada
+    if (data.formattedTable) {
+      newSeason.value.tabela = data.formattedTable;
+    }
+
+    // 3. Tentar mapear Campeão e Vice (Assumindo que estão na standings)
+    if (data.standings && data.standings.length >= 2) {
+      const champId = data.standings[0].teamId;
+      const viceId = data.standings[1].teamId;
+
+      // Mapear pelo ID do clube na CLUBS_DATA (se disponível)
+      const champ = CLUBS_DATA.find(c => c.pesId == champId || c.id == champId);
+      const vice = CLUBS_DATA.find(c => c.pesId == viceId || c.id == viceId);
+
+      if (champ) newSeason.value.campeao = champ.nome;
+      if (vice) newSeason.value.vice = vice.nome;
+      
+      console.log(`Mapeamento iMLPES: Campeão=${newSeason.value.campeao}, Vice=${newSeason.value.vice}`);
+    }
+
+    // 4. Tentar detectar o ano (se disponível no fileName ex: ML00000005)
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    newSeason.value.ano = `${currentYear} / ${currentYear + 1} = ${currentYear + 1}`;
+
+    alert("Dados importados com sucesso! Verifique se o Campeão e o Vice foram reconhecidos corretamente.");
+    
+  } catch (e) {
+    console.error("Erro ao importar JSON:", e);
+    alert("Erro ao processar o JSON. Certifique-se de que copiou o conteúdo completo do arquivo.");
+  }
 }
 
 const openScorerModal = (season) => {
@@ -1596,7 +1860,6 @@ watch([selectedContinent, selectedCountry, selectedCompetition, activeTab], () =
 
 
 onMounted(async () => {
-  await seasonStore.loadAll()
   await careerStore.loadAll()
 
   // 1. Sincronizar com parâmetros da URL (Navegação facilitada solicitada pelo usuário)
@@ -1610,6 +1873,22 @@ onMounted(async () => {
         break;
       }
     }
+  }
+
+  // CORREÇÃO DE PISCADA: Se já há uma competição selecionada (restaurada do localStorage),
+  // NÃO chamamos loadAll() — isso evita o flash de ver todas as ligas misturadas.
+  // Vamos direto para loadSeasons() que carrega apenas a lista filtrada da competição.
+  // O loadAll() só é necessário quando não há competição selecionada (primeira visita).
+  if (selectedCompetition.value) {
+    const targetCountry = selectedCompetition.value.pais || selectedCountry.value?.nome
+    await seasonStore.loadSeasons(selectedCompetition.value.nome, targetCountry)
+    if (selectedCompetition.value.nome === 'Sul-Americana' && seasonStore.list[0]) {
+      loadLibTeams(seasonStore.list[0].ano)
+    }
+  } else {
+    // Sem competição selecionada: carregar tudo para ter dados disponíveis para
+    // histórico de carreira e outros cálculos que dependem de todas as temporadas.
+    await seasonStore.loadAll()
   }
 
   // 2. Restaurar estado de navegação com segurança (removido do onMounted para rodar no setup)
@@ -1632,6 +1911,19 @@ onMounted(async () => {
     }
   } catch (e) {
     console.error("Error in onMounted UniversoView images:", e)
+  }
+})
+
+// onActivated é chamado toda vez que o componente keep-alive volta ao foco (ao navegar de volta).
+// Aqui apenas recarregamos as temporadas da competição selecionada para garantir dados atualizados,
+// sem remontagem, sem piscada — o restante do estado já está preservado.
+onActivated(async () => {
+  if (selectedCompetition.value) {
+    const targetCountry = selectedCompetition.value.pais || selectedCountry.value?.nome
+    await seasonStore.loadSeasons(selectedCompetition.value.nome, targetCountry)
+    if (selectedCompetition.value.nome === 'Sul-Americana' && seasonStore.list[0]) {
+      loadLibTeams(seasonStore.list[0].ano)
+    }
   }
 })
 </script>
@@ -2689,6 +2981,52 @@ onMounted(async () => {
   min-height: 2.5em; 
   display: flex; /* Fallback for alignment */ 
   align-items: center;
+}
+
+.lib-indicator-mini {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  filter: drop-shadow(0 0 5px rgba(57, 255, 20, 0.8));
+  transition: all 0.3s ease;
+  cursor: help;
+  vertical-align: middle;
+}
+
+.lib-indicator-mini:hover {
+  transform: scale(1.3);
+  filter: drop-shadow(0 0 10px rgba(57, 255, 20, 1));
+}
+
+.mundial-registration-grid {
+  border: 1px solid rgba(0, 242, 255, 0.1);
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.4);
+}
+
+.match-reg-card {
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+}
+
+.match-reg-card:focus-within {
+  border-color: rgba(0, 242, 255, 0.3);
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.game-input-sm {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  border-radius: 4px;
+  padding: 4px 8px;
+  height: 28px;
+}
+
+.game-input-sm:focus {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #00f2ff;
+  outline: none;
+  box-shadow: 0 0 10px rgba(0, 242, 255, 0.2);
 }
 </style>
 

@@ -111,10 +111,10 @@
 
                       <!-- ✏️ 🗑️ AÇÕES -->
                       <div class="cell-award cell-actions d-flex gap-2">
-                        <button class="btn btn-primary btn-sm rounded-circle p-2 action-btn-linear" @click="editAward(award)" title="Editar">
+                        <button class="btn btn-warning btn-sm rounded-circle p-2 action-btn-linear" @click.stop="editAward(award)" title="Editar" style="z-index: 50; position: relative;">
                           <i class="bi bi-pencil-fill" style="font-size: 1rem;"></i>
                         </button>
-                        <button class="btn btn-danger btn-sm rounded-circle p-2 action-btn-linear" @click="confirmDeleteAward(award.id)" title="Excluir">
+                        <button class="btn btn-danger btn-sm rounded-circle p-2 action-btn-linear" @click.stop="confirmDeleteAward(award.id)" title="Excluir" style="z-index: 50; position: relative;">
                           <i class="bi bi-trash-fill" style="font-size: 1rem;"></i>
                         </button>
                       </div>

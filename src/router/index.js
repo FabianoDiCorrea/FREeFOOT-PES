@@ -18,6 +18,7 @@ const router = createRouter({
         { path: '/selecao/:id/matriz', name: 'national-matrix', component: () => import('../views/NationalSeasonMatrixView.vue') },
         { path: '/checklist', name: 'season-checklist', component: () => import('../views/SeasonChecklistView.vue') },
         { path: '/sala-de-trofeus', name: 'trophy-room', component: () => import('../views/TrophyRoomView.vue') },
+        { path: '/clubes', name: 'club-management', component: () => import('../views/ClubManagementView.vue') },
     ],
 });
 

@@ -157,6 +157,22 @@
       </div>
     </GamePanel>
 
+    <!-- LEGENDA MUNDIAL -->
+    <div class="mt-3 px-2 d-flex flex-wrap gap-4 align-items-center justify-content-center opacity-75">
+      <div class="d-flex align-items-center gap-2 small fw-bold">
+        <span class="medal-dot bg-gold mini"></span> <span class="text-white">OURO: CAMPEÃO MUNDIAL</span>
+      </div>
+      <div class="d-flex align-items-center gap-2 small fw-bold">
+        <span class="medal-dot bg-silver mini"></span> <span class="text-white">PRATA: VICE-CAMPEÃO</span>
+      </div>
+      <div class="d-flex align-items-center gap-2 small fw-bold">
+        <span class="medal-dot bg-bronze mini"></span> <span class="text-white">BRONZE: 3º LUGAR</span>
+      </div>
+      <div class="d-flex align-items-center gap-2 small fw-bold">
+        <span class="medal-dot bg-light-black mini"></span> <span class="text-white">CINZA: 4º LUGAR</span>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -172,6 +188,7 @@ import TeamShield from '../components/TeamShield.vue'
 import NationalFlag from '../components/NationalFlag.vue'
 import { careerStore } from '../services/career.store'
 import LogoFREeFOOT from '../components/LogoFREeFOOT.vue'
+import { getSeasonFinalYear } from '../services/utils'
 
 const route = useRoute()
 const countryName = ref('')
@@ -321,8 +338,11 @@ const loadData = async () => {
             part_libertadores: 0,
             sudamericana: 0,
             part_sudamericana: 0,
-            mundial: 0,
             part_mundial: 0,
+            pos1_mundial: 0,
+            pos2_mundial: 0,
+            pos3_mundial: 0,
+            pos4_mundial: 0,
             relegations: 0,
             relegation_A_B: 0,
             access_B_A: 0,
@@ -350,10 +370,17 @@ const loadData = async () => {
     // 3. Processar Temporadas (Com trava de unicidade por ID)
     const processedSeasons = new Set();
     seasonStore.list.forEach(season => {
-        // Ignora se for uma temporada duplicada (mesmo ID)
-        const seasonId = season.id || `${season.competitionName}-${season.ano}`;
-        if (processedSeasons.has(seasonId)) return;
+        // Ignora se for uma temporada duplicada (mesmo ID ou mesma Comp-AnoFinal)
+        const sFinalYear = getSeasonFinalYear(season.ano);
+        const seasonId = season.id || `${season.competitionName}-${sFinalYear}`;
+        
+        // Além do ID, verificamos a chave de negócio (Comp + Ano) para blindar contra dados sujos
+        const businessKey = `${normalizeName(season.competitionName)}-${sFinalYear}`;
+        
+        if (processedSeasons.has(seasonId) || processedSeasons.has(businessKey)) return;
+        
         processedSeasons.add(seasonId);
+        processedSeasons.add(businessKey);
 
         const compName = season.competitionName;
         const compInfo = getCompetitionInfo(compName);
@@ -376,14 +403,65 @@ const loadData = async () => {
                     // Títulos
                     if (campeaoNorm) {
                         statsMap[campeaoNorm][slot.id]++;
+                        if (slot.id === 'mundial') statsMap[campeaoNorm].pos1_mundial++;
                     }
                     // Participações
+                    let teamsInSeason = [];
                     if (season.tabela) {
-                        const teamsInSeason = parseTable(season.tabela).map(t => t.time);
-                        teamsInSeason.forEach(teamName => {
-                            const tNorm = getStatsKey(teamName);
-                            if (tNorm) statsMap[tNorm]['part_' + slot.id]++;
-                        });
+                        teamsInSeason = parseTable(season.tabela).map(t => t.time);
+                    } else if (slot.id === 'mundial' && season.mundial) {
+                        // Se for mundial e não tem tabela, pega do bracket (semifinalistas e finalistas)
+                        const m = season.mundial;
+                        const candidates = [
+                            m.semi1?.time1, m.semi1?.time2,
+                            m.semi2?.time1, m.semi2?.time2,
+                            m.final?.time1, m.final?.time2
+                        ];
+                        teamsInSeason = [...new Set(candidates.filter(t => t))];
+                    }
+
+                    teamsInSeason.forEach(teamName => {
+                        const tNorm = getStatsKey(teamName);
+                        if (tNorm) statsMap[tNorm]['part_' + slot.id]++;
+                    });
+
+                    // --- DETALHES DO MUNDIAL (1º AO 4º) ---
+                    if (slot.id === 'mundial' && season.mundial) {
+                        const m = season.mundial;
+                        // Vice (Finalista perdedor)
+                        let vice = null;
+                        if (m.final.time1 && m.final.time2) {
+                            if (m.final.placar1 > m.final.placar2 || (m.final.placar1 === m.final.placar2 && m.final.pen1 > m.final.pen2)) {
+                                vice = m.final.time2;
+                            } else if (m.final.placar2 > m.final.placar1 || (m.final.placar2 === m.final.placar1 && m.final.pen2 > m.final.pen1)) {
+                                vice = m.final.time1;
+                            }
+                        }
+                        if (vice) {
+                            const vNorm = getStatsKey(vice);
+                            if (vNorm) statsMap[vNorm].pos2_mundial++;
+                        }
+
+                        // 3º e 4º Lugar
+                        let terceiro = null;
+                        let quarto = null;
+                        if (m.terceiro.time1 && m.terceiro.time2) {
+                            if (m.terceiro.placar1 > m.terceiro.placar2 || (m.terceiro.placar1 === m.terceiro.placar2 && m.terceiro.pen1 > m.terceiro.pen2)) {
+                                terceiro = m.terceiro.time1;
+                                quarto = m.terceiro.time2;
+                            } else if (m.terceiro.placar2 > m.terceiro.placar1 || (m.terceiro.placar2 === m.terceiro.placar1 && m.terceiro.pen2 > m.terceiro.pen1)) {
+                                terceiro = m.terceiro.time2;
+                                quarto = m.terceiro.time1;
+                            }
+                        }
+                        if (terceiro) {
+                            const t3Norm = getStatsKey(terceiro);
+                            if (t3Norm) statsMap[t3Norm].pos3_mundial++;
+                        }
+                        if (quarto) {
+                            const q4Norm = getStatsKey(quarto);
+                            if (q4Norm) statsMap[q4Norm].pos4_mundial++;
+                        }
                     }
                 }
             });
@@ -677,6 +755,31 @@ onMounted(() => {
 
 .fw-black { font-weight: 900; }
 .ls-1 { letter-spacing: 1.5px; }
+
+/* Medalhas Mundial */
+.medal-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  box-shadow: 0 0 5px rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  flex-shrink: 0;
+}
+.medal-dot.mini {
+  width: 10px;
+  height: 10px;
+}
+.x-mini-icon {
+  font-size: 7px;
+  color: rgba(0,0,0,0.5);
+}
+.bg-gold { background: radial-gradient(circle, #fff 0%, #ffea00 70%, #b8860b 100%) !important; box-shadow: 0 0 8px rgba(255, 234, 0, 0.6); }
+.bg-silver { background: radial-gradient(circle, #fff 0%, #c0c0c0 70%, #808080 100%) !important; box-shadow: 0 0 8px rgba(192, 192, 192, 0.6); }
+.bg-bronze { background: radial-gradient(circle, #fff 0%, #cd7f32 70%, #8b4513 100%) !important; box-shadow: 0 0 8px rgba(205, 127, 50, 0.4); }
+.bg-light-black { background: #444 !important; border: 1px solid rgba(255,255,255,0.2) !important; box-shadow: 0 0 5px rgba(255,255,255,0.05); }
 
 /* 6. ESTILOS DE PERSONALIZAÇÃO NACIONAL E COMPETIÇÃO */
 .table-responsive {

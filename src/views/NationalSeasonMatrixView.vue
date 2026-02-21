@@ -132,9 +132,13 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { seasonStore } from '../services/season.store'
+import { rankingsStore } from '../services/rankings.store'
 import { NATIONAL_TEAMS_DATA } from '../data/nationalTeams.data'
 import { NATIONAL_COMPETITIONS_STRUCTURE } from '../services/national.data'
 import { FEDERATIONS_DATA } from '../services/federations.data'
+import { INTERNATIONAL_DATA } from '../data/internationalCompetitions'
+import { normalizeYearStrict } from '../services/utils'
+import TeamShield from '../components/TeamShield.vue'
 import NationalFlag from '../components/NationalFlag.vue'
 import LogoFREeFOOT from '../components/LogoFREeFOOT.vue'
 
@@ -204,16 +208,20 @@ const processedMatrix = computed(() => {
     const continentTeamsNormalized = NATIONAL_TEAMS_DATA.filter(t => t.continente === fedUrl).map(t => normalize(t.nome));
 
     seasonStore.list.forEach(season => {
+        // Verifica se a temporada tem dados de tabela e nome de competição
         if (!season.tabela || !season.competitionName) return
 
-        const table = parseTable(season.tabela)
-        const year = season.ano?.toString().replace(/\s+/g, '') || ''
+        const tableStr = season.tabela || ''
+        const table = parseTable(tableStr)
+        const yearRaw = season.ano
+        const year = normalizeYearStrict(yearRaw)
         const compName = normalize(season.competitionName)
 
         table.forEach((row, index) => {
             const teamNameRaw = row.time
             const teamNameNorm = normalize(teamNameRaw)
 
+            // Filtra seleções que não pertencem ao continente atual
             if (!continentTeamsNormalized.includes(teamNameNorm)) return
 
             // Determinar Slot
@@ -291,20 +299,23 @@ const getRankFromExtra = (extra) => {
     if (e.includes('SEMIFINAL') || e.includes('4º') || e === '3º') return 4;
     if (e.includes('QUARTAS') || e.includes('8º')) return 8;
     if (e.includes('OITAVAS') || e.includes('16º')) return 16;
+    if (e.includes('16 AVOS')) return 24;
     if (e.includes('GRUPOS') || e.includes('32º')) return 32;
+    if (e.includes('PRÉ') || e.includes('PRE')) return 64;
     return 999;
 }
 
 const getRank = (team, season, slot) => {
   const result = matrixData.value[team]?.[season]?.[slot.key]
   if (!result) return ''
-  const rank = result.rank
   if (rank === 1) return '🏆 1º'
   if (rank === 2) return '🥈 2º'
   if (rank === 4) return '4º'
   if (rank === 8) return '8º'
   if (rank === 16) return '16º'
+  if (rank === 24) return '16 AVOS'
   if (rank === 32) return 'GF'
+  if (rank === 64) return 'P-LIB'
   return rank + 'º'
 }
 
@@ -314,6 +325,11 @@ const getCellBackground = (team, season, slot) => {
   const rank = result.rank
   if (rank === 1) return 'expert-gold-bg neon-border-gold'
   if (rank === 2) return 'expert-silver-bg neon-border-silver'
+  if (rank === 4) return 'expert-bronze-intl-grad'
+  if (rank === 8) return 'expert-green-intl-grad'
+  if (rank === 16) return 'expert-cyan-intl-grad'
+  if (rank === 24) return 'expert-blue-intl-grad'
+  if (rank === 32) return 'expert-red-light-intl-grad'
   return 'expert-blue-intl-bg'
 }
 
@@ -514,6 +530,36 @@ thead th {
 .expert-blue-intl-bg {
     background: rgba(0, 242, 255, 0.1) !important;
     color: #44d2ff !important;
+}
+
+.expert-bronze-intl-grad { 
+  background: linear-gradient(135deg, #cd7f32 0%, #8b4513 100%) !important; 
+  color: #fff !important; 
+  font-weight: 950 !important;
+}
+
+.expert-green-intl-grad { 
+  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%) !important; 
+  color: #fff !important; 
+  font-weight: 950 !important;
+}
+
+.expert-cyan-intl-grad { 
+  background: linear-gradient(135deg, #00f2ff 0%, #00a8b3 100%) !important; 
+  color: #000 !important; 
+  font-weight: 950 !important;
+}
+
+.expert-red-light-intl-grad { 
+  background: linear-gradient(135deg, #ff8a8a 0%, #ff6e6e 100%) !important; 
+  color: #fff !important; 
+  font-weight: 800 !important;
+}
+
+.expert-blue-intl-grad { 
+  background: linear-gradient(135deg, #0056b3 0%, #003366 100%) !important; 
+  color: #fff !important; 
+  font-weight: 900 !important;
 }
 
 /* Bordas Neon */

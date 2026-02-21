@@ -15,7 +15,8 @@ export const CLUBS_DATA = [
     "continente": "AMÉRICA DO SUL",
     "escudo_url": "https://a.imagem.app/oS7hgQ.png",
     "bandeira_url": "https://a.imagem.app/oS16yW.png",
-    "federacao_logo": "https://a.imagem.app/B76ggb.png"
+    "federacao_logo": "https://a.imagem.app/B76ggb.png",
+    "pesId": 1243
   },
   {
     "id": 3,
@@ -24,7 +25,8 @@ export const CLUBS_DATA = [
     "continente": "AMÉRICA DO SUL",
     "escudo_url": "https://a.imagem.app/oS7Sjb.png",
     "bandeira_url": "https://a.imagem.app/oS16yW.png",
-    "federacao_logo": "https://a.imagem.app/B76ggb.png"
+    "federacao_logo": "https://a.imagem.app/B76ggb.png",
+    "pesId": 112
   },
   {
     "id": 4,
@@ -177,7 +179,8 @@ export const CLUBS_DATA = [
     "continente": "AMÉRICA DO SUL",
     "escudo_url": "https://a.imagem.app/oS75aE.png",
     "bandeira_url": "https://a.imagem.app/oS16yW.png",
-    "federacao_logo": "https://a.imagem.app/B76ggb.png"
+    "federacao_logo": "https://a.imagem.app/B76ggb.png",
+    "pesId": 1251
   },
   {
     "id": 21,
@@ -204,7 +207,8 @@ export const CLUBS_DATA = [
     "continente": "AMÉRICA DO SUL",
     "escudo_url": "https://a.imagem.app/oS7wvC.png",
     "bandeira_url": "https://a.imagem.app/oS16yW.png",
-    "federacao_logo": "https://a.imagem.app/B76ggb.png"
+    "federacao_logo": "https://a.imagem.app/B76ggb.png",
+    "pesId": 133
   },
   {
     "id": 24,
@@ -213,7 +217,8 @@ export const CLUBS_DATA = [
     "continente": "AMÉRICA DO SUL",
     "escudo_url": "https://a.imagem.app/oS7LBY.png",
     "bandeira_url": "https://a.imagem.app/oS16yW.png",
-    "federacao_logo": "https://a.imagem.app/B76ggb.png"
+    "federacao_logo": "https://a.imagem.app/B76ggb.png",
+    "pesId": 126
   },
   {
     "id": 25,
@@ -222,7 +227,8 @@ export const CLUBS_DATA = [
     "continente": "AMÉRICA DO SUL",
     "escudo_url": "https://a.imagem.app/oS7tFa.png",
     "bandeira_url": "https://a.imagem.app/oS16yW.png",
-    "federacao_logo": "https://a.imagem.app/B76ggb.png"
+    "federacao_logo": "https://a.imagem.app/B76ggb.png",
+    "pesId": 125
   },
   {
     "id": 26,
@@ -240,7 +246,8 @@ export const CLUBS_DATA = [
     "continente": "AMÉRICA DO SUL",
     "escudo_url": "https://a.imagem.app/oS7Epk.png",
     "bandeira_url": "https://a.imagem.app/oS16yW.png",
-    "federacao_logo": "https://a.imagem.app/B76ggb.png"
+    "federacao_logo": "https://a.imagem.app/B76ggb.png",
+    "pesId": 120
   },
   {
     "id": 28,
@@ -249,7 +256,8 @@ export const CLUBS_DATA = [
     "continente": "AMÉRICA DO SUL",
     "escudo_url": "https://a.imagem.app/oS7QKV.png",
     "bandeira_url": "https://a.imagem.app/oS16yW.png",
-    "federacao_logo": "https://a.imagem.app/B76ggb.png"
+    "federacao_logo": "https://a.imagem.app/B76ggb.png",
+    "pesId": 118
   },
   {
     "id": 29,
@@ -258,7 +266,8 @@ export const CLUBS_DATA = [
     "continente": "AMÉRICA DO SUL",
     "escudo_url": "https://a.imagem.app/oS7RCJ.png",
     "bandeira_url": "https://a.imagem.app/oS16yW.png",
-    "federacao_logo": "https://a.imagem.app/B76ggb.png"
+    "federacao_logo": "https://a.imagem.app/B76ggb.png",
+    "pesId": 117
   },
   {
     "id": 30,
@@ -294,7 +303,8 @@ export const CLUBS_DATA = [
     "continente": "AMÉRICA DO SUL",
     "escudo_url": "https://a.imagem.app/oS7vMb.png",
     "bandeira_url": "https://a.imagem.app/oS16yW.png",
-    "federacao_logo": "https://a.imagem.app/B76ggb.png"
+    "federacao_logo": "https://a.imagem.app/B76ggb.png",
+    "pesId": 134
   },
   {
     "id": 34,
@@ -312,7 +322,8 @@ export const CLUBS_DATA = [
     "continente": "AMÉRICA DO SUL",
     "escudo_url": "https://a.imagem.app/oS74X1.png",
     "bandeira_url": "https://a.imagem.app/oS16yW.png",
-    "federacao_logo": "https://a.imagem.app/B76ggb.png"
+    "federacao_logo": "https://a.imagem.app/B76ggb.png",
+    "pesId": 1219
   },
   {
     "id": 36,
@@ -321,7 +332,8 @@ export const CLUBS_DATA = [
     "continente": "AMÉRICA DO SUL",
     "escudo_url": "https://a.imagem.app/oS7PQW.png",
     "bandeira_url": "https://a.imagem.app/oS16yW.png",
-    "federacao_logo": "https://a.imagem.app/B76ggb.png"
+    "federacao_logo": "https://a.imagem.app/B76ggb.png",
+    "pesId": 1245
   },
   {
     "id": 37,
@@ -330,7 +342,8 @@ export const CLUBS_DATA = [
     "continente": "AMÉRICA DO SUL",
     "escudo_url": "https://a.imagem.app/oS7Upt.png",
     "bandeira_url": "https://a.imagem.app/oS16yW.png",
-    "federacao_logo": "https://a.imagem.app/B76ggb.png"
+    "federacao_logo": "https://a.imagem.app/B76ggb.png",
+    "pesId": 114
   },
   {
     "id": 38,
@@ -339,7 +352,8 @@ export const CLUBS_DATA = [
     "continente": "AMÉRICA DO SUL",
     "escudo_url": "https://a.imagem.app/oS7fe0.png",
     "bandeira_url": "https://a.imagem.app/oS16yW.png",
-    "federacao_logo": "https://a.imagem.app/B76ggb.png"
+    "federacao_logo": "https://a.imagem.app/B76ggb.png",
+    "pesId": 113
   },
   {
     "id": 39,
@@ -348,7 +362,8 @@ export const CLUBS_DATA = [
     "continente": "AMÉRICA DO SUL",
     "escudo_url": "https://a.imagem.app/oS7yCy.png",
     "bandeira_url": "https://a.imagem.app/oS16yW.png",
-    "federacao_logo": "https://a.imagem.app/B76ggb.png"
+    "federacao_logo": "https://a.imagem.app/B76ggb.png",
+    "pesId": 1244
   },
   {
     "id": 40,
@@ -357,7 +372,8 @@ export const CLUBS_DATA = [
     "continente": "AMÉRICA DO SUL",
     "escudo_url": "https://a.imagem.app/oS7Dfr.png",
     "bandeira_url": "https://a.imagem.app/oS16yW.png",
-    "federacao_logo": "https://a.imagem.app/B76ggb.png"
+    "federacao_logo": "https://a.imagem.app/B76ggb.png",
+    "pesId": 116
   },
   {
     "id": 41,
@@ -366,7 +382,8 @@ export const CLUBS_DATA = [
     "continente": "AMÉRICA DO SUL",
     "escudo_url": "https://a.imagem.app/oS7O22.png",
     "bandeira_url": "https://a.imagem.app/oS16yW.png",
-    "federacao_logo": "https://a.imagem.app/B76ggb.png"
+    "federacao_logo": "https://a.imagem.app/B76ggb.png",
+    "pesId": 1242
   },
   {
     "id": 42,

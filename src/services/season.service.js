@@ -80,10 +80,30 @@ export const seasonService = {
             if (sName.includes('copa') && !sName.includes('super') && cName.includes('super')) return false;
 
             // Regra Genérica (com cuidado) - Apenas se os países baterem ou não tiver país definido (e passou pelo firewall)
-            // Se cName é "Brasileirão Série B" e sName é "Serie B", deve casar?
+            // PROTEÇÃO: "Recopa" não pode casar com "Sul-Americana" via includes
+            const isRecopaCase = cName.includes('recopa') || sName.includes('recopa');
+            const isSulAmerCase = (cName.includes('sul-americana') || cName.includes('sulamericana')) || (sName.includes('sul-americana') || sName.includes('sulamericana'));
+
+            if (isRecopaCase && isSulAmerCase && cName !== sName) {
+                // Se um é recopa e o outro é sul-americana pura, não podem casar
+                const onlySulAmer = (n) => (n.includes('sul-americana') || n.includes('sulamericana')) && !n.includes('recopa');
+                if ((isRecopaCase && onlySulAmer(sName)) || (isRecopaCase && onlySulAmer(cName))) return false;
+            }
+
+            // Agora com proteção para não cruzar divisões (Serie A, Serie B, etc)
+            const hasDiv = (name) => name.includes('serie') || name.includes('liga profissional') || name.includes('primera nacional') || name.includes('divisao');
+
             if (cName.includes(sName) || sName.includes(cName)) {
-                // Check extra para não casar strings muito curtas ou genéricas demais sem validação de contexto
-                if (sName.length > 5) return true;
+                // Se um tem "Serie B" e o outro não, não deve casar
+                if (cName.includes('serie b') && !sName.includes('serie b')) return false;
+                if (sName.includes('serie b') && !cName.includes('serie b')) return false;
+
+                // Bloqueio genérico para sub-strings curtas demais que geram lixo
+                if (sName.length <= 5 && cName !== sName) return false;
+
+                if (hasDiv(cName) && hasDiv(sName) && cName !== sName) return false;
+
+                return true;
             }
 
             return false;
@@ -94,12 +114,36 @@ export const seasonService = {
         const seasons = await this.getAll();
         // Limpeza profunda de proxies para evitar DataCloneError no IndexedDB
         const cleanSeason = JSON.parse(JSON.stringify(season));
-        const newSeason = {
-            ...cleanSeason,
-            id: Date.now()
-        };
-        seasons.push(newSeason);
-        await db.save(STORAGE_KEY_SEASONS, seasons);
-        return newSeason;
+
+        // Normalização agressiva para match de temporada
+        const normalize = (s) => s?.toString().toLowerCase().replace(/[^a-z0-9]/g, "").trim() || "";
+        const targetName = normalize(cleanSeason.competitionName);
+        const targetYear = normalize(cleanSeason.ano);
+
+        // Busca se já existe este registro para evitar duplicidade
+        const existingIndex = seasons.findIndex(s =>
+            normalize(s.competitionName) === targetName &&
+            normalize(s.ano) === targetYear
+        );
+
+        if (existingIndex > -1) {
+            // Atualiza o existente mantendo o ID original
+            const originalId = seasons[existingIndex].id;
+            seasons[existingIndex] = {
+                ...cleanSeason,
+                id: originalId
+            };
+            await db.save(STORAGE_KEY_SEASONS, seasons);
+            return seasons[existingIndex];
+        } else {
+            // Cria um novo registro
+            const newSeason = {
+                ...cleanSeason,
+                id: Date.now()
+            };
+            seasons.push(newSeason);
+            await db.save(STORAGE_KEY_SEASONS, seasons);
+            return newSeason;
+        }
     }
 };

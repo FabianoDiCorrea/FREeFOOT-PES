@@ -12,15 +12,24 @@ const imageStore = localforage.createInstance({
 });
 
 export const db = {
-  // Generic methods
   async get(key) {
+    return await freefootStore.getItem(key);
+  },
+
+  async getAll(key) {
     return await freefootStore.getItem(key) || [];
   },
 
   async save(key, data) {
-    // Garantir que os dados sejam serializáveis (limpa Proxies e funções)
     const serializableData = JSON.parse(JSON.stringify(data));
     return await freefootStore.setItem(key, serializableData);
+  },
+
+  async delete(key, id) {
+    // Se for uma lista, remove o item pelo ID
+    const list = await this.getAll(key);
+    const updated = list.filter(item => item.id !== id);
+    return await this.save(key, updated);
   },
 
   // Image handling (stores as base64)
@@ -82,6 +91,17 @@ export const db = {
       return true;
     } catch (e) {
       console.error("Erro na importação:", e);
+      return false;
+    }
+  },
+
+  async clearDatabase() {
+    try {
+      await freefootStore.clear();
+      await imageStore.clear();
+      return true;
+    } catch (e) {
+      console.error("Erro ao limpar banco de dados:", e);
       return false;
     }
   }

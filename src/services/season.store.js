@@ -9,6 +9,8 @@ export const seasonStore = reactive({
 
     async loadSeasons(competitionName, countryName = null) {
         this.loading = true;
+        // Limpar lista ANTES do await para evitar flash de dados antigos na tela
+        this.list = [];
         const data = await seasonService.getByCompetitionFlexible(competitionName, countryName);
         // Ordenar do mais recente para o mais antigo
         this.list = data.sort((a, b) => getSeasonFinalYear(b.ano) - getSeasonFinalYear(a.ano));

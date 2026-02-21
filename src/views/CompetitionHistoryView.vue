@@ -209,8 +209,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, onMounted, computed, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { ALL_COMPETITIONS_DATA } from '../services/competitions.data'
 import { INTERNATIONAL_DATA } from '../data/internationalCompetitions'
 import { seasonService } from '../services/season.service'
@@ -218,21 +218,39 @@ import { seasonStore } from '../services/season.store'
 import TeamShield from '../components/TeamShield.vue'
 import { CLUBS_DATA } from '../data/clubs.data'
 import { FEDERATIONS_DATA } from '../services/federations.data'
-import { getTrofeuPath } from '../services/utils'
+import { getTrofeuPath, getSeasonFinalYear } from '../services/utils'
 import NationalFlag from '../components/NationalFlag.vue'
 import { careerStore } from '../services/career.store'
+
+const props = defineProps({
+  competition: {
+    type: Object,
+    default: null
+  }
+})
 
 const route = useRoute()
 const competition = ref(null)
 const history = ref([])
 
 onMounted(async () => {
-  loadData()
+  if (props.competition) {
+      competition.value = props.competition
+      loadData(props.competition)
+  } else {
+      loadData()
+  }
   await careerStore.loadAll()
 })
 
+// Adicionar watcher para quando a prop mudar (ex: trocar de competição no Universo)
+watch(() => props.competition, (newVal) => {
+    if (newVal) {
+        competition.value = newVal
+        loadData(newVal)
+    }
+})
 // FIX: Reatividade para carregar dados assim que o store atualizar (ex: ao voltar da tela de edição)
-import { watch } from 'vue'
 watch(() => seasonStore.list, () => {
     loadData()
 }, { deep: true })
@@ -299,63 +317,79 @@ const parseTable = (tableText) => {
   return parsed
 }
 
-const loadData = async () => {
-  const compId = parseInt(route.params.id)
-  
-  const allComps = [
-    ...ALL_COMPETITIONS_DATA.flatMap(c => c.paises.flatMap(p => p.competicoes)),
-    ...ALL_COMPETITIONS_DATA.flatMap(c => c.continentais),
-    ...INTERNATIONAL_DATA
-  ]
-  
-  competition.value = allComps.find(c => c.id === compId)
+const loadData = async (compOverride = null) => {
+  if (compOverride) {
+      competition.value = compOverride
+  } else {
+      const compId = parseInt(route.params.id)
+      const allComps = [
+        ...ALL_COMPETITIONS_DATA.flatMap(c => c.paises.flatMap(p => p.competicoes)),
+        ...ALL_COMPETITIONS_DATA.flatMap(c => (c.continentais || [])),
+        ...INTERNATIONAL_DATA
+      ]
+      competition.value = allComps.find(c => c.id === compId)
+  }
   
   if (competition.value) {
     // ESTRATÉGIA DE FILTRO LOCAL (Mais robusta para casos como Primera Nacional)
     const allSeasons = await seasonService.getAll()
     
-    const normalize = (str) => str?.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim() || ""
+    const normalize = (str) => {
+        if (!str) return ""
+        return str.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim()
+    }
     const targetName = normalize(competition.value.nome)
-    const targetCountry = normalize(competition.value.pais)
+    const targetCountry = competition.value.pais ? normalize(competition.value.pais) : null
 
     const filtered = allSeasons.filter(s => {
         const sName = normalize(s.competitionName)
-        const sCountry = normalize(s.pais)
+        let sCountry = s.pais ? normalize(s.pais) : null
 
-        // 1. Match Exato de Nome
-        const exactMatchName = (sName === targetName)
+        // 0. Inferência de País
+        if (!sCountry) {
+            if (sName.includes('brasileirao') || sName.includes('copa do brasil')) sCountry = 'brasil';
+            if (sName.includes('argentina') || sName.includes('primera nacional') || sName.includes('liga profissional')) sCountry = 'argentina';
+        }
+
+        // 1. Bloqueio de País (se ambos definidos e diferentes)
+        const isInternational = targetCountry && ['AMERICA DO SUL', 'EUROPA', 'CONMEBOL', 'UEFA', 'MUNDO', 'INTERNACIONAL'].includes(targetCountry.toUpperCase());
+        if (targetCountry && sCountry && sCountry !== targetCountry && !isInternational) return false;
+
+        // 2. Proteção Recopa vs Sul-Americana
+        const isTargetRecopa = targetName.includes('recopa');
+        const isSeasonRecopa = sName.includes('recopa');
+        if (isTargetRecopa !== isSeasonRecopa) return false; // Se um é recopa e o outro não, barra.
+
+        // 3. Match de Nome
+        if (sName === targetName) return true;
         
-        // 2. Validação de País (CRUCIAL): Se target tem país, season DEVE bater ou ser neutra (mas se for neutra, perigo)
-        // Se a season tem país explícito e é diferente do target, REJEITA IMEDIATAMENTE.
-        if (targetCountry && sCountry && sCountry !== targetCountry) return false
+        if (targetName.includes('primera nacional') && sName.includes('primera nacional')) return true;
+        if ((targetName.includes('profissional') || targetName.includes('liga argentina')) && 
+            (sName.includes('profissional') || sName.includes('liga argentina'))) return true;
 
-        // 3. Match Flexível Específico
-        let nameMatch = false
-
-        // PRIMERA NACIONAL (Argentina)
-        if (targetName.includes('primera nacional')) {
-            if (sName.includes('primera nacional')) nameMatch = true
-            // Não aceita 'serie b' genérico aqui para evitar Brasileirão Série B
-        }
-        // LIGA PROFISSIONAL (Argentina)
-        else if (targetName.includes('profissional') || targetName.includes('liga argentina')) {
-             if (sName.includes('profissional') || sName.includes('liga argentina')) nameMatch = true
-        }
-        // CASOS GENÉRICOS (Só se não caiu nos específicos acima)
-        else {
-             if (exactMatchName) nameMatch = true
-             
-             // Lógica legada para outros casos, mas com cuidado
-             if (targetName.includes('nacional') && sName.includes('nacional') && !sName.includes('serie b')) nameMatch = true
+        if (sName.includes(targetName) || targetName.includes(sName)) {
+            // Bloqueio de sub-strings curtas demais ou divisões
+            if (sName.length <= 5 && sName !== targetName) return false;
+            if ((sName.includes('serie b') || sName.includes('serie a')) && sName !== targetName) return false;
+            return true;
         }
 
-        return nameMatch && (!targetCountry || !sCountry || sCountry === targetCountry)
+        return false;
     })
 
-    console.log('HISTORY LOCAL FILTER:', filtered.length, 'seasons found.')
+    // Deduplicação por Ano Final para evitar contagem dupla de registros sujos
+    const seenYears = new Set()
+    const uniqueSeasons = filtered.filter(s => {
+        const fYear = getSeasonFinalYear(s.ano)
+        if (seenYears.has(fYear)) return false
+        seenYears.add(fYear)
+        return true
+    })
+
+    console.log('HISTORY LOCAL FILTER:', uniqueSeasons.length, 'unique seasons found.')
     
     // Process promoted/relegated from table data
-    history.value = filtered.map(s => {
+    history.value = uniqueSeasons.map(s => {
       let rebaixadosList = []
       let promovidosList = []
 

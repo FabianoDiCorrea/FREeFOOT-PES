@@ -16,13 +16,18 @@
       </div>
 
       <div class="system-status d-flex align-items-center">
-        <span class="badge bg-secondary opacity-50 x-small">V.0.0.1</span>
+        <span class="badge bg-secondary opacity-50 x-small">V.0.0.2</span>
         <span class="ms-3 pt-time fw-bold text-secondary">{{ currentTime }}</span>
       </div>
     </header>
 
     <main class="main-content">
-      <router-view />
+      <!-- keep-alive preserva o UniversoView em memória para evitar remontagem e piscada ao voltar -->
+      <router-view v-slot="{ Component }">
+        <keep-alive include="UniversoView">
+          <component :is="Component" />
+        </keep-alive>
+      </router-view>
     </main>
   </div>
 </template>
@@ -30,6 +35,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import LogoFREeFOOT from './components/LogoFREeFOOT.vue'
+import { clubStore } from './services/club.store'
 
 const currentTime = ref('')
 
@@ -38,9 +44,12 @@ const updateTime = () => {
   currentTime.value = now.toLocaleTimeString('pt-BR')
 }
 
-onMounted(() => {
+onMounted(async () => {
   updateTime()
   setInterval(updateTime, 1000)
+  
+  // Inicializa o store de clubes (carrega customizações locais)
+  await clubStore.init()
 })
 </script>
 

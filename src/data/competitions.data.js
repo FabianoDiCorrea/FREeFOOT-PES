@@ -29,7 +29,7 @@ export const SOUTH_AMERICA_COMPETITIONS = [
     { id: 19, nome: "Supercopa Uruguai", pais: "Uruguai", tipo: "Supercopa", modoRegistro: "mata_mata_simples", logo: "/logos/competitions/supercopa-uruguai.png", promovidos: 0, rebaixados: 0, trofeu: 'trofeu-supercopa-uruguai' },
 
     // PARAGUAI
-    { id: 20, nome: "Liga Paraguaia", pais: "Paraguai", tipo: "Liga", modoRegistro: "liga", logo: "/logos/competitions/liga-paraguai.png", promovidos: 0, rebaixados: 2, trofeu: 'trofeu-liga-paraguaia' },
+    { id: 20, nome: "Liga Paraguaia", pais: "Paraguai", tipo: "Liga", modoRegistro: "liga", logo: "/logos/competitions/liga-paraguai.png.jpg", promovidos: 0, rebaixados: 2, trofeu: 'trofeu-liga-paraguaia' },
     { id: 21, nome: "Copa Paraguai", pais: "Paraguai", tipo: "Copa", modoRegistro: "mata_mata_simples", logo: "/logos/competitions/copa-paraguai.png", promovidos: 0, rebaixados: 0, trofeu: 'trofeu-copa-paraguai' },
 
     // BOLÍVIA

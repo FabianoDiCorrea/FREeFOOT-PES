@@ -51,7 +51,13 @@
                        getStatus(comp, year).registered ? 'row-registered' : 'row-pending',
                        { 'intl-row-bg': comp.tipo === 'internacional' }
                      ]">
-                   <TeamShield :teamName="comp.campeao" :size="30" :season="year" />
+                   <!-- INÍCIO: ESCUDO OU TROFÉU -->
+                   <div v-if="comp.tipo === 'especial'" class="d-flex align-items-center justify-content-center" style="width: 30px;">
+                       <img v-if="comp.realTrofeu" :src="comp.realTrofeu" style="height: 30px; width: 30px; object-fit: contain; filter: drop-shadow(0 0 5px rgba(255,193,7,0.3));">
+                       <i v-else class="bi bi-trophy-fill text-warning fs-5"></i>
+                   </div>
+                   <TeamShield v-else :teamName="getStatus(comp, year).champion" :size="30" :season="year" />
+
                    <!-- 1. LOGO -->
                    <div class="comp-logo-box">
                        <img v-if="comp.logo" :src="comp.logo" class="comp-logo-img" @error="(e) => e.target.style.display='none'" />
@@ -89,7 +95,7 @@
                        <i v-if="getStatus(comp, year).registered" class="bi bi-check-circle-fill text-success fs-5"></i>
                        <i v-else class="bi bi-dash-circle text-danger opacity-25 fs-5"></i>
                    </div>
-
+                   <!-- FIM: BOTAO DE CHECK OU STATUS -->
                 </div>
              </div>
           </div>
@@ -115,8 +121,11 @@ import { FEDERATIONS_DATA } from '../services/federations.data'
 import { NATIONAL_TEAMS_DATA } from '../data/nationalTeams.data'
 import { seasonStore } from '../services/season.store'
 import { INTERNATIONAL_DATA } from '../data/internationalCompetitions'
+import { awardsStore } from '../services/awards.store'
+import { rankingsStore } from '../services/rankings.store'
 import NationalFlag from '../components/NationalFlag.vue'
 import TeamShield from '../components/TeamShield.vue'
+import { normalizeYearStrict } from '../services/utils'
 
 const router = useRouter()
 const loading = ref(true)
@@ -126,20 +135,19 @@ const availableYears = ref([])
 const allCompetitions = ref([])
 const expandedYears = ref({}) // Controle do acordeão
 
-const normalizeYear = (y) => {
-    if (!y) return y;
-    let val = y.toString().trim();
-    // Se tiver parênteses como (2025/2026) 2026, tenta extrair o miolo
-    const matchBound = val.match(/\((\d{4}\s?\/\s?\d{4})\)/);
-    if (matchBound) val = matchBound[1];
 
-    // Padroniza Xxxx/Yyyy para Xxxx / Yyyy
-    if (val.includes('/')) {
-        const parts = val.split('/').map(p => p.trim());
-        if (parts.length === 2) return `${parts[0]} / ${parts[1]}`;
+
+const expandYear = (y) => {
+    if (!y) return y;
+    let s = y.toString().trim();
+    if (s.length === 2) {
+        const val = parseInt(s);
+        return val > 50 ? `19${s}` : `20${s}`;
     }
-    return val;
+    return s;
 }
+
+const normalizeYear = (y) => normalizeYearStrict(y);
 
 const toggleYear = (year) => {
     expandedYears.value[year] = !expandedYears.value[year]
@@ -150,14 +158,9 @@ const goBack = () => {
 }
 
 onMounted(async () => {
-
     loading.value = true
-    // Tenta carregar do store primeiro, se vazio busca do serviço
-    if (seasonStore.list.length > 0) {
-        seasons.value = seasonStore.list
-    } else {
-        seasons.value = await seasonService.getAll()
-    }
+    // SEMPRE carrega tudo para o checklist para evitar instabilidade do store filtrado
+    seasons.value = await seasonService.getAll()
     
     // Flatten Competitions Data
 
@@ -187,38 +190,96 @@ onMounted(async () => {
     // Adicionar Competições Internacionais (Libertadores, Sulamericana, etc.)
     flat.push(...INTERNATIONAL_DATA)
 
+    // Itens Especiais de Controle (FIFA / Globais) - Sincronizado com IndividualAwardsHistory.vue
+    const awardsData = [
+        { id: 'aw-1', nome: 'Melhor do Mundo', trofeu: '/src/assets/trofeus/individuais/melhor_do_mundo.png' },
+        { id: 'aw-2', nome: 'Melhor do Mundo (Técnico)', trofeu: '/src/assets/trofeus/individuais/melhor_tecnico_mundo.png' },
+        { id: 'aw-3', nome: 'Melhor da Europa', trofeu: '/src/assets/trofeus/individuais/melhor_da_europa.png' },
+        { id: 'aw-4', nome: 'Melhor da CONMEBOL (Rei da América)', trofeu: '/src/assets/trofeus/individuais/melhor_da_america.png' },
+        { id: 'aw-5', nome: 'Melhor da CONCACAF', trofeu: '/src/assets/trofeus/individuais/melhor_da_concacaf.png' }
+    ]
+
+    awardsData.forEach(aw => {
+        flat.push({ 
+            id: aw.id, 
+            nome: aw.nome, 
+            tipo: "especial", 
+            continente: "FIFA", 
+            logo: "/logos/competitions/fifa.png", 
+            realTrofeu: aw.trofeu, 
+            pais: "Mundo",
+            isAward: true
+        })
+    });
+
+    flat.push({ id: 'special-rank-clubs', nome: "Ranking de Clubes", tipo: "especial", continente: "FIFA", logo: "/logos/competitions/fifa.png", pais: "Mundo" })
+    flat.push({ id: 'special-rank-nt', nome: "Ranking de Seleções", tipo: "especial", continente: "FIFA", logo: "/logos/competitions/fifa.png", pais: "Mundo" })
+
     allCompetitions.value = flat
 
     // Extract unique years (Normalized)
     const yearsSet = new Set(seasons.value.map(s => normalizeYear(s.ano)))
-    availableYears.value = Array.from(yearsSet).sort().reverse()
+    availableYears.value = Array.from(yearsSet).sort((a, b) => b.localeCompare(a))
     
+    // Carregar outros dados necessários para o checklist
+    await awardsStore.loadAll()
+    await rankingsStore.loadAll()
+
     loading.value = false
 })
 
-watch(() => seasonStore.list, (newList) => {
-    if (newList && newList.length > 0) {
-        seasons.value = newList
-        // Atualizar anos disponíveis também (Normalized)
-        const yearsSet = new Set(newList.map(s => normalizeYear(s.ano)))
-        availableYears.value = Array.from(yearsSet).sort().reverse()
-    }
-}, { deep: true })
+// O watch foi removido porque o checklist deve manter a lista completa carregada no onMounted.
+// Se seasonStore.list for filtrado por outra tela, ele sobrescreveria erroneamente os dados aqui.
 
-// Filter years based on active tab
+// Filtra anos com base na aba ativa (Agora simplificado, pois o formato é unificado)
 const sortedYears = computed(() => {
     return availableYears.value.filter(y => {
         if (!y) return false
-        if (activeTab.value === 'americas') return y.toString().includes('/') // 2025/2026
-        if (activeTab.value === 'europa') return !y.toString().includes('/') && y.toString().length === 4 // 2026
-        return false
+        const val = y.toString()
+        
+        // Proteção contra anos malformados
+        if (val.includes('(') || val.includes(')')) return false
+
+        // No novo sistema unificado, todos os anos aparecem em ambas as abas,
+        // mas o conteúdo (competições) dentro deles é que muda.
+        return true
     })
 })
+
+const getYearDisplay = (year) => {
+    if (!year) return ''
+    const val = year.toString()
+    
+    // Prioridade 1: Se tem "=", pegamos o que vem DEPOIS (Ano de finalização)
+    if (val.includes('=')) {
+        const parts = val.split('=')
+        return parts[parts.length - 1].trim()
+    }
+
+    // Fallback para "-"
+    if (val.includes('-')) {
+        const parts = val.split('-')
+        return parts[parts.length - 1].trim()
+    }
+    
+    // Prioridade 2: Se tem "/", pegamos o que vem DEPOIS
+    if (val.includes('/')) {
+        const parts = val.split('/')
+        return parts[parts.length - 1].trim()
+    }
+
+    return val
+}
+
 
 const getCompetitionsForRegion = (region) => {
     return allCompetitions.value.filter(c => {
         const pais = c.pais || ''; 
         const continente = c.continente || '';
+
+        // Itens Globais (Compartilhados em Ambas as Abas)
+        const isGlobal = c.tipo === 'especial' || c.nome.includes('Mundial de Clubes');
+        if (isGlobal) return true;
 
         if (region === 'americas') {
             const list = ['Brasil', 'Argentina', 'Uruguai', 'Colômbia', 'Chile', 'Paraguai', 'Bolívia', 'Peru', 'Equador', 'Estados Unidos', 'México', 'Costa Rica', 'América do Sul', 'América do Norte'];
@@ -235,15 +296,77 @@ const getCompetitionsForRegion = (region) => {
 }
 
 const getStatus = (comp, year) => {
-    // Find matching season in DB
-    // Matching logic similar to "CompetitionHistoryView" local filter but stricter?
-    // Or just look for compID + year if we trust IDs?
-    // User data might verify by name. Let's start with flexible name match + year.
+    // Função auxiliar agressiva para normalização (remove espaços, hifens e acentos)
+    const normalize = (str) => {
+        if (!str) return ""
+        return str.toString()
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "") // Remove acentos
+            .replace(/[^a-z0-9]/g, "")        // Remove tudo que não for letra ou número
+            .trim()
+    }
     
-    const normalize = (str) => str?.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim() || ""
-    
+    const yearRef = year.toString() // Referência do loop (ex: "2026 / 2027")
+
+    // Função de match de ano unificada por CICLO (Ancorada no Ano Final expandido)
+    const isSameCycle = (s1, s2) => {
+        if (!s1 || !s2) return false
+        
+        const getFinalYear4Digit = (yStr) => {
+            const y = getYearDisplay(yStr); // Já lida com "/" e "-"
+            if (!y) return 0;
+            let s = y.toString().trim();
+            if (s.length === 2) {
+                const val = parseInt(s);
+                return val > 50 ? 1900 + val : 2000 + val;
+            }
+            return parseInt(s) || 0;
+        }
+
+        return getFinalYear4Digit(s1) === getFinalYear4Digit(s2);
+    }
+
+    // 1. Tratamento para Itens Especiais
+    if (comp.tipo === 'especial' || comp.isAward) {
+        if (comp.isAward) {
+            const hasAward = awardsStore.list.some(a => {
+                const storedYear = a.season || a.temporada || "";
+                if (!isSameCycle(storedYear, year)) return false;
+                
+                const aType = normalize(a.tipo || a.titulo || "");
+                const cName = normalize(comp.nome || "");
+                
+                // Matchers precisos (Sem espaços nos termos, pois o normalize removeu)
+                if (cName.includes("mundotecnico") && aType.includes("mundotecnico")) return true;
+                if (cName.includes("mundo") && !cName.includes("tecnico") && aType.includes("mundo") && !aType.includes("tecnico")) return true;
+                if (cName.includes("europa") && aType.includes("europa")) return true;
+                if (cName.includes("conmebol") || cName.includes("reidaamerica")) {
+                    if (aType.includes("conmebol") || aType.includes("reidaamerica") || aType.includes("america")) return true;
+                }
+                if (cName.includes("concacaf") && aType.includes("concacaf")) return true;
+                
+                return aType === cName || aType.includes(cName) || cName.includes(aType);
+            })
+            return { registered: hasAward }
+        }
+        if (comp.id === 'special-rank-clubs' || comp.id === 'special-rank-nt') {
+            const type = comp.id === 'special-rank-clubs' ? 'clubes' : 'selecoes'
+            const list = rankingsStore.list.value || []
+            const hasRank = list.some(r => {
+                if (r.type !== type) return false;
+                // Match estrito de temporada (prioriza strings idênticas)
+                if (normalizeYear(r.season) === normalizeYear(year)) return true;
+                // Se não for idêntica, usa a lógica de ciclo (que agora bloqueia o vazamento 27/28 vs 28/29)
+                return isSameCycle(r.season, year);
+            })
+            if (hasRank) return { registered: true }
+        }
+    }
+
     const match = seasons.value.find(s => {
-        if (normalizeYear(s.ano) !== normalizeYear(year)) return false
+        // Match de ano por Ciclo (Permite que salvar 2026 marque na linha 2026 / 2027)
+        if (!isSameCycle(s.ano, year)) return false
         
         let sCountry = s.pais ? normalize(s.pais) : null
         
@@ -256,9 +379,14 @@ const getStatus = (comp, year) => {
         }
 
         const cCountry = comp.pais ? normalize(comp.pais) : null
+        
+        // Competitções Continentais/Mundiais não barram por país
+        const isCompContinental = !!comp.continente || ['americadosul', 'europa', 'mundo', 'conmebol', 'uefa', 'fifa'].includes(cCountry)
 
-        // 1. Validação de País (Agora mais robusta com a inferência)
-        if (cCountry && sCountry && sCountry !== cCountry) return false
+        // 1. Validação de País (Internacionais não barram por país)
+        if (cCountry && sCountry && sCountry !== cCountry && !isCompContinental) {
+            return false
+        }
 
         // 1.5 FIREWALL EXPLÍCITO (Separação Brasil x Argentina) forçada
         const sName = normalize(s.competitionName)
@@ -271,35 +399,47 @@ const getStatus = (comp, year) => {
             if (sName.includes('brasileirao') || sName.includes('serie a') || sName.includes('serie b') || sName.includes('copa do brasil')) return false
         }
 
-        // 4. Proteção Específica: Copa vs Supercopa
-        // "Copa do Brasil" não pode casar com "Supercopa do Brasil"
-        if (cName.includes('copa') && !cName.includes('super') && sName.includes('super')) return false
-        if (sName.includes('copa') && !sName.includes('super') && cName.includes('super')) return false
-
-        // Match logic
+        // Match logic RIGOROSO (Proteção Total entre divisões e tipos)
         if (sName === cName) return true
         
-        // Strict Special Cases
-        if (cName === 'primera nacional' && sName === 'primera nacional') return true
+        // Match flexível para Sul-Americana / Sudamericana / Recopa
+        const isSulAmer = (name) => (name.includes("sulamericana") || name.includes("sudamericana")) && !name.includes("recopa");
+        if (isSulAmer(cName) && isSulAmer(sName)) return true;
         
-        // Only match generic "Nacional" if it's NOT "Primera Nacional"
-        if (cName.includes('nacional') && !cName.includes('primera nacional') && (sName.includes('nacional') || sName.includes('serie b'))) return true
-        
-        // Strict Professional/Serie A check
-        if (cName.includes('profissional') && (sName.includes('profissional') || sName.includes('serie a')) && cCountry === sCountry) return true
+        const isRecopa = (name) => name.includes("recopa");
+        if (isRecopa(cName) && isRecopa(sName)) return true;
+
+        // Bloqueio explícito entre divisões e tipos (Copa, Super, Recopa)
+        const matchBlockers = ['serieb', 'seriec', 'seried', 'primeranacional', 'championship', 'recopa', 'super', 'copa'];
+        for (const block of matchBlockers) {
+            const inC = cName.includes(block);
+            const inS = sName.includes(block);
+            if (inC !== inS) return false; // Se um tem e o outro não, não casa.
+        }
+
+        if (sName.includes(cName) || cName.includes(sName)) {
+            // Se passou pelo filtro de bloqueadores acima, podemos aceitar o match parcial longo
+            return sName.length > 5 && cName.length > 5
+        }
         
         return false
     })
     
     if (!match) return { registered: false }
     
-    // Check for valid scorers (must have a name)
     const hasValidTopScorer = match.topScorers && match.topScorers.some(s => s.nome && s.nome.trim() !== '')
     const hasValidLegacyScorer = match.artilheiro && match.artilheiro.nome && match.artilheiro.nome.trim() !== ''
 
+    // Verificação de Tabela ou Bracket (Para Copas/Mundial)
+    const isMataMata = comp.modoRegistro === 'mata_mata_simples' || normalize(comp.nome).includes('mundial')
+    const hasBracket = match.mundial && match.mundial.final && match.mundial.final.time1
+    const hasTable = !!match.tabela || (isMataMata && hasBracket)
+
     return {
         registered: true,
-        hasTable: !!match.tabela,
+        champion: match.campeao,
+        id: match.id,
+        hasTable,
         hasScorers: hasValidTopScorer || hasValidLegacyScorer
     }
 }
@@ -344,7 +484,7 @@ const getStatus = (comp, year) => {
     transform: scale(1.01) translateX(5px);
     border-color: rgba(255, 255, 255, 0.15);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 
-                0 0 15px rgba(255, 255, 255, 0.05);
+                inset 0 0 20px rgba(255, 255, 255, 0.05);
     z-index: 10;
 }
 

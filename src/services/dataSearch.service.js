@@ -1,4 +1,4 @@
-import { CLUBS_DATA } from '../data/clubs.data';
+import { clubStore } from './club.store';
 import { NATIONAL_TEAMS_DATA } from '../data/nationalTeams.data';
 import { normalizeString } from './utils';
 
@@ -9,8 +9,10 @@ export const dataSearchService = {
     findClub(name) {
         if (!name) return null;
         const search = normalizeString(name);
-        return CLUBS_DATA.find(c => normalizeString(c.nome) === search) ||
-            CLUBS_DATA.find(c => normalizeString(c.nome).includes(search));
+        const list = clubStore.list.length > 0 ? clubStore.list : [];
+
+        return list.find(c => normalizeString(c.nome) === search) ||
+            list.find(c => normalizeString(c.nome).includes(search));
     },
 
     /**
@@ -32,7 +34,8 @@ export const dataSearchService = {
     getClubsByCountry(countryName) {
         if (!countryName) return [];
         const search = normalizeString(countryName);
-        return CLUBS_DATA.filter(c => normalizeString(c.pais) === search);
+        const list = clubStore.list.length > 0 ? clubStore.list : [];
+        return list.filter(c => normalizeString(c.pais) === search);
     },
 
     /**

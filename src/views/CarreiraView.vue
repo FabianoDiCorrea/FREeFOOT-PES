@@ -149,9 +149,14 @@
                         <div class="header-main-h3 text-uppercase fw-black mb-2">
                             {{ selectedEntry.temporada }}
                         </div>
-                        <button class="btn btn-sm btn-outline-warning text-uppercase fw-bold x-small" @click="editCurrentEntry">
-                            <i class="bi bi-pencil-fill me-1"></i> Editar Dados
-                        </button>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-warning text-uppercase fw-bold x-small" @click="editCurrentEntry">
+                                <i class="bi bi-pencil-fill me-1"></i> Editar Dados
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger text-uppercase fw-bold x-small" @click="confirmDeleteEntry">
+                                <i class="bi bi-trash-fill me-1"></i> Excluir Temporada
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -665,6 +670,25 @@ const saveEntry = async () => {
     showForm.value = false
 }
 
+const confirmDeleteEntry = () => {
+    if (confirm(`Tem certeza que deseja excluir a temporada ${selectedEntry.value.temporada} no ${selectedEntry.value.timeNome}? Esta ação não pode ser desfeita.`)) {
+        deleteCurrentEntry()
+    }
+}
+
+const deleteCurrentEntry = async () => {
+    if (!selectedEntry.value?.id) return
+    await careerStore.removeEntry(selectedEntry.value.id)
+    
+    // Selecionar outra temporada após excluir
+    if (filteredHistory.value.length > 0) {
+        selectedEntry.value = filteredHistory.value[filteredHistory.value.length - 1]
+    } else {
+        selectedEntry.value = null
+    }
+    alert('Temporada removida com sucesso.')
+}
+
 
 
 // Cálculo automático de JOGOS para Copas/Inter (V + E + D)
@@ -966,16 +990,41 @@ const allCompetitionResults = computed(() => {
             const teamLine = lines.find(l => l.toLowerCase().includes(timeNome))
             
             if (teamLine) {
+                const linesRaw = season.tabela.split('\n').filter(l => l.trim());
+                const teamLineRaw = linesRaw.find(l => l.toLowerCase().includes(timeNome));
+                
+                // Tentar extrair 'extra' (colocação)
+                let extra = '';
+                let cells = teamLineRaw.split('\t');
+                if (cells.length === 1) cells = teamLineRaw.split(/\s{2,}/);
+                
+                if (/^\d+$/.test(cells[0]?.trim()) || /^\d+\.?$/.test(cells[0]?.trim())) {
+                    if (cells[2]) extra = cells[2].trim();
+                } else if (cells[1]) {
+                    extra = cells[1].trim();
+                }
+
                 const pos = lines.indexOf(teamLine) + 1
                 badge = `${pos}º Lugar`
                 ordem = pos
                 
-                if (pos === 1) {
-                    badge = 'CAMPEÃO'
-                    ordem = 1
-                } else if (pos === 2) {
-                    badge = 'VICE-CAMPEÃO'
-                    ordem = 2
+                if (extra) {
+                    const e = extra.toUpperCase();
+                    if (e.includes('CAMPEÃO') || e === 'CAMPEAO') { badge = 'CAMPEÃO'; ordem = 1; }
+                    else if (e.includes('VICE') || e.includes('2º')) { badge = 'VICE-CAMPEÃO'; ordem = 2; }
+                    else if (e.includes('SEMIFINAL') || e.includes('4º')) { badge = 'SEMIFINAL'; ordem = 4; }
+                    else if (e.includes('QUARTAS') || e.includes('8º')) { badge = 'QUARTAS'; ordem = 8; }
+                    else if (e.includes('OITAVAS') || e.includes('16º')) { badge = 'OITAVAS'; ordem = 16; }
+                    else if (e.includes('16 AVOS')) { badge = '16 AVOS'; ordem = 24; }
+                    else if (e.includes('GRUPOS') || e.includes('32º')) { badge = 'GRUPOS'; ordem = 32; }
+                } else {
+                    if (pos === 1) {
+                        badge = 'CAMPEÃO'
+                        ordem = 1
+                    } else if (pos === 2) {
+                        badge = 'VICE-CAMPEÃO'
+                        ordem = 2
+                    }
                 }
                 found = true
             }

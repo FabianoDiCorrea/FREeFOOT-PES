@@ -45,13 +45,12 @@
                 <!-- Partículas de Confete -->
                 <div v-for="n in 10" :key="n" class="confetti-p"></div>
 
-                <img v-if="competitionInfo && competitionInfo.trofeu" 
-                     :src="getTrofeuPath(competitionInfo.trofeu)" 
-                     class="trofeu-campeao" 
-                     alt="Troféu"
-                     @error="e => e.target.style.display='none'">
-                
                 <div class="position-relative d-flex align-items-center">
+                  <!-- Logo Libertadores (Indicador) -->
+                  <img v-if="season.competitionName === 'Sul-Americana' && isFromLibertadores(season.campeao)" 
+                       src="/logos/competitions/classdaliberta.png" 
+                       class="lib-indicator-large me-3" 
+                       title="Vindo da Libertadores" />
                   <TeamShield :teamName="season.campeao" :size="100" borderless class="escudo-campeao" :season="season.ano" />
                 </div>
 
@@ -60,11 +59,11 @@
                     {{ season.campeao }}
                     <i v-if="careerStore.isUserTeam(season.campeao, season.ano)" class="bi bi-controller text-neon-green pulse-neon" style="font-size: 1.1rem;"></i>
                   </h5>
-                  <div class="text-secondary small fw-bold text-uppercase opacity-75 mt-1" style="font-size: 0.8rem;">CAMPEÃO — {{ season.ano }}</div>
+                  <div class="text-secondary small fw-bold text-uppercase mt-1" style="font-size: 0.8rem;">CAMPEÃO — {{ season.ano }}</div>
                 </div>
               </div>
 
-              <div v-if="isInternational && getClubInfo(season.campeao)" class="d-flex justify-content-center align-items-center gap-2 opacity-75 mt-2">
+              <div v-if="isInternational && getClubInfo(season.campeao)" class="d-flex justify-content-center align-items-center gap-2 mt-2">
                 <template v-if="competitionInfo?.modoRegistro === 'mundial'">
                    <img :src="getClubInfo(season.campeao).federacaoLogo" style="height: 14px; width: auto; object-fit: contain;" />
                    <span class="fw-bold x-small">{{ getClubInfo(season.campeao).federacao }}</span>
@@ -77,14 +76,18 @@
 
             <!-- VICE -->
             <div class="col-md-6 p-2 text-center bg-transparent shadow-inset-left">
-              <div class="mb-1 d-inline-block pt-1">
+              <div class="mb-1 d-inline-block pt-1 d-flex align-items-center justify-content-center gap-3">
+                <img v-if="season.competitionName === 'Sul-Americana' && isFromLibertadores(season.vice)" 
+                     src="/logos/competitions/classdaliberta.png" 
+                     class="lib-indicator-medium" 
+                     title="Vindo da Libertadores" />
                 <TeamShield :teamName="season.vice" :size="80" borderless :season="season.ano" />
               </div>
               <h6 class="fw-bold text-uppercase text-secondary mb-0 small d-flex align-items-center justify-content-center gap-2">
                 {{ season.vice || 'SEM VICE' }}
                 <i v-if="season.vice && careerStore.isUserTeam(season.vice, season.ano)" class="bi bi-controller text-neon-green pulse-neon" style="font-size: 1.1rem;"></i>
               </h6>
-              <div v-if="isInternational && season.vice && getClubInfo(season.vice)" class="d-flex justify-content-center align-items-center gap-2 opacity-50">
+              <div v-if="isInternational && season.vice && getClubInfo(season.vice)" class="d-flex justify-content-center align-items-center gap-2">
                 <template v-if="competitionInfo?.modoRegistro === 'mundial'">
                    <img :src="getClubInfo(season.vice).federacaoLogo" style="height: 12px; width: auto; object-fit: contain;" />
                    <span class="fw-bold x-small">{{ getClubInfo(season.vice).federacao }}</span>
@@ -103,169 +106,22 @@
     </div>
 
 
-    <!-- CHAVEAMENTO MUNDIAL DE CLUBES -->
-    <div v-if="competitionInfo?.modoRegistro === 'mundial'" class="row g-2 mb-4">
+    <!-- CHAVEAMENTO MUNDIAL DE CLUBES (Componente Novo) -->
+    <div v-if="competitionInfo?.modoRegistro === 'mundial' || season.competitionName === 'Mundial de Clubes'" class="row g-2 mb-4">
       <div class="col-12">
-        <GamePanel customClass="p-0 overflow-hidden">
-          <div class="px-3 py-2 bg-primary bg-opacity-20 d-flex justify-content-between align-items-center border-bottom border-primary border-opacity-20">
-            <h6 class="m-0 text-primary fw-black x-small text-uppercase ls-1"><i class="bi bi-diagram-3-fill me-2"></i>MUNDIAL DE CLUBES - CHAVEAMENTO</h6>
-            <button class="btn btn-sm btn-primary fw-black x-small" @click="saveMundial">SALVAR CHAVEAMENTO</button>
+        <GamePanel customClass="p-3 overflow-hidden border border-primary border-opacity-10">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="m-0 fw-black text-info text-uppercase ls-1">
+              <i class="bi bi-diagram-3 me-2"></i>CHAVEAMENTO MUNDIAL
+            </h5>
+            <button class="btn btn-sm btn-outline-primary fw-bold px-3" @click="showMundialModal = true">
+              <i class="bi bi-pencil-square me-2"></i>EDITAR CHAVEAMENTO
+            </button>
           </div>
-
-          <div class="p-4 mundial-bracket-container">
-            <div class="row g-4 justify-content-center align-items-center">
-              <!-- SEMIFINAIS -->
-              <div class="col-md-5">
-                <div class="d-flex flex-column gap-4">
-                  <!-- SEMI 1 -->
-                  <div class="mundial-match-card">
-                    <div class="match-title x-small fw-black text-secondary mb-2 text-center">SEMIFINAL 1</div>
-                    <div class="d-flex align-items-center justify-content-between gap-2">
-                      <div class="d-flex flex-column align-items-center text-center" style="width: 120px;">
-                        <TeamShield :teamName="season.mundial.semi1.time1" :size="36" :season="season.ano" />
-                        <input type="text" v-model="season.mundial.semi1.time1" class="form-control game-input-sm x-small text-center mt-1" placeholder="Time A">
-                        <div v-if="getClubInfo(season.mundial.semi1.time1)" class="d-flex flex-column align-items-center gap-0 opacity-50 mt-1 lh-1">
-                           <div class="d-flex align-items-center gap-1 mb-1">
-                               <img :src="getClubInfo(season.mundial.semi1.time1).federacaoLogo" style="height: 8px; width: auto;" />
-                               <span class="x-small fw-bold" style="font-size: 0.55rem;">{{ getClubInfo(season.mundial.semi1.time1).federacao }}</span>
-                           </div>
-                           <div class="d-flex align-items-center gap-1">
-                               <NationalFlag :countryName="getClubInfo(season.mundial.semi1.time1).pais" :size="8" />
-                               <span class="x-small fw-bold" style="font-size: 0.55rem;">{{ getClubInfo(season.mundial.semi1.time1).pais }}</span>
-                           </div>
-                        </div>
-                      </div>
-                      <div class="d-flex align-items-center gap-1">
-                        <input type="number" v-model="season.mundial.semi1.placar1" class="form-control game-score-input fs-5">
-                        <span class="opacity-25 x-small fw-bold">X</span>
-                        <input type="number" v-model="season.mundial.semi1.placar2" class="form-control game-score-input fs-5">
-                      </div>
-                      <div class="d-flex flex-column align-items-center text-center" style="width: 120px;">
-                        <TeamShield :teamName="season.mundial.semi1.time2" :size="36" :season="season.ano" />
-                        <input type="text" v-model="season.mundial.semi1.time2" class="form-control game-input-sm x-small text-center mt-1" placeholder="Time B">
-                        <div v-if="getClubInfo(season.mundial.semi1.time2)" class="d-flex flex-column align-items-center gap-0 opacity-50 mt-1 lh-1">
-                           <div class="d-flex align-items-center gap-1 mb-1">
-                               <img :src="getClubInfo(season.mundial.semi1.time2).federacaoLogo" style="height: 8px; width: auto;" />
-                               <span class="x-small fw-bold" style="font-size: 0.55rem;">{{ getClubInfo(season.mundial.semi1.time2).federacao }}</span>
-                           </div>
-                           <div class="d-flex align-items-center gap-1">
-                               <NationalFlag :countryName="getClubInfo(season.mundial.semi1.time2).pais" :size="8" />
-                               <span class="x-small fw-bold" style="font-size: 0.55rem;">{{ getClubInfo(season.mundial.semi1.time2).pais }}</span>
-                           </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- SEMI 2 -->
-                  <div class="mundial-match-card">
-                    <div class="match-title x-small fw-black text-secondary mb-2 text-center">SEMIFINAL 2</div>
-                    <div class="d-flex align-items-center justify-content-between gap-2">
-                      <div class="d-flex flex-column align-items-center text-center" style="width: 120px;">
-                        <TeamShield :teamName="season.mundial.semi2.time1" :size="36" :season="season.ano" />
-                        <input type="text" v-model="season.mundial.semi2.time1" class="form-control game-input-sm x-small text-center mt-1" placeholder="Time A">
-                        <div v-if="getClubInfo(season.mundial.semi2.time1)" class="d-flex flex-column align-items-center gap-0 opacity-50 mt-1 lh-1">
-                           <div class="d-flex align-items-center gap-1 mb-1">
-                               <img :src="getClubInfo(season.mundial.semi2.time1).federacaoLogo" style="height: 8px; width: auto;" />
-                               <span class="x-small fw-bold" style="font-size: 0.55rem;">{{ getClubInfo(season.mundial.semi2.time1).federacao }}</span>
-                           </div>
-                           <div class="d-flex align-items-center gap-1">
-                               <NationalFlag :countryName="getClubInfo(season.mundial.semi2.time1).pais" :size="8" />
-                               <span class="x-small fw-bold" style="font-size: 0.55rem;">{{ getClubInfo(season.mundial.semi2.time1).pais }}</span>
-                           </div>
-                        </div>
-                      </div>
-                      <div class="d-flex align-items-center gap-1">
-                        <input type="number" v-model="season.mundial.semi2.placar1" class="form-control game-score-input fs-5">
-                        <span class="opacity-25 x-small fw-bold">X</span>
-                        <input type="number" v-model="season.mundial.semi2.placar2" class="form-control game-score-input fs-5">
-                      </div>
-                      <div class="d-flex flex-column align-items-center text-center" style="width: 120px;">
-                        <TeamShield :teamName="season.mundial.semi2.time2" :size="36" :season="season.ano" />
-                        <input type="text" v-model="season.mundial.semi2.time2" class="form-control game-input-sm x-small text-center mt-1" placeholder="Time B">
-                        <div v-if="getClubInfo(season.mundial.semi2.time2)" class="d-flex flex-column align-items-center gap-0 opacity-50 mt-1 lh-1">
-                           <div class="d-flex align-items-center gap-1 mb-1">
-                               <img :src="getClubInfo(season.mundial.semi2.time2).federacaoLogo" style="height: 8px; width: auto;" />
-                               <span class="x-small fw-bold" style="font-size: 0.55rem;">{{ getClubInfo(season.mundial.semi2.time2).federacao }}</span>
-                           </div>
-                           <div class="d-flex align-items-center gap-1">
-                               <NationalFlag :countryName="getClubInfo(season.mundial.semi2.time2).pais" :size="8" />
-                               <span class="x-small fw-bold" style="font-size: 0.55rem;">{{ getClubInfo(season.mundial.semi2.time2).pais }}</span>
-                           </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- FINAL & 3º LUGAR -->
-              <div class="col-md-7">
-                 <div class="d-flex flex-column gap-5 h-100 justify-content-center border-start border-secondary border-opacity-10 ps-5">
-                    <!-- GRANDE FINAL -->
-                    <div class="mundial-match-card final-card highlight-gold p-4">
-                      <div class="match-title small fw-black text-warning mb-3 text-center ls-2">🏆 GRANDE FINAL</div>
-                      <div class="d-flex align-items-center justify-content-between gap-4">
-                        <div class="d-flex flex-column align-items-center flex-grow-1">
-                          <TeamShield :teamName="season.mundial.final.time1" :size="80" borderless :season="season.ano" />
-                          <div class="fw-black text-uppercase mt-2 text-center" style="font-size: 1.1rem;">{{ season.mundial.final.time1 || 'FINALISTA 1' }}</div>
-                          <div v-if="getClubInfo(season.mundial.final.time1)" class="d-flex flex-column justify-content-center align-items-center gap-1 opacity-50 mt-1">
-                             <div class="d-flex align-items-center gap-2">
-                                <img :src="getClubInfo(season.mundial.final.time1).federacaoLogo" style="height: 12px; width: auto;" />
-                                <span class="x-small fw-bold">{{ getClubInfo(season.mundial.final.time1).federacao }}</span>
-                             </div>
-                             <div class="d-flex align-items-center gap-2">
-                                <NationalFlag :countryName="getClubInfo(season.mundial.final.time1).pais" :size="10" />
-                                <span class="x-small fw-bold">{{ getClubInfo(season.mundial.final.time1).pais }}</span>
-                             </div>
-                          </div>
-                        </div>
-                        
-                        <div class="d-flex align-items-center gap-2">
-                          <input type="number" v-model="season.mundial.final.placar1" class="form-control game-score-input-lg">
-                          <span class="fw-black opacity-25">X</span>
-                          <input type="number" v-model="season.mundial.final.placar2" class="form-control game-score-input-lg">
-                        </div>
-
-                        <div class="d-flex flex-column align-items-center flex-grow-1">
-                          <TeamShield :teamName="season.mundial.final.time2" :size="80" borderless :season="season.ano" />
-                          <div class="fw-black text-uppercase mt-2 text-center" style="font-size: 1.1rem;">{{ season.mundial.final.time2 || 'FINALISTA 2' }}</div>
-                          <div v-if="getClubInfo(season.mundial.final.time2)" class="d-flex flex-column justify-content-center align-items-center gap-1 opacity-50 mt-1">
-                             <div class="d-flex align-items-center gap-2">
-                                <img :src="getClubInfo(season.mundial.final.time2).federacaoLogo" style="height: 12px; width: auto;" />
-                                <span class="x-small fw-bold">{{ getClubInfo(season.mundial.final.time2).federacao }}</span>
-                             </div>
-                             <div class="d-flex align-items-center gap-2">
-                                <NationalFlag :countryName="getClubInfo(season.mundial.final.time2).pais" :size="10" />
-                                <span class="x-small fw-bold">{{ getClubInfo(season.mundial.final.time2).pais }}</span>
-                             </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- DISPUTA 3º LUGAR -->
-                    <div class="mundial-match-card third-place-card py-2 px-4 shadow-sm bg-black bg-opacity-20 mx-auto" style="width: 400px;">
-                      <div class="match-title x-small fw-black text-secondary mb-2 text-center opacity-50">DISPUTA 3º LUGAR</div>
-                      <div class="d-flex align-items-center justify-content-between gap-2">
-                        <div class="d-flex align-items-center gap-2 flex-grow-1">
-                          <TeamShield :teamName="season.mundial.terceiro.time1" :size="20" borderless :season="season.ano" />
-                          <span class="x-small fw-bold opacity-75 text-truncate" style="max-width: 100px;">{{ season.mundial.terceiro.time1 }}</span>
-                        </div>
-                        <div class="d-flex align-items-center gap-1">
-                          <input type="number" v-model="season.mundial.terceiro.placar1" class="form-control game-score-input x-small">
-                          <span class="opacity-25 x-small">x</span>
-                          <input type="number" v-model="season.mundial.terceiro.placar2" class="form-control game-score-input x-small">
-                        </div>
-                        <div class="d-flex align-items-center gap-2 justify-content-end flex-grow-1">
-                          <span class="x-small fw-bold opacity-75 text-truncate" style="max-width: 100px;">{{ season.mundial.terceiro.time2 }}</span>
-                          <TeamShield :teamName="season.mundial.terceiro.time2" :size="20" borderless :season="season.ano" />
-                        </div>
-                      </div>
-                    </div>
-                 </div>
-              </div>
-            </div>
-          </div>
+          <MundialBracket 
+            :mundial="season.mundial" 
+            :isEditable="false" 
+          />
         </GamePanel>
       </div>
     </div>
@@ -273,8 +129,14 @@
     <!-- CONTEÚDO PRINCIPAL: TABELA + ARTILHARIA (SIDE-BY-SIDE SEM VÁCUO) -->
     <div class="d-flex flex-wrap gap-2 align-items-start">
       
-      <!-- LADO ESQUERDO: TABELA (FIXED WIDTH TO ACTUAL SIZE) -->
-      <div v-if="(competitionInfo?.modoRegistro === 'liga' && season.tabela) || competitionInfo?.modoRegistro === 'participantes'" class="flex-shrink-0" style="width: fit-content; max-width: 600px;">
+      <!-- LADO ESQUERDO: TABELA (AMPLIADA SÓ NA SUL-AMERICANA) -->
+      <div v-if="(competitionInfo?.modoRegistro === 'liga' && season.tabela) || competitionInfo?.modoRegistro === 'participantes'" 
+           class="flex-shrink-0" 
+           :style="{ 
+             width: 'fit-content', 
+             minWidth: season.competitionName === 'Sul-Americana' ? '650px' : 'auto', 
+             maxWidth: season.competitionName === 'Sul-Americana' ? '850px' : '600px' 
+           }">
         
         <!-- Caso Liga -->
         <GamePanel v-if="competitionInfo?.modoRegistro === 'liga'" customClass="p-0 overflow-hidden">
@@ -316,19 +178,34 @@
                    class="cup-row-v2"
                    :class="[
                      { 'row-alt': idx % 2 !== 0 },
-                     getPlacementColorClass(p.colocacao)
+                     getPlacementColorClass(p.colocacao),
+                     { 'is-sul-americana': season.competitionName === 'Sul-Americana' }
                    ]">
                 
 
-                <!-- INFO EQUIPE -->
-                <div class="team-info-cup">
-                  <!-- Ícone de Troféu/Medalha (condicional) -->
+                <!-- INFO EQUIPE (REORDENADO) -->
+                <div class="team-info-cup d-flex align-items-center gap-2">
+                  <!-- 1. Ícone de Troféu/Medalha -->
                   <div class="trophy-icon-container">
                     <span v-if="p.colocacao === 'CAMPEÃO'" class="trophy-icon gold">🏆</span>
                     <span v-else-if="p.colocacao === 'VICE'" class="trophy-icon silver">🥈</span>
                   </div>
-                  <TeamShield :teamName="p.nome" :size="24" :season="season.ano" />
-                  <span class="team-name text-truncate">{{ p.nome }}</span>
+                  
+                  <!-- 2. Logo Libertadores (Indicador) -->
+                  <div class="lib-indicator-container">
+                    <img v-if="season.competitionName === 'Sul-Americana' && isFromLibertadores(p.nome)" 
+                         src="/logos/competitions/classdaliberta.png" 
+                         class="lib-indicator-small" 
+                         title="Vindo da Libertadores" />
+                  </div>
+
+                  <!-- 3. Escudo -->
+                  <div class="shield-container">
+                    <TeamShield :teamName="p.nome" :size="24" :season="season.ano" />
+                  </div>
+
+                  <!-- 4. Nome do Time -->
+                  <span class="team-name text-truncate flex-grow-1">{{ p.nome }}</span>
                 </div>
 
                 <!-- STATS / DADOS -->
@@ -373,8 +250,8 @@
         </GamePanel>
       </div>
 
-      <!-- LADO DIREITO: ARTILHARIA PREMIUM (FILLS REMAINING SPACE) -->
-      <div v-if="hasScorers" class="flex-grow-1" style="min-width: 400px;">
+      <!-- LADO DIREITO: ARTILHARIA PREMIUM (COMPACTA SÓ NA SUL-AMERICANA) -->
+      <div v-if="hasScorers" class="flex-grow-1" :style="{ minWidth: season.competitionName === 'Sul-Americana' ? '320px' : '400px' }">
         <GamePanel customClass="h-100 p-0 overflow-hidden">
           <div class="p-2 px-3 bg-black bg-opacity-30 border-bottom border-secondary border-opacity-10">
             <h6 class="m-0 text-warning fw-black x-small text-uppercase ls-1">
@@ -413,7 +290,7 @@
                    <div class="v-divider-h"></div>
                    <div class="d-flex align-items-center gap-2 px-3">
                      <NationalFlag :countryName="sc.nacionalidade" :size="32" class="rounded-circle shadow" />
-                     <span class="text-uppercase fw-black opacity-50" style="font-size: 0.8rem; letter-spacing: 1px;">{{ sc.nacionalidade }}</span>
+                     <span class="text-uppercase fw-black" style="font-size: 0.8rem; letter-spacing: 1px;">{{ sc.nacionalidade }}</span>
                    </div>
                 </div>
 
@@ -426,7 +303,7 @@
                     </div>
                     <div class="d-flex flex-column">
                       <span class="club-name-h">{{ sc.clube }}</span>
-                      <div class="d-flex align-items-center gap-1 opacity-50" style="font-size: 0.65rem;">
+                      <div class="d-flex align-items-center gap-1" style="font-size: 0.65rem;">
                         <NationalFlag :countryName="getClubInfo(sc.clube)?.pais" :size="10" />
                         <span class="fw-bold">{{ getClubInfo(sc.clube)?.pais }}</span>
                       </div>
@@ -434,10 +311,10 @@
                   </div>
                 </div>
 
-                <!-- GOLS (DESTAQUE AMARELO) -->
+                <!-- GOLS (COMPACTO) -->
                 <div class="scorer-goals-h ms-auto">
                   <div class="goals-box-h">
-                    <div class="val">{{ sc.gols }}</div>
+                    <div class="val" style="font-size: 1.5rem;">{{ sc.gols }}</div>
                     <div class="lbl">GOLS</div>
                   </div>
                 </div>
@@ -462,6 +339,35 @@
       </div>
     </div>
 
+    <!-- MODAIS -->
+    <!-- Modal Mundial de Clubes -->
+    <div v-if="showMundialModal" class="form-full-screen-overlay">
+       <div class="form-full-screen-content custom-scrollbar">
+           <div class="d-flex justify-content-between align-items-center mb-4">
+               <h2 class="text-warning fw-black m-0">EDITAR CHAVEAMENTO MUNDIAL</h2>
+               <button class="btn-close-large" @click="showMundialModal = false">×</button>
+           </div>
+           
+           <div class="row">
+               <div class="col-12">
+                   <div class="p-4 rounded-4 bg-black bg-opacity-40 border border-primary border-opacity-20 shadow-2xl">
+                       <MundialBracket 
+                          :mundial="season.mundial" 
+                          :isEditable="true"
+                          @updateMatch="updateMundialField"
+                       />
+                   </div>
+               </div>
+           </div>
+
+           <div class="d-flex justify-content-center mt-5 mb-5 pb-5">
+               <button class="btn btn-lg btn-warning fw-black px-5 py-3 shadow-lg hover-glow" @click="saveMundialBracket">
+                   <i class="bi bi-check-circle-fill me-2"></i>SALVAR CHAVEAMENTO DO MUNDIAL
+               </button>
+           </div>
+       </div>
+    </div>
+
   </div>
 </template>
 
@@ -483,17 +389,56 @@ import { dataSearchService } from '../services/dataSearch.service'
 import { imageCacheService } from '../services/imageCache.service'
 import { ALL_COMPETITIONS_DATA } from '../services/competitions.data'
 import { INTERNATIONAL_DATA } from '../data/internationalCompetitions'
+import MundialBracket from '../components/MundialBracket.vue'
 
 const PLACEMENTS_OPTIONS = [
   'CAMPEÃO',
   'VICE',
-  'TERCEIRO',
+  'ELIM. 16 AVOS',
   'SEMIFINAL',
   'QUARTAS',
   'OITAVAS',
   'FASE DE GRUPOS',
   'PRÉ-LIBERTADORES'
 ]
+
+const libertadoresTeams = ref([])
+
+const loadLibertadoresTeams = async () => {
+  if (!season.value) return
+  if (season.value.competitionName !== 'Sul-Americana') return
+  
+  try {
+    const allSeasons = await seasonService.getAll()
+    const libSeason = allSeasons.find(s => 
+      s.competitionName === 'Libertadores' && 
+      s.ano === season.value.ano
+    )
+    
+    if (libSeason) {
+      const teams = []
+      if (libSeason.tabela) {
+        const lines = libSeason.tabela.split('\n').filter(l => l.trim())
+        lines.forEach(line => {
+          let cells = line.split('\t')
+          if (cells.length === 1) cells = line.split(/\s{2,}/)
+          if (cells[0]) teams.push(cells[0].replace(/^\d+[\s.]*/, '').trim())
+        })
+      }
+      if (libSeason.participantes) {
+        libSeason.participantes.forEach(p => teams.push(p.nome))
+      }
+      libertadoresTeams.value = [...new Set(teams)]
+    }
+  } catch (e) {
+    console.error("Erro ao carregar times da Libertadores:", e)
+  }
+}
+
+const isFromLibertadores = (teamName) => {
+  if (!teamName) return false
+  return libertadoresTeams.value.some(t => t.toLowerCase().trim() === teamName.toLowerCase().trim())
+}
 
 const route = useRoute()
 const season = ref(null)
@@ -511,6 +456,108 @@ const getCachedLogo = (url) => {
   if (!url) return null
   if (url.startsWith('data:')) return url
   return cachedLogos.value[url] || url
+}
+
+const showMundialModal = ref(false)
+
+const updateMundialField = (phase, field, value) => {
+  if (!season.value.mundial) return
+  season.value.mundial[phase][field] = value
+}
+
+const computeMundialResults = () => {
+  const m = season.value.mundial;
+  if (!m) return;
+
+  // Semi 1
+  if (m.semi1.placar1 > m.semi1.placar2) {
+    m.final.time1 = m.semi1.time1;
+    m.terceiro.time1 = m.semi1.time2;
+  } else if (m.semi1.placar2 > m.semi1.placar1) {
+    m.final.time1 = m.semi1.time2;
+    m.terceiro.time1 = m.semi1.time1;
+  } else if (m.semi1.pen1 || m.semi1.pen2) {
+    if (m.semi1.pen1 > m.semi1.pen2) {
+      m.final.time1 = m.semi1.time1;
+      m.terceiro.time1 = m.semi1.time2;
+    } else {
+      m.final.time1 = m.semi1.time2;
+      m.terceiro.time1 = m.semi1.time1;
+    }
+  }
+
+  // Semi 2
+  if (m.semi2.placar1 > m.semi2.placar2) {
+    m.final.time2 = m.semi2.time1;
+    m.terceiro.time2 = m.semi2.time2;
+  } else if (m.semi2.placar2 > m.semi2.placar1) {
+    m.final.time2 = m.semi2.time2;
+    m.terceiro.time2 = m.semi2.time1;
+  } else if (m.semi2.pen1 || m.semi2.pen2) {
+    if (m.semi2.pen1 > m.semi2.pen2) {
+      m.final.time2 = m.semi2.time1;
+      m.terceiro.time2 = m.semi2.time2;
+    } else {
+      m.final.time2 = m.semi2.time2;
+      m.terceiro.time2 = m.semi2.time1;
+    }
+  }
+
+  // Final
+  if (m.final.placar1 > m.final.placar2) {
+    season.value.campeao = m.final.time1;
+    season.value.vice = m.final.time2;
+  } else if (m.final.placar2 > m.final.placar1) {
+    season.value.campeao = m.final.time2;
+    season.value.vice = m.final.time1;
+  } else if (m.final.pen1 || m.final.pen2) {
+    if (m.final.pen1 > m.final.pen2) {
+      season.value.campeao = m.final.time1;
+      season.value.vice = m.final.time2;
+    } else {
+      season.value.campeao = m.final.time2;
+      season.value.vice = m.final.time1;
+    }
+  }
+}
+
+const saveMundialBracket = async () => {
+  try {
+    // Recalcular Campeão e Vice antes de salvar
+    const m = season.value.mundial
+    let novoCampeao = season.value.campeao
+    let novoVice = season.value.vice
+
+    if (m.final.time1 && m.final.time2 && (m.final.placar1 !== '' || m.final.placar2 !== '')) {
+        const p1 = parseInt(m.final.placar1) || 0
+        const p2 = parseInt(m.final.placar2) || 0
+        const pn1 = parseInt(m.final.pen1) || 0
+        const pn2 = parseInt(m.final.pen2) || 0
+
+        if (p1 > p2 || (p1 === p2 && pn1 > pn2)) {
+            novoCampeao = m.final.time1
+            novoVice = m.final.time2
+        } else if (p2 > p1 || (p2 === p1 && pn2 > pn1)) {
+            novoCampeao = m.final.time2
+            novoVice = m.final.time1
+        }
+    }
+
+    await seasonService.update(season.value.id, { 
+        mundial: season.value.mundial,
+        campeao: novoCampeao,
+        vice: novoVice
+    })
+    
+    season.value.campeao = novoCampeao
+    season.value.vice = novoVice
+    
+    showMundialModal.value = false
+    alert('Chaveamento do Mundial salvo com sucesso!')
+  } catch (error) {
+    console.error('Erro ao salvar mundial:', error)
+    alert('Erro ao salvar: ' + error.message)
+  }
 }
 
 const getFlagUrl = (countryName) => {
@@ -610,23 +657,35 @@ const allScorers = computed(() => {
 const seasonCountTitles = computed(() => {
   if (!season.value) return 0
   const teamName = season.value.campeao
+  if (!teamName) return 0
+  const compName = season.value.competitionName
   const currentYear = getSeasonFinalYear(season.value.ano)
   
-  return seasonStore.list.filter(s => {
-    return s.campeao.toLowerCase().trim() === teamName.toLowerCase().trim() &&
+  const matches = seasonStore.list.filter(s => {
+    return s.competitionName === compName &&
+           s.campeao && s.campeao.toLowerCase().trim() === teamName.toLowerCase().trim() &&
            getSeasonFinalYear(s.ano) <= currentYear
-  }).length
+  })
+  
+  // Contar apenas anos únicos para evitar duplicidade de registros
+  return new Set(matches.map(s => getSeasonFinalYear(s.ano))).size
 })
 
 const seasonCountVices = computed(() => {
-  if (!season.value || !season.value.vice) return 0
+  if (!season.value) return 0
   const teamName = season.value.vice
+  if (!teamName) return 0
+  const compName = season.value.competitionName
   const currentYear = getSeasonFinalYear(season.value.ano)
   
-  return seasonStore.list.filter(s => {
-    return s.vice && s.vice.toLowerCase().trim() === teamName.toLowerCase().trim() &&
+  const matches = seasonStore.list.filter(s => {
+    return s.competitionName === compName &&
+           s.vice && s.vice.toLowerCase().trim() === teamName.toLowerCase().trim() &&
            getSeasonFinalYear(s.ano) <= currentYear
-  }).length
+  })
+
+  // Contar apenas anos únicos para evitar duplicidade de registros
+  return new Set(matches.map(s => getSeasonFinalYear(s.ano))).size
 })
 
 const headerBgStyle = computed(() => {
@@ -660,6 +719,7 @@ const loadSeasonData = async () => {
   }
   if (found) {
     season.value = found;
+    loadLibertadoresTeams();
     if (!season.value.participantes) season.value.participantes = [];
     if (!season.value.mundial && season.value.competitionName === 'Mundial de Clubes') {
       season.value.mundial = {
@@ -686,10 +746,11 @@ const getPlacementColorClass = (colocacao) => {
   const c = colocacao.toUpperCase().trim();
   if (c.includes('CAMPEÃO')) return 'pos-gold';
   if (c.includes('VICE')) return 'pos-silver';
-  if (c.includes('TERCEIRO') || c.includes('SEMIFINAL')) return 'pos-bronze';
+  if (c.includes('SEMIFINAL')) return 'pos-bronze';
   if (c.includes('QUARTAS')) return 'pos-green';
   if (c.includes('OITAVAS')) return 'pos-cyan';
-  if (c.includes('GRUPOS')) return 'pos-blue-dark';
+  if (c.includes('16 AVOS')) return 'pos-blue';
+  if (c.includes('GRUPOS')) return 'pos-red-light';
   if (c.includes('PRÉ')) return 'pos-red';
   return '';
 }
@@ -739,6 +800,27 @@ watch(() => route.params.id, () => {
   loadSeasonData();
 })
 
+// Sincronização automática de Campeão e Vice a partir da lista de participantes
+watch(() => season.value?.participantes, (newPart) => {
+  if (!newPart || !season.value) return
+  
+  const champ = newPart.find(p => p.colocacao === 'CAMPEÃO')
+  const vice = newPart.find(p => p.colocacao === 'VICE')
+  
+  if (champ && season.value.campeao !== champ.nome) {
+    season.value.campeao = champ.nome
+  }
+  if (vice && season.value.vice !== vice.nome) {
+    season.value.vice = vice.nome
+  }
+}, { deep: true })
+
+// Sincronização automática para o modo Mundial
+watch(() => season.value?.mundial, (newMundial) => {
+  if (!newMundial || !season.value) return
+  computeMundialResults()
+}, { deep: true })
+
 // FIX: Reagir a atualizações no Store (ex: após edição do artilheiro)
 watch(() => seasonStore.list, () => {
   const id = String(route.params.id);
@@ -778,51 +860,6 @@ const saveClassification = async () => {
   }
 }
 
-const updateMundialPositions = () => {
-  const m = season.value.mundial;
-  if (!m) return;
-
-  // Semi 1
-  if (m.semi1.placar1 > m.semi1.placar2) {
-    m.final.time1 = m.semi1.time1;
-    m.terceiro.time1 = m.semi1.time2;
-  } else if (m.semi1.placar2 > m.semi1.placar1) {
-    m.final.time1 = m.semi1.time2;
-    m.terceiro.time1 = m.semi1.time1;
-  }
-
-  // Semi 2
-  if (m.semi2.placar1 > m.semi2.placar2) {
-    m.final.time2 = m.semi2.time1;
-    m.terceiro.time2 = m.semi2.time2;
-  } else if (m.semi2.placar2 > m.semi2.placar1) {
-    m.final.time2 = m.semi2.time2;
-    m.terceiro.time2 = m.semi2.time1;
-  }
-
-  // Final
-  if (m.final.placar1 > m.final.placar2) {
-    season.value.campeao = m.final.time1;
-    season.value.vice = m.final.time2;
-  } else if (m.final.placar2 > m.final.placar1) {
-    season.value.campeao = m.final.time2;
-    season.value.vice = m.final.time1;
-  }
-}
-
-const saveMundial = async () => {
-  updateMundialPositions();
-  try {
-    await seasonStore.updateSeason(season.value.id, { 
-      mundial: JSON.parse(JSON.stringify(season.value.mundial)),
-      campeao: season.value.campeao,
-      vice: season.value.vice
-    });
-    alert('Mundial salvo com sucesso!');
-  } catch (error) {
-    console.error('Erro ao salvar Mundial:', error);
-  }
-}
 </script>
 
 <style scoped>
@@ -1267,17 +1304,48 @@ const saveMundial = async () => {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 8px;
-  padding-left: 8px; /* Reduzido para dar espaço ao ícone */
-  width: 210px;
+  gap: 8px; /* Gap reduzido para o padrão */
+  padding-left: 8px;
+  width: 220px; /* Ajustado de 210 para 220 para acomodar troféu+escudo com folga */
   z-index: 1;
   background: rgba(30, 40, 55, 0.98); 
   border-right: 1px solid rgba(255, 255, 255, 0.1);
+  transition: width 0.3s ease;
 }
 
-/* Container do ícone de troféu/medalha */
+/* LAYOUT ESPECIAL APENAS PARA SUL-AMERICANA */
+.cup-row-v2.is-sul-americana .team-info-cup {
+  width: 320px;
+  gap: 12px;
+}
+
+/* CONTAINERS DE ALINHAMENTO FIXO */
 .trophy-icon-container {
-  width: 24px;
+  width: 24px; /* Fixado para todas as linhas */
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.lib-indicator-container {
+  width: 0; /* Oculto por padrão (Libertadores, etc) */
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  transition: width 0.3s ease;
+}
+
+.cup-row-v2.is-sul-americana .lib-indicator-container {
+  width: 28px;
+}
+
+.shield-container {
+  width: 32px; /* Fixado para todas as linhas */
   height: 24px;
   display: flex;
   align-items: center;
@@ -1610,5 +1678,95 @@ select.form-select.cup-input-select.pos-red {
   color: #ffffff !important; 
   font-weight: 950 !important;
   -webkit-text-fill-color: #ffffff !important;
+}
+
+.cup-row-v2.pos-blue { background: rgba(0, 150, 255, 0.15) !important; }
+.cup-row-v2.pos-red-light { background: rgba(255, 0, 0, 0.1) !important; }
+
+select.form-select.cup-input-select.pos-blue { 
+  background-color: #0026ff !important; 
+  color: #ffffff !important; 
+  font-weight: 950 !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+select.form-select.cup-input-select.pos-red-light { 
+  background-color: #ff6e6e !important; 
+  color: #ffffff !important; 
+  font-weight: 950 !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+.lib-indicator-large {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  filter: drop-shadow(0 0 10px rgba(57, 255, 20, 0.8));
+  transition: all 0.3s ease;
+  cursor: help;
+}
+
+.lib-indicator-medium {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  filter: drop-shadow(0 0 8px rgba(57, 255, 20, 0.8));
+  transition: all 0.3s ease;
+  cursor: help;
+}
+
+.lib-indicator-small {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  filter: drop-shadow(0 0 5px rgba(57, 255, 20, 0.8));
+  transition: all 0.3s ease;
+  cursor: help;
+}
+
+.lib-indicator-large:hover, .lib-indicator-medium:hover, .lib-indicator-small:hover {
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 15px rgba(57, 255, 20, 1));
+}
+
+/* Modal Full Screen (Copiado de UniversoView) */
+.form-full-screen-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.98);
+  backdrop-filter: blur(25px);
+  z-index: 5000;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  padding: 5vh 5vw;
+}
+
+.form-full-screen-content {
+  width: 100%;
+  max-width: 1400px;
+  max-height: 100%;
+  overflow-y: auto;
+  padding-right: 1rem;
+}
+
+.btn-close-large {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-close-large:hover {
+  background: #ff4136;
+  transform: rotate(180deg) scale(1.1);
+  border-color: white;
 }
 </style>

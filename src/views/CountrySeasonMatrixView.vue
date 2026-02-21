@@ -155,11 +155,12 @@ import { useRoute } from 'vue-router'
 import { seasonStore } from '../services/season.store'
 import { careerStore } from '../services/career.store'
 import { CLUBS_DATA } from '../data/clubs.data'
-import { ALL_COMPETITIONS_DATA } from '../services/competitions.data'
+import { ALL_COMPETITIONS_DATA as RAW_DATA } from '../services/competitions.data'
 import { INTERNATIONAL_DATA } from '../data/internationalCompetitions'
 import TeamShield from '../components/TeamShield.vue'
 import NationalFlag from '../components/NationalFlag.vue'
 import LogoFREeFOOT from '../components/LogoFREeFOOT.vue'
+import { normalizeYearStrict } from '../services/utils'
 
 const route = useRoute()
 const countryId = computed(() => route.params.id)
@@ -179,7 +180,7 @@ const intlSlots = ref([])
 const getFederationByCountry = (cName) => {
   const norm = (s) => s?.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim() || ""
   const target = norm(cName)
-  for (const continent of ALL_COMPETITIONS_DATA) {
+  for (const continent of RAW_DATA) {
     if (continent.paises.some(p => norm(p.nome) === target)) {
       return continent.continente
     }
@@ -189,7 +190,7 @@ const getFederationByCountry = (cName) => {
 
 const mainLeagueLogo = computed(() => {
   const countryIdVal = countryId.value?.toLowerCase()
-  for (const continent of ALL_COMPETITIONS_DATA) {
+  for (const continent of RAW_DATA) {
     const p = continent.paises.find(p => p.nome.toLowerCase() === countryIdVal)
     if (p) {
       const liga = p.competicoes.find(c => c.tipo === 'Liga')
@@ -230,7 +231,7 @@ const setupSlots = () => {
   ]
 
   // 2. Buscar ligas deste país no sistema
-  for (const continent of ALL_COMPETITIONS_DATA) {
+  for (const continent of RAW_DATA) {
      const p = continent.paises.find(p => p.nome.toLowerCase() === countryIdVal)
      if (p) {
        leaguesFound = p.competicoes.filter(c => c.tipo === 'Liga')
@@ -281,13 +282,25 @@ const processedMatrix = computed(() => {
     return { data, seasons: [], clubs: [], noClubs: true }
   }
 
+  // 1.5 Pre-processar Metadata das Competições para busca ultra-rápida (Evita hangs)
+  const allCompsFlat = RAW_DATA.flatMap(c => c.paises ? c.paises.flatMap(p => p.competicoes || []) : [])
+  const compsMapByName = {}
+  const compsMapById = {}
+  
+  allCompsFlat.forEach(c => {
+    const normName = normalize(c.nome)
+    if (!compsMapByName[normName]) compsMapByName[normName] = c
+    if (!compsMapById[c.id]) compsMapById[c.id] = c
+  })
+
   // 2. Processar temporadas
   seasonStore.list.forEach(season => {
-    if (!season.tabela || !season.competitionName) return
+    if (!season.competitionName) return
     
-    const table = parseTable(season.tabela)
+    const tableStr = season.tabela || ''
+    const table = parseTable(tableStr)
     const yearRaw = season.ano
-    const year = yearRaw?.toString().replace(/\s+/g, '') || ''
+    const year = normalizeYearStrict(yearRaw)
     const compName = normalize(season.competitionName)
 
     table.forEach((row, index) => {
@@ -346,46 +359,104 @@ const processedMatrix = computed(() => {
       }
 
       if (slotKey) {
-        if (!data[clubNameNorm]) {
-           data[clubNameNorm] = {}
-           // Preservar o nome "Raw" para exibição (priorizando o que está no CLUBS_DATA se possível)
-           const originalClub = CLUBS_DATA.find(c => normalize(c.nome) === clubNameNorm)
-           clubNameMap[clubNameNorm] = originalClub ? originalClub.nome : clubNameRaw
-        }
-        if (!data[clubNameNorm][year]) data[clubNameNorm][year] = {}
-        
-        // Determinar se é ACESSO (Direto ou Playoff)
-        let isAccess = false
-        const compId = season.competitionId || (ALL_COMPETITIONS_DATA.flatMap(c => c.paises.flatMap(p => p.competicoes)).find(c => normalize(c.nome) === compName)?.id)
-        const meta = ALL_COMPETITIONS_DATA.flatMap(c => c.paises.flatMap(p => p.competicoes)).find(c => c.id === compId)
-        
-        if (meta && meta.promovidos > 0) {
-           const normPlayoffs = (season.promovidosPlayoff || []).map(p => normalize(p))
-           const playoffCount = normPlayoffs.length
-           const directCount = Math.max(0, meta.promovidos - playoffCount)
-           
-           isAccess = (rank <= directCount) || normPlayoffs.includes(clubNameNorm)
-        }
-
-        // Determinar se é REBAIXAMENTO
-        let isRelegation = false
-        if (meta && meta.rebaixados > 0) {
-           isRelegation = (rank > (table.length - meta.rebaixados))
-        }
-
-        if (!data[clubNameNorm][year][slotKey] || rank < data[clubNameNorm][year][slotKey].rank) {
-          data[clubNameNorm][year][slotKey] = { 
-            rank, 
-            compName: season.competitionName,
-            isAccess,
-            isRelegation
+          if (!data[clubNameNorm]) {
+             data[clubNameNorm] = {}
+             // Preservar o nome "Raw" para exibição
+             const originalClub = CLUBS_DATA.find(c => normalize(c.nome) === clubNameNorm)
+             clubNameMap[clubNameNorm] = originalClub ? originalClub.nome : clubNameRaw
           }
-        }
-        
-        clubsSet.add(clubNameNorm)
-        seasonsSet.add(year)
+          if (!data[clubNameNorm][year]) data[clubNameNorm][year] = {}
+          
+          // Determinar se é ACESSO (Direto ou Playoff)
+          let isAccess = false
+          const meta = compsMapById[season.competitionId] || compsMapByName[compName]
+          
+          if (meta && meta.promovidos > 0) {
+             const normPlayoffs = (season.promovidosPlayoff || []).map(p => normalize(p))
+             const playoffCount = normPlayoffs.length
+             const directCount = Math.max(0, meta.promovidos - playoffCount)
+             
+             isAccess = (rank <= directCount) || normPlayoffs.includes(clubNameNorm)
+          }
+
+          // Determinar se é REBAIXAMENTO
+          let isRelegation = false
+          if (meta && meta.rebaixados > 0) {
+             isRelegation = (rank > (table.length - meta.rebaixados))
+          }
+
+          if (!data[clubNameNorm][year][slotKey] || rank < data[clubNameNorm][year][slotKey].rank) {
+            data[clubNameNorm][year][slotKey] = { 
+              rank, 
+              compName: season.competitionName,
+              isAccess,
+              isRelegation
+            }
+          }
+          
+          clubsSet.add(clubNameNorm)
+          seasonsSet.add(year)
       }
     })
+
+    // NOVO: Coleta detalhada do Mundial (Top 4) - Fora do loop da tabela
+    if (season.mundial) {
+        const m = season.mundial;
+        const normComp = normalize(season.competitionName);
+        if (normComp.includes('mundial de clubes')) {
+            const processMundialPos = (teamRaw, pRank) => {
+                if (!teamRaw) return;
+                const tNorm = normalize(teamRaw);
+                if (countryClubsNamesNormalized.includes(tNorm)) {
+                    if (!data[tNorm]) {
+                        data[tNorm] = {};
+                        const originalClub = CLUBS_DATA.find(c => normalize(c.nome) === tNorm);
+                        clubNameMap[tNorm] = originalClub ? originalClub.nome : teamRaw;
+                    }
+                    if (!data[tNorm][year]) data[tNorm][year] = {};
+                    data[tNorm][year]['intl_Mundial de Clubes'] = { 
+                        rank: pRank, 
+                        compName: 'Mundial de Clubes' 
+                    };
+                    clubsSet.add(tNorm);
+                    seasonsSet.add(year);
+                }
+            };
+
+            // Campeão (A partir do campo season.campeao que é preenchido pelo watcher do mundial)
+            if (season.campeao) processMundialPos(season.campeao, 1);
+
+            // Vice (Finalista perdedor)
+            let vice = null;
+            if (m.final && m.final.time1 && m.final.time2) {
+                const p1 = Number(m.final.placar1) || 0;
+                const p2 = Number(m.final.placar2) || 0;
+                const pn1 = Number(m.final.pen1) || 0;
+                const pn2 = Number(m.final.pen2) || 0;
+
+                if (p1 > p2 || (p1 === p2 && pn1 > pn2)) vice = m.final.time2;
+                else if (p2 > p1 || (p2 === p1 && pn2 > pn1)) vice = m.final.time1;
+            }
+            if (vice) processMundialPos(vice, 2);
+
+            // 3º e 4º
+            let terceiro = null, quarto = null;
+            if (m.terceiro && m.terceiro.time1 && m.terceiro.time2) {
+                const p1 = Number(m.terceiro.placar1) || 0;
+                const p2 = Number(m.terceiro.placar2) || 0;
+                const pn1 = Number(m.terceiro.pen1) || 0;
+                const pn2 = Number(m.terceiro.pen2) || 0;
+
+                if (p1 > p2 || (p1 === p2 && pn1 > pn2)) {
+                    terceiro = m.terceiro.time1; quarto = m.terceiro.time2;
+                } else if (p2 > p1 || (p2 === p1 && pn2 > pn1)) {
+                    terceiro = m.terceiro.time2; quarto = m.terceiro.time1;
+                }
+            }
+            if (terceiro) processMundialPos(terceiro, 3);
+            if (quarto) processMundialPos(quarto, 4);
+        }
+    }
   })
 
   // Ordenação de temporadas
@@ -465,6 +536,7 @@ const getRankFromExtra = (extra) => {
     if (e === 'OITAVAS' || e === 'OITAVAS DE FINAL') return 16;
     if (e.includes('FASE DE GRUPOS') || e === 'GRUPOS') return 32;
     if (e.includes('PRÉ') || e.includes('PRE')) return 64;
+    if (e.includes('16 AVOS')) return 24;
     return 999;
 }
 
@@ -507,10 +579,13 @@ const getCellExpertStyle = (club, season, slot) => {
   if (slot.type === 'intl') {
     if (rank === 1) classes.push('expert-gold-bg', 'neon-border-gold')
     else if (rank === 2) classes.push('expert-silver-bg', 'neon-border-silver')
-    else if (rank === 4) classes.push('expert-bronze-intl-grad')
+    else if (rank === 3) classes.push('expert-bronze-intl-grad')
+    else if (rank === 4) classes.push('expert-neutral-bg', 'opacity-75')
+    else if (rank === 4) classes.push('expert-bronze-intl-grad', 'opacity-50') // Fallback visual
     else if (rank === 8) classes.push('expert-green-intl-grad')
     else if (rank === 16) classes.push('expert-cyan-intl-grad')
-    else if (rank === 32) classes.push('expert-blue-intl-grad')
+    else if (rank === 24) classes.push('expert-blue-intl-grad')
+    else if (rank === 32) classes.push('expert-red-light-intl-grad')
     else if (rank === 64) classes.push('expert-red-intl-grad')
     else classes.push('expert-neutral-bg')
   }
@@ -552,9 +627,12 @@ const getRank = (club, season, slot) => {
   if (slot.type === 'intl') {
     if (rank === 1) return '🏆 CAMPEÃO'
     if (rank === 2) return '🥈 VICE'
-    if (rank === 4) return 'SEMIFINAL'
+    if (rank === 3) return '🥉 3º LUGAR'
+    if (rank === 4) return '4º LUGAR'
+    if (rank === 4) return 'SEMIFINAL' // Compatibilidade com outras comps
     if (rank === 8) return 'QUARTAS'
     if (rank === 16) return 'OITAVAS'
+    if (rank === 24) return '16 AVOS'
     if (rank === 32) return 'GRUPOS'
     if (rank === 64) return 'PRÉ-LIBERTA'
     return rank + 'º'
@@ -821,13 +899,31 @@ thead th {
 
 .expert-blue-intl-grad { 
   background: linear-gradient(135deg, #0056b3 0%, #003366 100%) !important; 
-  color: #000 !important; 
+  color: #fff !important; 
   font-weight: 900 !important;
+}
+
+.expert-blue-intl-grad-v2 { 
+  background: linear-gradient(135deg, #003366 0%, #001a33 100%) !important; 
+  color: #fff !important; 
+  font-weight: 800 !important;
+}
+
+.expert-cyan-intl-grad { 
+  background: linear-gradient(135deg, #00f2ff 0%, #00a8b3 100%) !important; 
+  color: #000 !important; 
+  font-weight: 950 !important;
+}
+
+.expert-red-light-intl-grad { 
+  background: linear-gradient(135deg, #ff8a8a 0%, #ff6e6e 100%) !important; 
+  color: #fff !important; 
+  font-weight: 800 !important;
 }
 
 .expert-red-intl-grad { 
   background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%) !important; /* Carmesim */
-  color: #000 !important; 
+  color: #fff !important; 
   font-weight: 950 !important;
 }
 
