@@ -6,26 +6,30 @@ export const dataSearchService = {
     /**
      * Busca um clube pelo nome.
      */
-    findClub(name) {
+    findClub(name, exactOnly = false) {
         if (!name) return null;
         const search = normalizeString(name);
         const list = clubStore.list.length > 0 ? clubStore.list : [];
 
-        return list.find(c => normalizeString(c.nome) === search) ||
-            list.find(c => normalizeString(c.nome).includes(search));
+        const exactMatch = list.find(c => normalizeString(c.nome) === search);
+        if (exactMatch || exactOnly) return exactMatch;
+
+        return list.find(c => normalizeString(c.nome).includes(search));
     },
 
     /**
      * Busca uma seleção pelo nome.
      */
-    findNationalTeam(name) {
+    findNationalTeam(name, exactOnly = false) {
         if (!name) return null;
         const search = normalizeString(name);
 
-        // Tenta busca pelo nome ou pelo país (se for seleção, o país pode estar vazio nos dados)
-        return NATIONAL_TEAMS_DATA.find(n => normalizeString(n.nome) === search) ||
-            NATIONAL_TEAMS_DATA.find(n => normalizeString(n.nome).includes(search)) ||
+        const exactMatch = NATIONAL_TEAMS_DATA.find(n => normalizeString(n.nome) === search) ||
             NATIONAL_TEAMS_DATA.find(n => normalizeString(n.pais) === search);
+
+        if (exactMatch || exactOnly) return exactMatch;
+
+        return NATIONAL_TEAMS_DATA.find(n => normalizeString(n.nome).includes(search));
     },
 
     /**
@@ -50,7 +54,19 @@ export const dataSearchService = {
     /**
      * Busca automática (Clube ou Seleção).
      */
-    search(name) {
+    search(name, type = null) {
+        if (type === 'selecao') return this.findNationalTeam(name);
+        if (type === 'clube') return this.findClub(name);
+
+        // Prioridade 1: Match exato em clubes
+        const exactClub = this.findClub(name, true);
+        if (exactClub) return exactClub;
+
+        // Prioridade 2: Match exato em seleções
+        const exactNational = this.findNationalTeam(name, true);
+        if (exactNational) return exactNational;
+
+        // Prioridade 3: Match parcial
         return this.findClub(name) || this.findNationalTeam(name);
     }
 };

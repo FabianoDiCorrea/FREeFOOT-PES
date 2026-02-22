@@ -113,57 +113,12 @@
 
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
-import { seasonService } from '../services/season.service'
-import { ALL_COMPETITIONS_DATA as RAW_DATA } from '../services/competitions.data' 
-import { FEDERATIONS_DATA } from '../services/federations.data'
-import { NATIONAL_TEAMS_DATA } from '../data/nationalTeams.data'
-import { seasonStore } from '../services/season.store'
-import { INTERNATIONAL_DATA } from '../data/internationalCompetitions'
-import { awardsStore } from '../services/awards.store'
-import { rankingsStore } from '../services/rankings.store'
-import NationalFlag from '../components/NationalFlag.vue'
-import TeamShield from '../components/TeamShield.vue'
-import { normalizeYearStrict } from '../services/utils'
-
-const router = useRouter()
-const loading = ref(true)
-const activeTab = ref('americas')
-const seasons = ref([])
-const availableYears = ref([])
-const allCompetitions = ref([])
-const expandedYears = ref({}) // Controle do acordeão
-
-
-
-const expandYear = (y) => {
-    if (!y) return y;
-    let s = y.toString().trim();
-    if (s.length === 2) {
-        const val = parseInt(s);
-        return val > 50 ? `19${s}` : `20${s}`;
-    }
-    return s;
-}
-
-const normalizeYear = (y) => normalizeYearStrict(y);
-
-const toggleYear = (year) => {
-    expandedYears.value[year] = !expandedYears.value[year]
-}
-
-const goBack = () => {
-    router.push('/universo?reset=true')
-}
-
-onMounted(async () => {
+const loadAllData = async () => {
     loading.value = true
     // SEMPRE carrega tudo para o checklist para evitar instabilidade do store filtrado
     seasons.value = await seasonService.getAll()
     
     // Flatten Competitions Data
-
     const flat = []
     RAW_DATA.forEach(region => {
         // Add country competitions
@@ -173,7 +128,6 @@ onMounted(async () => {
             }
         })
         // As continentais que vêm do RAW_DATA geralmente já existem no INTERNATIONAL_DATA
-        // Para evitar duplicados como "Copa Libertadores" e "Libertadores", vamos filtrar
         if (region.continentais) {
             region.continentais.forEach(c => {
                 const isDuplicate = INTERNATIONAL_DATA.some(intComp => 
@@ -187,10 +141,10 @@ onMounted(async () => {
         }
     })
 
-    // Adicionar Competições Internacionais (Libertadores, Sulamericana, etc.)
+    // Adicionar Competições Internacionais
     flat.push(...INTERNATIONAL_DATA)
 
-    // Itens Especiais de Controle (FIFA / Globais) - Sincronizado com IndividualAwardsHistory.vue
+    // Itens Especiais de Controle
     const awardsData = [
         { id: 'aw-1', nome: 'Melhor do Mundo', trofeu: '/src/assets/trofeus/individuais/melhor_do_mundo.png' },
         { id: 'aw-2', nome: 'Melhor do Mundo (Técnico)', trofeu: '/src/assets/trofeus/individuais/melhor_tecnico_mundo.png' },
@@ -221,15 +175,19 @@ onMounted(async () => {
     const yearsSet = new Set(seasons.value.map(s => normalizeYear(s.ano)))
     availableYears.value = Array.from(yearsSet).sort((a, b) => b.localeCompare(a))
     
-    // Carregar outros dados necessários para o checklist
+    // Carregar outros dados necessários
     await awardsStore.loadAll()
     await rankingsStore.loadAll()
 
     loading.value = false
-})
+}
 
-// O watch foi removido porque o checklist deve manter a lista completa carregada no onMounted.
-// Se seasonStore.list for filtrado por outra tela, ele sobrescreveria erroneamente os dados aqui.
+import { onActivated } from 'vue'
+
+onMounted(loadAllData)
+onActivated(loadAllData)
+
+watch(() => seasonStore.list, loadAllData, { deep: true })
 
 // Filtra anos com base na aba ativa (Agora simplificado, pois o formato é unificado)
 const sortedYears = computed(() => {

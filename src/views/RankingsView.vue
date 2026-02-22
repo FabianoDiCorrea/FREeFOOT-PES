@@ -82,7 +82,7 @@
                                   </div>
                                </td>
                                <td>
-                                  <TeamShield :teamName="item.teamName" :size="45" borderless class="shield-hover" />
+                                  <TeamShield :teamName="item.teamName" :isNational="activeTab === 'selecoes'" :size="45" borderless class="shield-hover" />
                                </td>
                                <td>
                                   <div class="fw-black text-uppercase ls-1 fs-5 d-flex align-items-center gap-3">
@@ -122,7 +122,7 @@
                                   </div>
                                </td>
                                <td>
-                                  <TeamShield :teamName="group.myTeam.teamName" :size="45" borderless class="shield-hover" />
+                                  <TeamShield :teamName="group.myTeam.teamName" :isNational="activeTab === 'selecoes'" :size="45" borderless class="shield-hover" />
                                </td>
                                <td>
                                   <div class="fw-black text-uppercase ls-1 fs-5 text-warning d-flex align-items-center gap-3">
@@ -148,14 +148,24 @@
                 <!-- COLUNA PAÍSES (REPRESENTAÇÃO) -->
                 <div class="col-lg-4">
                    <div class="table-side-container p-3">
-                      <h5 class="fw-black text-warning text-uppercase mb-3 ls-1 x-small border-bottom border-warning border-opacity-25 pb-2">RANK DE PAÍSES (TOP 16)</h5>
+                      <h5 class="fw-black text-warning text-uppercase mb-3 ls-1 x-small border-bottom border-warning border-opacity-25 pb-2">
+                        {{ activeTab === 'clubes' ? 'RANK DE PAÍSES (TOP 16)' : 'RANK DE FEDERAÇÕES (TOP 16)' }}
+                      </h5>
                       <div class="d-flex flex-column gap-2">
-                         <div v-for="(p, idx) in calculateCountryStats(group.ranking)" :key="p.country" 
+                         <div v-for="(p, idx) in calculateSidebarStats(group.ranking)" :key="p.name" 
                               class="country-stat-row d-flex align-items-center justify-content-between p-2 rounded-2">
                             <div class="d-flex align-items-center gap-3">
                                <span class="fw-bold text-secondary small" style="width: 20px;">{{ idx + 1 }}º</span>
-                               <NationalFlag :countryName="p.country" :size="30" class="rounded-circle shadow-sm" />
-                               <span class="fw-bold text-uppercase small ls-1 truncate-country">{{ p.country }}</span>
+                               
+                               <template v-if="activeTab === 'clubes'">
+                                 <NationalFlag :countryName="p.name" :size="30" class="rounded-circle shadow-sm" />
+                               </template>
+                               <template v-else>
+                                 <img v-if="p.logo" :src="p.logo" class="federation-logo-sidebar" />
+                                 <i v-else class="bi bi-globe-americas text-secondary fs-4"></i>
+                               </template>
+
+                               <span class="fw-bold text-uppercase small ls-1 truncate-country">{{ p.name }}</span>
                             </div>
                             <span class="badge bg-warning text-dark fw-black fs-6">{{ p.count }}</span>
                          </div>
@@ -252,6 +262,7 @@ import { dataSearchService } from '../services/dataSearch.service'
 import LogoFREeFOOT from '../components/LogoFREeFOOT.vue'
 import TeamShield from '../components/TeamShield.vue'
 import NationalFlag from '../components/NationalFlag.vue'
+import { FEDERATIONS_DATA } from '../services/federations.data'
 
 const activeTab = ref('clubes')
 const expandedSeasons = ref({})
@@ -287,16 +298,49 @@ const sortedRankings = computed(() => {
     const norm = (n) => n?.toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
 
     const rankingWithEvo = r.ranking.map(item => {
+      // Enriquecimento de federação para dados legados (Seleções)
+      let fedLogo = item.federationLogo
+      let fedName = item.federationName
+      
+      if (r.type === 'selecoes' && (!fedLogo || !fedName)) {
+          const found = dataSearchService.findNationalTeam(item.teamName)
+          if (found) {
+              fedLogo = fedLogo || found.federacao_logo || found.continente || ''
+              if (!fedName) {
+                  const fedEntry = Object.values(FEDERATIONS_DATA).find(f => f.logo === fedLogo)
+                  fedName = fedEntry ? fedEntry.nome : ''
+              }
+          }
+      }
+
       const prevItem = prev?.ranking.find(p => norm(p.teamName) === norm(item.teamName))
       if (prevItem) {
-        return { ...item, evolution: prevItem.position - item.position, isNew: false }
+        return { 
+          ...item, 
+          federationLogo: fedLogo, 
+          federationName: fedName, 
+          evolution: prevItem.position - item.position, 
+          isNew: false 
+        }
       }
       // Se não achou no ranking principal, tenta achar no MyTeam da temporada anterior
       const prevMyTeam = prev?.myTeam
       if (prevMyTeam && norm(prevMyTeam.teamName) === norm(item.teamName)) {
-         return { ...item, evolution: prevMyTeam.position - item.position, isNew: false }
+         return { 
+           ...item, 
+           federationLogo: fedLogo, 
+           federationName: fedName, 
+           evolution: prevMyTeam.position - item.position, 
+           isNew: false 
+         }
       }
-      return { ...item, evolution: 0, isNew: true }
+      return { 
+        ...item, 
+        federationLogo: fedLogo, 
+        federationName: fedName, 
+        evolution: 0, 
+        isNew: true 
+      }
     })
 
     // Calcular evolução para o MyTeam
@@ -396,25 +440,46 @@ const saveRanking = async () => {
   for (let i = 0; i < lines.length; i++) {
     // Extrair apenas o nome, removendo numeração de início e qualquer "- País" ou "|" do final se houver
     const rawName = lines[i].replace(/^\d+[\s.]+|[-|]+.*$/g, '').trim()
-    const found = dataSearchService.search(rawName)
+    const found = dataSearchService.search(rawName, activeTab.value === 'selecoes' ? 'selecao' : 'clube')
     
+    let fedLogo = found?.escudo_url || found?.federacao_logo || ''
+    let fedName = ''
+
+    if (activeTab.value === 'selecoes' && found) {
+        fedLogo = found.federacao_logo || found.continente || ''
+        // Tenta encontrar o nome da federação pelo logo
+        const fedEntry = Object.values(FEDERATIONS_DATA).find(f => f.logo === fedLogo)
+        fedName = fedEntry ? fedEntry.nome : ''
+    }
+
     parsedRanking.push({
       position: i + 1,
       teamName: found?.nome || rawName,
       teamId: found?.id || null,
       country: found?.pais || found?.nome || '',
-      federationLogo: found?.federacao_logo || ''
+      federationLogo: fedLogo,
+      federationName: fedName
     })
   }
 
   let myTeam = null
   if (form.value.myTeamName) {
     const fMy = dataSearchService.search(form.value.myTeamName)
+    let myFedLogo = fMy?.federacao_logo || ''
+    let myFedName = ''
+
+    if (activeTab.value === 'selecoes' && fMy) {
+        myFedLogo = fMy.federacao_logo || fMy.continente || ''
+        const fedEntry = Object.values(FEDERATIONS_DATA).find(f => f.logo === myFedLogo)
+        myFedName = fedEntry ? fedEntry.nome : ''
+    }
+
     myTeam = {
       position: form.value.myTeamPos,
       teamName: fMy?.nome || form.value.myTeamName,
       country: fMy?.pais || fMy?.nome || '',
-      federationLogo: fMy?.federacao_logo || ''
+      federationLogo: myFedLogo,
+      federationName: myFedName
     }
   }
 
@@ -440,17 +505,25 @@ const confirmDelete = async (season) => {
   }
 }
 
-const calculateCountryStats = (ranking) => {
+const calculateSidebarStats = (ranking) => {
   const stats = {}
-  ranking.forEach(item => {
-    if (!item.country) return
-    if (!stats[item.country]) stats[item.country] = 0
-    stats[item.country]++
-  })
-
-  return Object.entries(stats)
-    .map(([country, count]) => ({ country, count }))
-    .sort((a, b) => b.count - a.count)
+  
+  if (activeTab.value === 'clubes') {
+      ranking.forEach(item => {
+        if (!item.country) return
+        if (!stats[item.country]) stats[item.country] = { name: item.country, count: 0 }
+        stats[item.country].count++
+      })
+      return Object.values(stats).sort((a, b) => b.count - a.count)
+  } else {
+      // Para seleções, agrupar por federação
+      ranking.forEach(item => {
+        const key = item.federationName || 'Outros'
+        if (!stats[key]) stats[key] = { name: key, count: 0, logo: item.federationLogo }
+        stats[key].count++
+      })
+      return Object.values(stats).sort((a, b) => b.count - a.count)
+  }
 }
 </script>
 
@@ -577,6 +650,12 @@ const calculateCountryStats = (ranking) => {
   width: 35px;
   object-fit: contain;
   filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
+}
+
+.federation-logo-sidebar {
+  height: 24px;
+  width: 24px;
+  object-fit: contain;
 }
 
 .modal-overlay {

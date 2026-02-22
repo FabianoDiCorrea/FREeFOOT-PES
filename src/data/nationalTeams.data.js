@@ -17,7 +17,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2GbdT.png",
     "bandeira_url": "https://a.imagem.app/o2HrFa.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 3,
@@ -27,7 +27,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2G3b3.png",
     "bandeira_url": "https://a.imagem.app/o2HwQ9.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 4,
@@ -37,7 +37,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2GB1Z.png",
     "bandeira_url": "https://a.imagem.app/o2HCpk.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 5,
@@ -47,7 +47,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2GGui.png",
     "bandeira_url": "https://a.imagem.app/o2HtKV.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 6,
@@ -57,7 +57,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2GHN8.png",
     "bandeira_url": "https://a.imagem.app/o2HuCJ.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 7,
@@ -67,7 +67,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2GhYE.png",
     "bandeira_url": "https://a.imagem.app/o2HEfG.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 8,
@@ -77,7 +77,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2Gkce.png",
     "bandeira_url": "https://a.imagem.app/o2HQzm.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 9,
@@ -87,7 +87,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2Gz4N.png",
     "bandeira_url": "https://a.imagem.app/o2HRlX.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 10,
@@ -97,7 +97,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2G7SC.png",
     "bandeira_url": "https://a.imagem.app/o2HZMb.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 11,
@@ -107,7 +107,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2GYqY.png",
     "bandeira_url": "https://a.imagem.app/o2HmBQ.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 12,
@@ -117,7 +117,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2Gnda.png",
     "bandeira_url": "https://a.imagem.app/o2HgX1.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 13,
@@ -127,7 +127,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2GKb9.png",
     "bandeira_url": "https://a.imagem.app/o2HvQW.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 14,
@@ -137,7 +137,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2Ge6k.png",
     "bandeira_url": "https://a.imagem.app/o2HMpt.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 15,
@@ -147,7 +147,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2GsuV.png",
     "bandeira_url": "https://a.imagem.app/o2H4e0.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 16,
@@ -157,7 +157,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2G1NJ.png",
     "bandeira_url": "https://a.imagem.app/o2HPCy.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 17,
@@ -167,7 +167,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2GinG.png",
     "bandeira_url": "https://a.imagem.app/o2HUfr.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 18,
@@ -177,7 +177,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2GFcm.png",
     "bandeira_url": "https://a.imagem.app/o2Hf22.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 19,
@@ -187,7 +187,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2GXPX.png",
     "bandeira_url": "https://a.imagem.app/o2HylP.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 20,
@@ -197,7 +197,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2GThb.png",
     "bandeira_url": "https://a.imagem.app/o2HDMl.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 21,
@@ -207,7 +207,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2GqqQ.png",
     "bandeira_url": "https://a.imagem.app/o2HOGS.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 22,
@@ -217,7 +217,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/BhGc92.png",
     "bandeira_url": "https://a.imagem.app/BhGrVP.webp",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 23,
@@ -227,7 +227,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2GlbW.png",
     "bandeira_url": "https://a.imagem.app/o2HpRT.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 24,
@@ -237,7 +237,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2G56t.png",
     "bandeira_url": "https://a.imagem.app/o2SA83.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 25,
@@ -247,7 +247,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2G9E0.png",
     "bandeira_url": "https://a.imagem.app/o2SbeZ.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 26,
@@ -257,7 +257,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2GcNy.png",
     "bandeira_url": "https://a.imagem.app/o2SoLi.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 27,
@@ -267,7 +267,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2Gwnr.png",
     "bandeira_url": "https://a.imagem.app/o2S3y8.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 28,
@@ -277,7 +277,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2GCr2.png",
     "bandeira_url": "https://a.imagem.app/o2SG2E.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 29,
@@ -287,7 +287,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2GLPP.png",
     "bandeira_url": "https://a.imagem.app/o2SH5e.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 30,
@@ -297,7 +297,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2Guhl.png",
     "bandeira_url": "https://a.imagem.app/o2SSMN.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 31,
@@ -307,7 +307,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2GEJS.png",
     "bandeira_url": "https://a.imagem.app/o2SkGC.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 32,
@@ -317,7 +317,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2GImv.png",
     "bandeira_url": "https://a.imagem.app/o2SzxY.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 33,
@@ -327,7 +327,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2GRoT.png",
     "bandeira_url": "https://a.imagem.app/o2S2Ra.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 34,
@@ -337,7 +337,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2GZi3.png",
     "bandeira_url": "https://a.imagem.app/o2SY89.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 35,
@@ -347,7 +347,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2GdEZ.png",
     "bandeira_url": "https://a.imagem.app/o2Snsk.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 36,
@@ -357,7 +357,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/BhGJst.png",
     "bandeira_url": "https://a.imagem.app/BhGjt0.webp",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76yUr.png"
   },
   {
     "id": 37,
@@ -377,7 +377,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2Sfuk.png",
     "bandeira_url": "https://a.imagem.app/o2SRDi.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76ggb.png"
   },
   {
     "id": 39,
@@ -387,7 +387,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2SyDV.png",
     "bandeira_url": "https://a.imagem.app/o2SQtZ.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76ggb.png"
   },
   {
     "id": 40,
@@ -397,7 +397,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2SNYJ.png",
     "bandeira_url": "https://a.imagem.app/o2SdY8.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76ggb.png"
   },
   {
     "id": 41,
@@ -407,7 +407,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2SOcG.png",
     "bandeira_url": "https://a.imagem.app/o2Sm9E.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76ggb.png"
   },
   {
     "id": 42,
@@ -417,7 +417,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2SW4m.png",
     "bandeira_url": "https://a.imagem.app/o2Sg4e.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76ggb.png"
   },
   {
     "id": 43,
@@ -427,7 +427,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2h8SX.png",
     "bandeira_url": "https://a.imagem.app/o2SMHN.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76ggb.png"
   },
   {
     "id": 44,
@@ -437,7 +437,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2hAqb.png",
     "bandeira_url": "https://a.imagem.app/o2SVTC.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76ggb.png"
   },
   {
     "id": 45,
@@ -447,7 +447,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2hGut.png",
     "bandeira_url": "https://a.imagem.app/o2S4dY.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76ggb.png"
   },
   {
     "id": 46,
@@ -457,7 +457,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2hbdQ.png",
     "bandeira_url": "https://a.imagem.app/o2SUAa.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76ggb.png"
   },
   {
     "id": 47,
@@ -467,7 +467,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2h3b1.png",
     "bandeira_url": "https://a.imagem.app/o2Sa19.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76ggb.png"
   },
   {
     "id": 48,
@@ -487,7 +487,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2hini.png",
     "bandeira_url": "https://a.imagem.app/o2hYql.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76POt.png"
   },
   {
     "id": 50,
@@ -497,7 +497,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2hFr8.png",
     "bandeira_url": "https://a.imagem.app/o2hnmS.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76POt.png"
   },
   {
     "id": 51,
@@ -507,7 +507,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2hXPE.png",
     "bandeira_url": "https://a.imagem.app/o2hKbv.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76POt.png"
   },
   {
     "id": 52,
@@ -517,7 +517,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2hThe.png",
     "bandeira_url": "https://a.imagem.app/o2he6T.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76POt.png"
   },
   {
     "id": 53,
@@ -527,7 +527,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2hqqN.png",
     "bandeira_url": "https://a.imagem.app/o2hsE3.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76POt.png"
   },
   {
     "id": 54,
@@ -537,7 +537,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2hJmC.png",
     "bandeira_url": "https://a.imagem.app/o2h1NZ.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76POt.png"
   },
   {
     "id": 55,
@@ -547,7 +547,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/BhGdY8.png",
     "bandeira_url": "https://a.imagem.app/BhGRDi.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76POt.png"
   },
   {
     "id": 56,
@@ -557,7 +557,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/BhGI13.png",
     "bandeira_url": "https://a.imagem.app/BhGQtZ.webp",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76POt.png"
   },
   {
     "id": 57,
@@ -577,7 +577,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2h9E9.png",
     "bandeira_url": "https://a.imagem.app/o2hPk2.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76a00.webp"
   },
   {
     "id": 59,
@@ -587,7 +587,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2hcOk.png",
     "bandeira_url": "https://a.imagem.app/o2hVUr.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76a00.webp"
   },
   {
     "id": 60,
@@ -597,7 +597,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2hwnV.png",
     "bandeira_url": "https://a.imagem.app/o2hUJP.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76a00.webp"
   },
   {
     "id": 61,
@@ -607,7 +607,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2hCrJ.png",
     "bandeira_url": "https://a.imagem.app/o2hagl.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76a00.webp"
   },
   {
     "id": 62,
@@ -617,7 +617,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2hLUG.png",
     "bandeira_url": "https://a.imagem.app/o2hy3S.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76a00.webp"
   },
   {
     "id": 63,
@@ -627,7 +627,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2huhm.png",
     "bandeira_url": "https://a.imagem.app/o2hDiv.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76a00.webp"
   },
   {
     "id": 64,
@@ -637,7 +637,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2hEJX.png",
     "bandeira_url": "https://a.imagem.app/o2hNIT.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76a00.webp"
   },
   {
     "id": 65,
@@ -647,7 +647,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2hIgb.png",
     "bandeira_url": "https://a.imagem.app/o2hOW3.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76a00.webp"
   },
   {
     "id": 66,
@@ -657,7 +657,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2hRoQ.png",
     "bandeira_url": "https://a.imagem.app/o2hp0Z.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76a00.webp"
   },
   {
     "id": 67,
@@ -667,7 +667,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2hZi1.png",
     "bandeira_url": "https://a.imagem.app/o2k8wi.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76a00.webp"
   },
   {
     "id": 68,
@@ -677,7 +677,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/BhGg4e.png",
     "bandeira_url": "https://a.imagem.app/BhGm9E.webp",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76a00.webp"
   },
   {
     "id": 69,
@@ -687,7 +687,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/BhGVTC.png",
     "bandeira_url": "https://a.imagem.app/BhGMHN.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76a00.webp"
   },
   {
     "id": 70,
@@ -707,7 +707,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2kte3.png",
     "bandeira_url": "https://a.imagem.app/o2z2ZS.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76MoQ.png"
   },
   {
     "id": 72,
@@ -717,7 +717,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2kCpT.png",
     "bandeira_url": "https://a.imagem.app/o2zzxl.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76MoQ.png"
   },
   {
     "id": 73,
@@ -727,7 +727,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2kuCZ.png",
     "bandeira_url": "https://a.imagem.app/o2zY8v.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76MoQ.png"
   },
   {
     "id": 74,
@@ -737,7 +737,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2kEfi.png",
     "bandeira_url": "https://a.imagem.app/o2znsT.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76MoQ.png"
   },
   {
     "id": 75,
@@ -747,7 +747,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2kQ28.png",
     "bandeira_url": "https://a.imagem.app/o2z0t3.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76MoQ.png"
   },
   {
     "id": 76,
@@ -757,7 +757,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2kRlE.png",
     "bandeira_url": "https://a.imagem.app/o2zKyZ.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76MoQ.png"
   },
   {
     "id": 77,
@@ -767,7 +767,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2kZMe.png",
     "bandeira_url": "https://a.imagem.app/o2zs7i.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76MoQ.png"
   },
   {
     "id": 78,
@@ -777,7 +777,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2kmBN.png",
     "bandeira_url": "https://a.imagem.app/o2z198.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76MoQ.png"
   },
   {
     "id": 79,
@@ -787,7 +787,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2kgXC.png",
     "bandeira_url": "https://a.imagem.app/o2z6VE.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76MoQ.png"
   },
   {
     "id": 80,
@@ -797,7 +797,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2kvRY.png",
     "bandeira_url": "https://a.imagem.app/o2zFHe.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76MoQ.png"
   },
   {
     "id": 81,
@@ -807,7 +807,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2kMpa.png",
     "bandeira_url": "https://a.imagem.app/o2zXxN.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76MoQ.png"
   },
   {
     "id": 82,
@@ -817,7 +817,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2k4e9.png",
     "bandeira_url": "https://a.imagem.app/o2zxZC.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76MoQ.png"
   },
   {
     "id": 83,
@@ -827,7 +827,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2kPLk.png",
     "bandeira_url": "https://a.imagem.app/o2zqAY.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76MoQ.png"
   },
   {
     "id": 84,
@@ -837,7 +837,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2kUfV.png",
     "bandeira_url": "https://a.imagem.app/o2zJsa.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76MoQ.png"
   },
   {
     "id": 85,
@@ -847,7 +847,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2kf2J.png",
     "bandeira_url": "https://a.imagem.app/o2zjt9.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76MoQ.png"
   },
   {
     "id": 86,
@@ -857,7 +857,7 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2ky5G.png",
     "bandeira_url": "https://a.imagem.app/o2zlDk.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76MoQ.png"
   },
   {
     "id": 87,
@@ -867,6 +867,6 @@ export const NATIONAL_TEAMS_DATA = [
     "escudo_url": "https://a.imagem.app/o2kDMm.png",
     "bandeira_url": "https://a.imagem.app/o2z97V.png",
     "logo_continente": "",
-    "federacao_logo": ""
+    "federacao_logo": "https://a.imagem.app/B76MoQ.png"
   }
 ];

@@ -119,7 +119,7 @@
                       <td class="fw-bold fs-5 text-nowrap">{{ s.ano }}</td>
                       <td class="text-nowrap">
                         <div class="d-flex align-items-center gap-2">
-                          <TeamShield :teamName="s.campeao" :size="36" :season="s.ano" />
+                          <TeamShield :teamName="s.campeao" :isNational="activeTab === 'selecoes'" :size="36" :season="s.ano" />
                           <div class="d-flex flex-column">
                             <div class="d-flex align-items-center gap-1 no-wrap">
                               <span class="fw-bold text-uppercase name-cell">{{ s.campeao }}</span>
@@ -161,7 +161,7 @@
                       </td>
                       <td class="text-nowrap">
                         <div class="d-flex align-items-center gap-2">
-                          <TeamShield :teamName="s.vice" :size="28" :season="s.ano" />
+                          <TeamShield :teamName="s.vice" :isNational="activeTab === 'selecoes'" :size="28" :season="s.ano" />
                           <div class="d-flex flex-column">
                             <div class="d-flex align-items-center gap-1 no-wrap">
                               <span class="small text-uppercase name-cell-vice">{{ s.vice || '-' }}</span>
@@ -618,7 +618,7 @@
                     <input type="text" v-model="newSeason.campeao" 
                            @focus="showTeamResults.campeao = true"
                            class="form-control game-input" placeholder="Buscar time...">
-                    <TeamShield :teamName="newSeason.campeao" :size="48" />
+                    <TeamShield :teamName="newSeason.campeao" :isNational="activeTab === 'selecoes'" :size="48" />
                   </div>
                   <!-- Dropdown de Busca -->
                   <div v-if="showTeamResults.campeao && filteredTeams(newSeason.campeao).length > 0" class="team-search-dropdown shadow-lg">
@@ -644,7 +644,7 @@
                     <input type="text" v-model="newSeason.vice" 
                            @focus="showTeamResults.vice = true"
                            class="form-control game-input" placeholder="Buscar time...">
-                    <TeamShield :teamName="newSeason.vice" :size="48" />
+                    <TeamShield :teamName="newSeason.vice" :isNational="activeTab === 'selecoes'" :size="48" />
                   </div>
                   <!-- Dropdown de Busca -->
                   <div v-if="showTeamResults.vice && filteredTeams(newSeason.vice).length > 0" class="team-search-dropdown shadow-lg">
@@ -680,7 +680,7 @@
                     <div v-for="t in filteredTeams(teamSearchQuery.participantes)" :key="t.nome" 
                          @click="selectTeam('participantes', t.nome)"
                          class="team-search-item">
-                      <TeamShield :teamName="t.nome" :size="24" />
+                      <TeamShield :teamName="t.nome" :isNational="activeTab === 'selecoes'" :size="24" />
                       <span class="fw-bold">{{ t.nome }}</span>
                       <small class="ms-auto opacity-50">{{ t.pais }}</small>
                     </div>
@@ -706,7 +706,7 @@
               <div class="participant-list-compact-grid">
                 <div v-for="(p, idx) in newSeason.participantes" :key="p.clubeId" class="participant-item-card">
                    <div class="d-flex align-items-center gap-2">
-                     <TeamShield :teamName="p.nome" :size="20" borderless />
+                     <TeamShield :teamName="p.nome" :isNational="activeTab === 'selecoes'" :size="20" borderless />
                      <div class="flex-grow-1 min-w-0">
                        <div class="fw-bold text-uppercase x-small text-truncate">{{ p.nome }}</div>
                        <div class="x-small opacity-50 text-uppercase" style="font-size: 0.6rem;">{{ p.pais }}</div>
@@ -827,7 +827,7 @@
                   <div v-for="t in filteredTeams(scorerForm.clube)" :key="t.nome" 
                        @click="selectTeam('clubeArtilheiro', t.nome)"
                        class="team-search-item">
-                    <TeamShield :teamName="t.nome" :size="20" />
+                    <TeamShield :teamName="t.nome" :isNational="activeTab === 'selecoes'" :size="20" />
                     <span class="fw-bold">{{ t.nome }}</span>
                   </div>
                 </div>
@@ -1070,7 +1070,8 @@ const playerPhotoPreview = ref(null)
 const filteredTeams = (query) => {
   if (!query) return [];
   const q = query.toLowerCase().trim();
-  return CLUBS_DATA.filter(c => c.nome.toLowerCase().includes(q)).slice(0, 10);
+  const source = activeTab.value === 'selecoes' ? NATIONAL_TEAMS_DATA : CLUBS_DATA;
+  return source.filter(c => c.nome.toLowerCase().includes(q)).slice(0, 10);
 }
 
 const updateMundialPositions = (phase, field, value) => {
@@ -1134,7 +1135,8 @@ const addParticipant = (teamName) => {
   const alreadyAdded = newSeason.value.participantes.some(p => p.nome.toLowerCase().trim() === q);
   if (alreadyAdded) return;
 
-  const club = CLUBS_DATA.find(c => c.nome.toLowerCase().trim() === q);
+  const source = activeTab.value === 'selecoes' ? NATIONAL_TEAMS_DATA : CLUBS_DATA;
+  const club = source.find(c => c.nome.toLowerCase().trim() === q);
   
   if (club) {
     const fed = getFederation(club.continente);

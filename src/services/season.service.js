@@ -37,10 +37,11 @@ export const seasonService = {
                 if (sName.includes('brasileirao') || sName.includes('copa do brasil')) sCountry = 'brasil';
                 if (sName.includes('argentina') || sName.includes('primera nacional') || sName.includes('liga profissional')) sCountry = 'argentina';
                 if (sName.includes('inglesa') || sName.includes('premier league') || sName.includes('fa cup')) sCountry = 'inglaterra';
+                if (sName.includes('venezuelana') || sName.includes('venezuela')) sCountry = 'venezuela';
             }
 
             // 1. Validação de País (Agora mais robusta com a inferência)
-            const isInternational = cCountry && ['AMERICA DO SUL', 'EUROPA', 'CONMEBOL', 'UEFA', 'MUNDO', 'INTERNACIONAL'].includes(cCountry.toUpperCase());
+            const isInternational = cCountry && ['AMERICA DO SUL', 'EUROPA', 'CONMEBOL', 'UEFA', 'MUNDO', 'INTERNACIONAL', 'FIFA'].includes(cCountry.toUpperCase());
 
             if (cCountry && sCountry && sCountry !== cCountry && !isInternational) {
                 return false;

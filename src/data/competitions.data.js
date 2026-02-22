@@ -47,6 +47,10 @@ export const SOUTH_AMERICA_COMPETITIONS = [
     { id: 29, nome: "Copa Equador", pais: "Equador", tipo: "Copa", modoRegistro: "mata_mata_simples", logo: "/logos/competitions/copa-equador.png", promovidos: 0, rebaixados: 0, trofeu: 'trofeu-copa-equador' },
     { id: 30, nome: "Supercopa Equador", pais: "Equador", tipo: "Supercopa", modoRegistro: "mata_mata_simples", logo: "/logos/competitions/supercopa-equador.png", promovidos: 0, rebaixados: 0, trofeu: 'trofeu-supercopa-equador' },
 
+    // VENEZUELA
+    { id: 34, nome: "Liga Venezuelana", pais: "Venezuela", tipo: "Liga", modoRegistro: "liga", logo: "/logos/competitions/liga_venezuela.png", promovidos: 0, rebaixados: 1, trofeu: 'trofeu-liga-venezuela' },
+    { id: 35, nome: "Copa Venezuela", pais: "Venezuela", tipo: "Copa", modoRegistro: "mata_mata_simples", logo: "/logos/competitions/copa_venezuela.png", promovidos: 0, rebaixados: 0, trofeu: 'trofeu-copa-venezuela' },
+
     // CONTINENTAIS (Bônus para integridade)
     { id: 31, nome: "Copa Libertadores", pais: "América do Sul", tipo: "Copa", modoRegistro: "participantes", logo: "/logos/competitions/libertadores.png", promovidos: 0, rebaixados: 0, trofeu: 'trofeu-libertadores' },
     { id: 32, nome: "Copa Sul-Americana", pais: "América do Sul", tipo: "Copa", modoRegistro: "participantes", logo: "/logos/competitions/sulamericana.png", promovidos: 0, rebaixados: 0, trofeu: 'trofeu-sulamericana' },

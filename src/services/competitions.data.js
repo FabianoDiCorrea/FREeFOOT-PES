@@ -50,6 +50,11 @@ export const SOUTH_AMERICA_DATA = {
             nome: "Bolívia",
             bandeira: "https://flagcdn.com/w80/bo.png",
             competicoes: SOUTH_AMERICA_COMPETITIONS.filter(c => c.pais === "Bolívia")
+        },
+        {
+            nome: "Venezuela",
+            bandeira: "https://flagcdn.com/w80/ve.png",
+            competicoes: SOUTH_AMERICA_COMPETITIONS.filter(c => c.pais === "Venezuela")
         }
     ],
     continentais: INTERNATIONAL_COMPETITIONS.filter(c => c.pais === "América do Sul")

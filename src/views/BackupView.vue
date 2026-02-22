@@ -26,9 +26,20 @@
       <div class="col-md-4">
         <GamePanel>
           <div class="text-center p-4">
+             <i class="bi bi-calendar-x fs-1 mb-3 text-warning"></i>
+             <h3>LIMPAR TEMPORADAS</h3>
+             <p class="mb-4 opacity-75">Apaga apenas as temporadas registradas e prêmios. Mantém os clubes e configs.</p>
+             <GameButton @click="handleClearSeasons" class="w-100 btn-outline-warning">Limpar Histórico</GameButton>
+          </div>
+        </GamePanel>
+      </div>
+
+      <div class="col-md-4">
+        <GamePanel>
+          <div class="text-center p-4">
             <i class="bi bi-trash fs-1 mb-3 text-danger"></i>
             <h3>HARD RESET</h3>
-            <p class="mb-4 opacity-75">Apaga **todos** os dados. Use apenas se tiver backup!</p>
+            <p class="mb-4 opacity-75">Apaga **todos** os dados (incluindo clubes importados). Use com cautela!</p>
             <GameButton @click="handleClearAll" class="w-100 btn-danger">Zerar Sistema</GameButton>
           </div>
         </GamePanel>
@@ -215,6 +226,21 @@ const handleImport = async (event) => {
     }
   }
   reader.readAsText(file)
+}
+
+const handleClearSeasons = async () => {
+  if (!confirm('Deseja realmente apagar TODAS as temporadas, prêmios e rankings? Isso limpará o checklist para você recomeçar seu ciclo.')) return
+  
+  try {
+    const keysToWipe = ['temporadas', 'individual_awards', 'rankings', 'carreiras']
+    for (const key of keysToWipe) {
+      await db.save(key, [])
+    }
+    alert('Histórico de carreira zerado! Reiniciando...')
+    window.location.reload()
+  } catch (e) {
+    alert('Erro ao limpar dados: ' + e.message)
+  }
 }
 
 const handleClearAll = async () => {

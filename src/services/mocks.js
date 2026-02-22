@@ -4,6 +4,7 @@ export const MOCK_DATA = {
     paises: [
         { nome: "Brasil", bandeira: "https://flagcdn.com/w80/br.png", continente: "América do Sul" },
         { nome: "Argentina", bandeira: "https://flagcdn.com/w80/ar.png", continente: "América do Sul" },
+        { nome: "Venezuela", bandeira: "https://flagcdn.com/w80/ve.png", continente: "América do Sul" },
         { nome: "Inglaterra", bandeira: "https://flagcdn.com/w80/gb-eng.png", continente: "Europa" },
         { nome: "Espanha", bandeira: "https://flagcdn.com/w80/es.png", continente: "Europa" },
         { nome: "Itália", bandeira: "https://flagcdn.com/w80/it.png", continente: "Europa" },

@@ -352,7 +352,7 @@ const loadData = async (compOverride = null) => {
         }
 
         // 1. Bloqueio de País (se ambos definidos e diferentes)
-        const isInternational = targetCountry && ['AMERICA DO SUL', 'EUROPA', 'CONMEBOL', 'UEFA', 'MUNDO', 'INTERNACIONAL'].includes(targetCountry.toUpperCase());
+        const isInternational = targetCountry && ['AMERICA DO SUL', 'EUROPA', 'CONMEBOL', 'UEFA', 'MUNDO', 'INTERNACIONAL', 'FIFA'].includes(targetCountry.toUpperCase());
         if (targetCountry && sCountry && sCountry !== targetCountry && !isInternational) return false;
 
         // 2. Proteção Recopa vs Sul-Americana

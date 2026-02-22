@@ -35,20 +35,23 @@ const props = defineProps({
   borderless: Boolean,
   season: String,
   premium: Boolean, // Ativa o fundo de bandeira desfocada
-  countryName: String // Necessário para o fundo premium
+  countryName: String, // Necessário para o fundo premium
+  isNational: Boolean // Força a busca apenas em seleções
 })
 
 const hasError = ref(false)
 const cachedUrl = ref(null)
 
-const shieldUrl = computed(() => {
+const sourceUrl = computed(() => {
   if (props.forceUrl) return props.forceUrl
-  if (cachedUrl.value) return cachedUrl.value
   if (!props.teamName || hasError.value) return null
   
-  const team = dataSearchService.findClub(props.teamName) || dataSearchService.findNationalTeam(props.teamName)
+  const type = props.isNational ? 'selecao' : null
+  const team = dataSearchService.search(props.teamName, type)
   return team?.escudo_url || team?.bandeira_url || null
 })
+
+const shieldUrl = computed(() => cachedUrl.value || sourceUrl.value)
 
 const isUserControlled = computed(() => {
   if (!props.teamName) return false
@@ -74,12 +77,14 @@ const flagBgStyle = computed(() => {
   return url ? { backgroundImage: `url(${url})` } : {}
 })
 
-watch(() => shieldUrl.value, async (newUrl) => {
+watch(() => sourceUrl.value, async (newUrl) => {
   if (newUrl && !newUrl.startsWith('data:')) {
     const base64 = await imageCacheService.getOrCache(newUrl)
     if (base64 && base64.startsWith('data:')) {
       cachedUrl.value = base64
     }
+  } else if (!newUrl) {
+    cachedUrl.value = null
   }
 }, { immediate: true })
 
